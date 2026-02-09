@@ -59,12 +59,26 @@
 
         .particle {
             position: absolute;
-            width: 2px;
-            height: 2px;
-            background: rgba(139, 92, 246, 0.6);
+            width: 4px;
+            height: 4px;
+            background: rgba(139, 92, 246, 0.9);
             border-radius: 50%;
             animation: float linear infinite;
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 1), 0 0 40px rgba(124, 58, 237, 0.5);
+        }
+
+        /* Разные размеры частиц для глубины */
+        .particle:nth-child(odd) {
+            width: 3px;
+            height: 3px;
+            background: rgba(124, 58, 237, 0.8);
+        }
+
+        .particle:nth-child(3n) {
+            width: 5px;
+            height: 5px;
+            background: rgba(167, 139, 250, 0.9);
+            box-shadow: 0 0 25px rgba(167, 139, 250, 1), 0 0 50px rgba(139, 92, 246, 0.6);
         }
 
         @keyframes float {
@@ -84,26 +98,26 @@
             }
         }
 
-        .particle:nth-child(1) { left: 10%; animation-duration: 15s; animation-delay: 0s; }
-        .particle:nth-child(2) { left: 20%; animation-duration: 18s; animation-delay: 2s; }
-        .particle:nth-child(3) { left: 30%; animation-duration: 12s; animation-delay: 4s; }
-        .particle:nth-child(4) { left: 40%; animation-duration: 20s; animation-delay: 1s; }
-        .particle:nth-child(5) { left: 50%; animation-duration: 16s; animation-delay: 3s; }
-        .particle:nth-child(6) { left: 60%; animation-duration: 14s; animation-delay: 5s; }
-        .particle:nth-child(7) { left: 70%; animation-duration: 19s; animation-delay: 2s; }
-        .particle:nth-child(8) { left: 80%; animation-duration: 17s; animation-delay: 4s; }
-        .particle:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 1s; }
-        .particle:nth-child(10) { left: 15%; animation-duration: 21s; animation-delay: 3s; }
-        .particle:nth-child(11) { left: 25%; animation-duration: 16s; animation-delay: 0s; }
-        .particle:nth-child(12) { left: 35%; animation-duration: 18s; animation-delay: 5s; }
-        .particle:nth-child(13) { left: 45%; animation-duration: 14s; animation-delay: 2s; }
-        .particle:nth-child(14) { left: 55%; animation-duration: 20s; animation-delay: 4s; }
-        .particle:nth-child(15) { left: 65%; animation-duration: 15s; animation-delay: 1s; }
-        .particle:nth-child(16) { left: 75%; animation-duration: 19s; animation-delay: 3s; }
-        .particle:nth-child(17) { left: 85%; animation-duration: 17s; animation-delay: 0s; }
-        .particle:nth-child(18) { left: 95%; animation-duration: 13s; animation-delay: 5s; }
-        .particle:nth-child(19) { left: 5%; animation-duration: 22s; animation-delay: 2s; }
-        .particle:nth-child(20) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
+        .particle:nth-child(1) { left: 10%; animation-duration: 12s; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-duration: 15s; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 30%; animation-duration: 10s; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 40%; animation-duration: 16s; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 50%; animation-duration: 13s; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 60%; animation-duration: 11s; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 70%; animation-duration: 14s; animation-delay: 2s; }
+        .particle:nth-child(8) { left: 80%; animation-duration: 12s; animation-delay: 4s; }
+        .particle:nth-child(9) { left: 90%; animation-duration: 10s; animation-delay: 1s; }
+        .particle:nth-child(10) { left: 15%; animation-duration: 17s; animation-delay: 3s; }
+        .particle:nth-child(11) { left: 25%; animation-duration: 13s; animation-delay: 0s; }
+        .particle:nth-child(12) { left: 35%; animation-duration: 15s; animation-delay: 5s; }
+        .particle:nth-child(13) { left: 45%; animation-duration: 11s; animation-delay: 2s; }
+        .particle:nth-child(14) { left: 55%; animation-duration: 16s; animation-delay: 4s; }
+        .particle:nth-child(15) { left: 65%; animation-duration: 12s; animation-delay: 1s; }
+        .particle:nth-child(16) { left: 75%; animation-duration: 14s; animation-delay: 3s; }
+        .particle:nth-child(17) { left: 85%; animation-duration: 13s; animation-delay: 0s; }
+        .particle:nth-child(18) { left: 95%; animation-duration: 10s; animation-delay: 5s; }
+        .particle:nth-child(19) { left: 5%; animation-duration: 18s; animation-delay: 2s; }
+        .particle:nth-child(20) { left: 50%; animation-duration: 13s; animation-delay: 4s; }
 
         /* --- LAYOUT --- */
         .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
@@ -1139,6 +1153,502 @@
             justify-content: center;
             margin-top: 24px;
         }
+
+        /* Profile Progress Bar */
+        .progress-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: 10px;
+            transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 0 20px rgba(124, 58, 237, 0.6);
+        }
+
+        /* Pulsing Verification Button */
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 15px rgba(124, 58, 237, 0);
+            }
+        }
+
+        .btn-pulse {
+            animation: pulse 2s infinite;
+        }
+
+        /* Smooth Tab Transitions */
+        .app-tab {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Enhanced Job Card Hover */
+        .job-card {
+            cursor: pointer;
+        }
+
+        .job-card:hover {
+            transform: translateY(-8px) scale(1.02) !important;
+            border-color: rgba(124, 58, 237, 0.6) !important;
+            box-shadow: 0 30px 80px rgba(124, 58, 237, 0.4) !important;
+        }
+
+        /* Filters Section */
+        .filters-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-input {
+            flex: 1;
+            min-width: 200px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .filter-btn {
+            padding: 10px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text);
+        }
+
+        .filter-btn.active {
+            background: var(--accent-gradient);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* Confetti Animation */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: #f0f;
+            position: fixed;
+            top: -10px;
+            z-index: 9999;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Job Counter Badge */
+        .job-counter {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ef4444;
+            animation: pulse 2s infinite;
+        }
+
+        /* Blurred Jobs Teaser */
+        .jobs-locked {
+            position: relative;
+            filter: blur(8px);
+            pointer-events: none;
+            user-select: none;
+        }
+
+        .unlock-overlay {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 10;
+            text-align: center;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid rgba(124, 58, 237, 0.3);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+            pointer-events: auto;
+        }
+
+        /* Avatar Upload */
+        .avatar-upload {
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-upload:hover {
+            transform: scale(1.05);
+        }
+
+        .avatar-upload-overlay {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            background: var(--accent-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--bg);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar-upload-overlay:hover {
+            transform: scale(1.1);
+        }
+
+        /* Profile Form Fields */
+        .profile-field {
+            margin-bottom: 16px;
+        }
+
+        .profile-field label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .profile-field input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            padding: 12px 16px;
+            border-radius: 12px;
+            color: #fff;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .profile-field input:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Admin Tabs */
+        .admin-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        /* Filter Chips (Mobile) */
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 12px 0;
+            margin-bottom: 16px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .filter-chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .chip:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .chip.active {
+            background: var(--accent-gradient);
+            border-color: var(--primary-light);
+            color: #fff;
+        }
+
+        /* Support Chat Widget */
+        .support-widget {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+
+        .support-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--accent-gradient);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: pulse 2s infinite;
+        }
+
+        .support-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(124, 58, 237, 0.6);
+        }
+
+        .support-menu {
+            position: absolute;
+            bottom: 70px;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 12px;
+            min-width: 200px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .support-menu.active {
+            display: block;
+        }
+
+        .support-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            color: var(--text);
+            text-decoration: none;
+            transition: background 0.3s ease;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .support-option:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        /* Application History */
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .history-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(124, 58, 237, 0.3);
+        }
+
+        .history-date {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        /* WhatsApp Button Enhanced */
+        .btn-whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-whatsapp:hover {
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-whatsapp::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-whatsapp:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        /* Push Notification Permission */
+        .notification-banner {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: none;
+            align-items: center;
+            gap: 16px;
+            z-index: 9998;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+            animation: slideDown 0.4s ease;
+        }
+
+        .notification-banner.active {
+            display: flex;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateX(-50%) translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .filter-chips {
+                padding: 12px 20px;
+                margin: 0 -20px 16px;
+            }
+
+            .support-widget {
+                bottom: 80px;
+            }
+
+            .notification-banner {
+                left: 20px;
+                right: 20px;
+                transform: none;
+                width: auto;
+            }
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .admin-tab:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-tab.active {
+            color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .admin-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -9px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-light);
+        }
     </style>
 </head>
 <body>
@@ -1175,7 +1685,12 @@
 
 <header>
     <div class="container header-inner">
-        <div class="logo">Teen<span>X</span></div>
+        <div style="display:flex; align-items:center; gap:16px;">
+            <div class="logo">Teen<span>X</span></div>
+            <div class="job-counter" id="jobCounter" style="display:none;">
+                🔥 <span id="jobCount">0</span> вакансий
+            </div>
+        </div>
         <div id="authHeaderBtn">
             <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;" onclick="openAuthModal()">Войти</button>
         </div>
@@ -1299,7 +1814,24 @@
 <div id="app-view">
     <div class="container">
         <div id="tab-jobs" class="app-tab" style="display:block;">
-            <h2 style="margin-bottom: 24px;">Вакансии</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+                <h2 style="margin:0;">Вакансии</h2>
+            </div>
+            
+            <div class="filters-bar">
+                <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Поиск по названию..." oninput="filterJobs()">
+                <button class="filter-btn active" onclick="filterByAge('all')">Все</button>
+                <button class="filter-btn" onclick="filterByAge('14')">14+</button>
+                <button class="filter-btn" onclick="filterByAge('16')">16+</button>
+                <button class="filter-btn" onclick="filterByAge('18')">18+</button>
+                <select class="filter-input" style="flex:initial; width:auto;" onchange="sortJobs(this.value)">
+                    <option value="default">Сортировка</option>
+                    <option value="price-high">Зарплата: по убыванию</option>
+                    <option value="price-low">Зарплата: по возрастанию</option>
+                    <option value="newest">Новые</option>
+                </select>
+            </div>
+            
             <div id="jobList"></div>
         </div>
 
@@ -1330,10 +1862,14 @@
             <div style="padding: 40px 0;">
                 <div class="profile-card">
                     <div class="profile-content">
-                        <div class="profile-avatar-wrapper">
+                        <div class="profile-avatar-wrapper avatar-upload" onclick="document.getElementById('avatarInput').click()">
                             <div class="profile-avatar">
-                                <img id="pAvatar" style="width:100%; height:100%; object-fit:cover;">
+                                <img id="pAvatar" style="width:100%; height:100%; object-fit:cover;" src="https://ui-avatars.com/api/?name=User&background=7c3aed&color=fff&size=120">
                             </div>
+                            <div class="avatar-upload-overlay">
+                                <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
+                            </div>
+                            <input type="file" id="avatarInput" accept="image/*" style="display:none;" onchange="uploadAvatar()">
                             <div class="profile-status-badge" id="pStatusBadge">✓</div>
                         </div>
                         <div style="text-align:center;">
@@ -1347,12 +1883,33 @@
                     </div>
                 </div>
 
+                <div class="progress-section">
+                    <div class="progress-header">
+                        <span style="font-size:14px; font-weight:600;">Заполненность профиля</span>
+                        <span style="font-size:14px; font-weight:700; color:var(--primary-light);" id="progressPercent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill" style="width:0%;"></div>
+                    </div>
+                    <div style="margin-top:12px; font-size:12px; color:var(--text-secondary);" id="progressHint">Заполните все поля для получения доступа</div>
+                </div>
+
                 <div id="verifySection" style="display:none;">
                     <div class="verify-box">
-                        <h3 style="margin-bottom:12px; font-size:18px;">Верификация аккаунта</h3>
-                        <p style="color:var(--text-secondary); font-size:14px; margin-bottom:16px;">Для доступа к контактам работодателей необходимо подтвердить возраст</p>
-                        <button class="btn btn-accent" style="width:100%;" onclick="openModal('modalVerify')">🔐 Пройти верификацию</button>
+                        <h3 style="margin-bottom:12px; font-size:18px;">⚠️ Верификация обязательна</h3>
+                        <p style="color:var(--text-secondary); font-size:14px; margin-bottom:16px;">
+                            <strong>Без верификации вы не сможете:</strong><br>
+                            • Видеть контакты работодателей<br>
+                            • Откликаться на вакансии<br>
+                            • Получать предложения о работе
+                        </p>
+                        <button class="btn btn-accent btn-pulse" style="width:100%;" onclick="openModal('modalVerify')">🔐 Пройти верификацию сейчас</button>
                     </div>
+                </div>
+
+                <div id="applicationHistory" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
+                    <h3 style="color: var(--primary-light); margin-bottom:15px;">📊 История откликов</h3>
+                    <div id="historyList"></div>
                 </div>
 
                 <div id="bossPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
@@ -1364,21 +1921,43 @@
                 <div id="adminPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
                     <h3 style="color: var(--primary-light); margin-bottom:15px;">🛡️ Админ-панель</h3>
                     
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
-                        <button class="btn btn-primary" onclick="showAdminTab('jobs')">Вакансии</button>
-                        <button class="btn btn-primary" onclick="showAdminTab('users')">Верификация</button>
+                    <div class="admin-tabs">
+                        <button class="admin-tab active" onclick="switchAdminTab('jobs')">📋 Вакансии</button>
+                        <button class="admin-tab" onclick="switchAdminTab('users')">👥 Верификация</button>
+                        <button class="admin-tab" onclick="switchAdminTab('stats')">📊 Статистика</button>
                     </div>
                     
-                    <div id="adminJobsTab" style="display:none;">
-                        <h4 style="margin-bottom:12px;">Модерация вакансий</h4>
+                    <div id="adminJobsTab">
+                        <h4 style="margin-bottom:12px; font-size:15px;">⏳ На модерации</h4>
                         <div id="pendingJobsList"></div>
-                        <h4 style="margin:20px 0 12px;">Корзина</h4>
+                        <h4 style="margin:20px 0 12px; font-size:15px;">🗑️ Корзина</h4>
                         <div id="trashList"></div>
                     </div>
                     
                     <div id="adminUsersTab" style="display:none;">
-                        <h4 style="margin-bottom:12px;">Запросы на верификацию</h4>
+                        <h4 style="margin-bottom:12px; font-size:15px;">⏳ Ожидают проверки</h4>
                         <div id="pendingUsersList"></div>
+                    </div>
+                    
+                    <div id="adminStatsTab" style="display:none;">
+                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px;">
+                            <div class="stat-item">
+                                <div class="stat-number" id="statTotalUsers">0</div>
+                                <div class="stat-label">Всего пользователей</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="statVerifiedUsers">0</div>
+                                <div class="stat-label">Верифицировано</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="statTotalJobs">0</div>
+                                <div class="stat-label">Всего вакансий</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number" id="statActiveJobs">0</div>
+                                <div class="stat-label">Активных</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1408,6 +1987,52 @@
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
             </div>
         </div>
+    </div>
+
+    <!-- Support Chat Widget -->
+    <div class="support-widget" id="supportWidget">
+        <button class="support-button" onclick="toggleSupportMenu()">
+            <svg width="28" height="28" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+        </button>
+        <div class="support-menu" id="supportMenu">
+            <a href="https://t.me/alikhan_ceo" target="_blank" class="support-option">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161l-1.84 8.673c-.137.623-.5.775-.998.483l-2.756-2.03-1.33 1.279c-.147.147-.27.27-.553.27l.197-2.8 5.092-4.6c.22-.197-.048-.308-.342-.11l-6.294 3.963-2.71-.846c-.59-.185-.602-.59.125-.872l10.598-4.086c.49-.178.918.11.76.872z"/>
+                </svg>
+                <span>Telegram</span>
+            </a>
+            <a href="https://wa.me/77001234567" target="_blank" class="support-option">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                </svg>
+                <span>WhatsApp</span>
+            </a>
+            <a href="mailto:support@teenx.kz" class="support-option">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                    <polyline points="22,6 12,13 2,6"></polyline>
+                </svg>
+                <span>Email</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Push Notification Banner -->
+    <div class="notification-banner" id="notificationBanner">
+        <div style="font-size:32px;">🔔</div>
+        <div style="flex:1;">
+            <div style="font-weight:600; margin-bottom:4px;">Включить уведомления?</div>
+            <div style="font-size:12px; color:var(--text-secondary);">Узнавай первым о новых вакансиях</div>
+        </div>
+        <button class="btn btn-accent" style="padding:8px 16px; font-size:13px;" onclick="requestNotificationPermission()">Включить</button>
+        <button onclick="closeNotificationBanner()" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; padding:8px;">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
     </div>
 
     <!-- Bottom Navigation (Mobile) -->
@@ -1557,11 +2182,26 @@
 
 <div id="modalEdit" class="modal">
     <div class="modal-box">
-        <h3>Профиль</h3>
-        <input id="eName" placeholder="ФИО">
-        <input id="ePhone" placeholder="Телефон">
-        <button class="btn btn-primary" style="width:100%" onclick="saveProfile()">Сохранить</button>
-        <button class="btn" style="width:100%; margin-top:10px; background:transparent;" onclick="closeModals()">Закрыть</button>
+        <h3 style="margin-bottom:20px;">✏️ Редактировать профиль</h3>
+        
+        <div class="profile-field">
+            <label>Имя *</label>
+            <input id="eFirstName" placeholder="Например: Алихан">
+        </div>
+        
+        <div class="profile-field">
+            <label>Фамилия *</label>
+            <input id="eLastName" placeholder="Например: Маликов">
+        </div>
+        
+        <div class="profile-field">
+            <label>Номер WhatsApp *</label>
+            <input id="ePhone" type="tel" placeholder="77001234567">
+            <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Формат: 77001234567 (без +)</div>
+        </div>
+        
+        <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="saveProfile()">💾 Сохранить изменения</button>
+        <button class="btn" style="width:100%; margin-top:10px; background:transparent;" onclick="closeModals()">Отмена</button>
     </div>
 </div>
 
@@ -1589,6 +2229,10 @@
 
     let currentUser = null;
     let selectedRole = 'teen';
+    let allJobs = [];
+    let currentFilter = 'all';
+    let currentSort = 'newest';
+    let applicationHistory = [];
     
     // Toast Notification System
     function showToast(message, type = 'info', title = '') {
@@ -1713,6 +2357,189 @@
         if (bottomNav) bottomNav.classList.add('active');
         if (sideNav) sideNav.classList.add('active');
     };
+
+    // Confetti Animation
+    function createConfetti() {
+        const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ffa500', '#ff1493'];
+        for (let i = 0; i < 50; i++) {
+            setTimeout(() => {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+            }, i * 30);
+        }
+    }
+
+    // Filter and Sort Functions
+    window.filterByAge = (age) => {
+        currentFilter = age;
+        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+        event.target.classList.add('active');
+        displayJobs();
+    };
+
+    window.filterJobs = () => {
+        displayJobs();
+    };
+
+    window.sortJobs = (sortType) => {
+        currentSort = sortType;
+        displayJobs();
+    };
+
+    function displayJobs() {
+        const list = document.getElementById('jobList');
+        
+        // Check if user is unverified teen - show blurred teaser
+        if (currentUser.type === 'teen' && currentUser.verified !== 'yes') {
+            list.innerHTML = `
+                <div style="position:relative; min-height:400px;">
+                    <div class="jobs-locked">
+                        <div class="job-card" style="margin-bottom:16px;">
+                            <h3>Промоутер в ТРЦ</h3>
+                            <div>50,000₸/мес • 14+ • Уральск</div>
+                            <p>Требуется активный подросток для раздачи листовок...</p>
+                        </div>
+                        <div class="job-card">
+                            <h3>Курьер</h3>
+                            <div>60,000₸/мес • 16+ • Уральск</div>
+                            <p>Доставка заказов по городу на велосипеде...</p>
+                        </div>
+                    </div>
+                    <div class="unlock-overlay">
+                        <div style="font-size:48px; margin-bottom:16px;">🔒</div>
+                        <h3 style="margin-bottom:12px;">Вакансии скрыты</h3>
+                        <p style="color:var(--text-secondary); margin-bottom:24px; font-size:14px;">
+                            Пройдите верификацию, чтобы<br>увидеть все доступные вакансии
+                        </p>
+                        <button class="btn btn-accent" onclick="switchTab('profile'); setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100);">Пройти верификацию</button>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+        
+        const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
+        let filtered = allJobs.filter(job => {
+            const matchesSearch = job.title.toLowerCase().includes(searchTerm) || job.desc.toLowerCase().includes(searchTerm);
+            const matchesAge = currentFilter === 'all' || job.age.includes(currentFilter);
+            return matchesSearch && matchesAge && job.status === 'active';
+        });
+
+        // Sort
+        if (currentSort === 'price-high') {
+            filtered.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+        } else if (currentSort === 'price-low') {
+            filtered.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+        } else if (currentSort === 'newest') {
+            filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+        }
+
+        list.innerHTML = '';
+
+        if (filtered.length === 0) {
+            list.innerHTML = `
+                <div style="text-align:center; padding:80px 20px;">
+                    <div style="font-size:64px; margin-bottom:16px; opacity:0.3;">🔍</div>
+                    <h3 style="margin-bottom:8px;">Ничего не найдено</h3>
+                    <p style="color:var(--text-secondary); font-size:14px;">Попробуйте изменить фильтры</p>
+                </div>
+            `;
+            return;
+        }
+
+        filtered.forEach(job => {
+            const card = document.createElement('div');
+            card.className = 'job-card';
+            
+            let contactBtn = '';
+            if (currentUser.type === 'teen') {
+                if (currentUser.verified === 'yes') {
+                    contactBtn = `<a href="https://wa.me/${job.phone}" target="_blank" class="btn btn-primary btn-whatsapp" style="width:100%; text-decoration:none;" onclick="trackApplication('${job.id}', '${job.title}')">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="margin-right:8px;">
+                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                        </svg>
+                        Написать в WhatsApp
+                    </a>`;
+                } else {
+                    contactBtn = `<button class="btn btn-ghost" style="width:100%;" onclick="openModal('modalVerify')">🔒 Требуется верификация</button>`;
+                }
+            } else {
+                contactBtn = `<a href="https://wa.me/${job.phone}" target="_blank" class="btn btn-primary btn-whatsapp" style="width:100%; text-decoration:none;">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24" style="margin-right:8px;">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
+                    </svg>
+                    Написать в WhatsApp
+                </a>`;
+            }
+            
+            card.innerHTML = `
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <h3 style="font-size:18px; font-weight:700;">${job.title}</h3>
+                    <span class="price-tag">${job.price}</span>
+                </div>
+                <div style="font-size:13px; color:#aaa; margin-bottom:15px;">${job.age} • Уральск</div>
+                <p style="font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.6;">${job.desc}</p>
+                ${contactBtn}
+            `;
+            list.appendChild(card);
+            requestAnimationFrame(() => card.classList.add('visible'));
+        });
+    }
+
+    function parsePrice(priceStr) {
+        const match = priceStr.match(/\d+/);
+        return match ? parseInt(match[0]) : 0;
+    }
+
+    // Calculate Profile Progress
+    function updateProfileProgress() {
+        let progress = 0;
+        let hints = [];
+        
+        // Name (first + last)
+        if (currentUser.firstName && currentUser.lastName) {
+            progress += 20;
+        } else {
+            hints.push('имя и фамилия');
+        }
+        
+        // Phone
+        if (currentUser.phone) {
+            progress += 20;
+        } else {
+            hints.push('номер телефона');
+        }
+        
+        // Avatar
+        if (currentUser.avatar && !currentUser.avatar.includes('ui-avatars.com')) {
+            progress += 20;
+        } else {
+            hints.push('фото профиля');
+        }
+        
+        // Verification
+        if (currentUser.verified === 'yes') {
+            progress += 40;
+        } else {
+            hints.push('верификация (самое важное)');
+        }
+        
+        document.getElementById('progressPercent').textContent = progress + '%';
+        document.getElementById('progressFill').style.width = progress + '%';
+        
+        if (progress === 100) {
+            document.getElementById('progressHint').textContent = '✅ Профиль полностью заполнен! Вы можете откликаться на вакансии.';
+            document.getElementById('progressHint').style.color = '#10b981';
+        } else {
+            document.getElementById('progressHint').textContent = `Осталось заполнить: ${hints.join(', ')}`;
+        }
+    }
 
     // Reveal on scroll (для плавного появления блоков как на Swipy)
     const revealObserver = new IntersectionObserver((entries) => {
@@ -1896,8 +2723,19 @@
         }
 
         // Profile - Enhanced Digital ID Card
-        document.getElementById('pName').innerText = currentUser.name || 'Пользователь';
-        if(currentUser.avatar) document.getElementById('pAvatar').src = currentUser.avatar;
+        const displayName = currentUser.name || 'Пользователь';
+        document.getElementById('pName').innerText = displayName;
+        
+        if(currentUser.avatar) {
+            document.getElementById('pAvatar').src = currentUser.avatar;
+        } else {
+            // Generate avatar from name
+            const initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('pAvatar').src = `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}&background=7c3aed&color=fff&size=120`;
+        }
+        
+        // Update profile progress
+        updateProfileProgress();
         
         const statusEl = document.getElementById('pStatus');
         const badgeEl = document.getElementById('pStatusBadge');
@@ -1955,54 +2793,32 @@
         `;
         
         const snap = await getDocs(collection(db, "jobs"));
-        list.innerHTML = '';
-        
-        if (snap.empty) {
-            list.innerHTML = `
-                <div style="text-align:center; padding:80px 20px;">
-                    <div style="font-size:64px; margin-bottom:16px; opacity:0.3;">💼</div>
-                    <h3 style="margin-bottom:8px;">Пока нет активных вакансий</h3>
-                    <p style="color:var(--text-secondary); font-size:14px;">Новые предложения появятся совсем скоро</p>
-                </div>
-            `;
-            return;
-        }
+        allJobs = [];
         
         snap.forEach(d => {
-            const j = d.data();
-            if (j.status !== 'active') return;
-            const card = document.createElement('div');
-            card.className = 'job-card';
-            
-            let contactBtn = '';
-            if (currentUser.type === 'teen') {
-                if (currentUser.verified === 'yes') {
-                    contactBtn = `<a href="https://wa.me/${j.phone}" target="_blank" class="btn btn-primary" style="width:100%; text-decoration:none;">Написать в WhatsApp</a>`;
-                } else {
-                    contactBtn = `<button class="btn btn-ghost" style="width:100%;" onclick="openModal('modalVerify')">🔒 Требуется верификация</button>`;
-                }
-            } else {
-                contactBtn = `<a href="https://wa.me/${j.phone}" target="_blank" class="btn btn-primary" style="width:100%; text-decoration:none;">Написать в WhatsApp</a>`;
-            }
-            
-            card.innerHTML = `
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <h3 style="font-size:18px; font-weight:700;">${j.title}</h3>
-                    <span class="price-tag">${j.price}</span>
-                </div>
-                <div style="font-size:13px; color:#aaa; margin-bottom:15px;">${j.age} • Уральск</div>
-                <p style="font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.6;">${j.desc}</p>
-                ${contactBtn}
-            `;
-            list.appendChild(card);
-            requestAnimationFrame(() => {
-                card.classList.add('visible');
-            });
+            allJobs.push({ id: d.id, ...d.data() });
         });
+        
+        // Update job counter
+        const activeJobs = allJobs.filter(j => j.status === 'active').length;
+        if (activeJobs > 0) {
+            document.getElementById('jobCounter').style.display = 'inline-flex';
+            document.getElementById('jobCount').textContent = activeJobs;
+        }
+        
+        list.innerHTML = '';
+        displayJobs();
     }
 
     // JOB CREATION
     window.createJob = async () => {
+        // Check if boss is verified
+        if (currentUser.type === 'boss' && currentUser.verified !== 'yes') {
+            showToast('Пройдите верификацию для публикации вакансий', 'error');
+            openModal('modalVerify');
+            return;
+        }
+        
         const title = document.getElementById('jTitle').value.trim();
         const price = document.getElementById('jPrice').value.trim();
         const desc = document.getElementById('jDesc').value.trim();
@@ -2207,6 +3023,7 @@
     
     window.approveUser = async (uid) => {
         await updateDoc(doc(db, "users", uid), { verified: 'yes' });
+        createConfetti();
         showToast('Пользователь успешно верифицирован', 'success');
         showAdminTab('users');
     };
@@ -2218,24 +3035,269 @@
     };
 
     window.saveProfile = async () => {
-        const name = document.getElementById('eName').value.trim();
+        const firstName = document.getElementById('eFirstName').value.trim();
+        const lastName = document.getElementById('eLastName').value.trim();
         const phone = document.getElementById('ePhone').value.trim();
         
-        const updates = {};
-        if (name) updates.name = name;
-        if (phone) updates.phone = phone;
+        if (!firstName || !lastName || !phone) {
+            showToast('Заполните все обязательные поля', 'error');
+            return;
+        }
         
-        if (Object.keys(updates).length > 0) {
-            await updateDoc(doc(db, "users", currentUser.uid), updates);
-            showToast('Профиль успешно обновлен', 'success');
-            closeModals();
+        // Validate phone
+        if (!/^7\d{10}$/.test(phone)) {
+            showToast('Неверный формат номера. Используйте: 77001234567', 'error');
+            return;
+        }
+        
+        const fullName = `${firstName} ${lastName}`;
+        
+        await updateDoc(doc(db, "users", currentUser.uid), {
+            name: fullName,
+            firstName: firstName,
+            lastName: lastName,
+            phone: phone
+        });
+        
+        showToast('Профиль успешно обновлен', 'success');
+        closeModals();
+        renderApp();
+    };
+    
+    // Avatar Upload
+    window.uploadAvatar = async () => {
+        const file = document.getElementById('avatarInput').files[0];
+        if (!file) return;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            showToast('Файл слишком большой. Максимум 5MB', 'error');
+            return;
+        }
+        
+        showToast('Загрузка фото...', 'info');
+        
+        try {
+            const storageRef = ref(storage, `avatars/${currentUser.uid}/${Date.now()}_${file.name}`);
+            await uploadBytes(storageRef, file);
+            const url = await getDownloadURL(storageRef);
+            
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                avatar: url
+            });
+            
+            showToast('Фото профиля обновлено', 'success');
             renderApp();
-        } else {
-            showToast('Заполните хотя бы одно поле', 'error');
+        } catch (error) {
+            console.error('Upload error:', error);
+            showToast('Ошибка загрузки фото', 'error');
         }
     };
+    
+    // Admin Tab Switching
+    window.switchAdminTab = (tab) => {
+        document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
+        event.target.classList.add('active');
+        
+        document.getElementById('adminJobsTab').style.display = tab === 'jobs' ? 'block' : 'none';
+        document.getElementById('adminUsersTab').style.display = tab === 'users' ? 'block' : 'none';
+        document.getElementById('adminStatsTab').style.display = tab === 'stats' ? 'block' : 'none';
+        
+        if (tab === 'jobs') {
+            renderPendingJobs();
+            renderTrash();
+        } else if (tab === 'users') {
+            renderPendingUsers();
+        } else if (tab === 'stats') {
+            renderAdminStats();
+        }
+    };
+    
+    // Admin Stats
+    async function renderAdminStats() {
+        const usersSnap = await getDocs(collection(db, "users"));
+        const jobsSnap = await getDocs(collection(db, "jobs"));
+        
+        const totalUsers = usersSnap.size;
+        const verifiedUsers = usersSnap.docs.filter(d => d.data().verified === 'yes').length;
+        const totalJobs = jobsSnap.size;
+        const activeJobs = jobsSnap.docs.filter(d => d.data().status === 'active').length;
+        
+        document.getElementById('statTotalUsers').textContent = totalUsers;
+        document.getElementById('statVerifiedUsers').textContent = verifiedUsers;
+        document.getElementById('statTotalJobs').textContent = totalJobs;
+        document.getElementById('statActiveJobs').textContent = activeJobs;
+    }
+    
+    // Quick Filter (Mobile Chips)
+    window.quickFilter = (type) => {
+        // Update chip active state
+        document.querySelectorAll('.chip').forEach(chip => chip.classList.remove('active'));
+        event.target.closest('.chip').classList.add('active');
+        
+        if (type === 'all') {
+            currentFilter = 'all';
+            currentSort = 'newest';
+        } else if (type === 'high-salary') {
+            currentFilter = 'all';
+            currentSort = 'price-high';
+        } else if (type === 'new') {
+            currentFilter = 'all';
+            currentSort = 'newest';
+        } else {
+            currentFilter = type;
+            currentSort = 'newest';
+        }
+        
+        displayJobs();
+    };
+    
+    // Track Application
+    window.trackApplication = async (jobId, jobTitle) => {
+        if (!currentUser) return;
+        
+        const application = {
+            jobId: jobId,
+            jobTitle: jobTitle,
+            timestamp: new Date().toISOString(),
+            userId: currentUser.uid
+        };
+        
+        try {
+            await addDoc(collection(db, "applications"), application);
+            applicationHistory.unshift(application);
+            if (applicationHistory.length > 10) applicationHistory.pop();
+            localStorage.setItem('applicationHistory', JSON.stringify(applicationHistory));
+        } catch (error) {
+            console.error('Error tracking application:', error);
+        }
+    };
+    
+    // Load Application History
+    async function loadApplicationHistory() {
+        if (!currentUser || currentUser.type !== 'teen') return;
+        
+        try {
+            const q = query(
+                collection(db, "applications"),
+                where("userId", "==", currentUser.uid)
+            );
+            const snapshot = await getDocs(q);
+            
+            applicationHistory = [];
+            snapshot.forEach(doc => {
+                applicationHistory.push(doc.data());
+            });
+            
+            applicationHistory.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            renderApplicationHistory();
+        } catch (error) {
+            console.error('Error loading history:', error);
+        }
+    }
+    
+    // Render Application History
+    function renderApplicationHistory() {
+        const historyEl = document.getElementById('applicationHistory');
+        const listEl = document.getElementById('historyList');
+        
+        if (currentUser.type !== 'teen' || applicationHistory.length === 0) {
+            historyEl.style.display = 'none';
+            return;
+        }
+        
+        historyEl.style.display = 'block';
+        
+        listEl.innerHTML = applicationHistory.slice(0, 5).map(app => {
+            const date = new Date(app.timestamp);
+            const timeAgo = getTimeAgo(date);
+            
+            return `
+                <div class="history-item">
+                    <div class="history-date">📅 ${timeAgo}</div>
+                    <div style="font-weight:600; margin-bottom:4px;">${app.jobTitle}</div>
+                    <div style="font-size:12px; color:var(--text-secondary);">Отклик отправлен</div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Time Ago Helper
+    function getTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+        
+        if (seconds < 60) return 'Только что';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)} мин назад`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)} ч назад`;
+        if (seconds < 604800) return `${Math.floor(seconds / 86400)} дн назад`;
+        
+        return date.toLocaleDateString('ru-RU');
+    }
+    
+    // Support Widget
+    window.toggleSupportMenu = () => {
+        const menu = document.getElementById('supportMenu');
+        menu.classList.toggle('active');
+    };
+    
+    // Close support menu when clicking outside
+    document.addEventListener('click', (e) => {
+        const widget = document.getElementById('supportWidget');
+        const menu = document.getElementById('supportMenu');
+        if (widget && !widget.contains(e.target)) {
+            menu.classList.remove('active');
+        }
+    });
+    
+    // Push Notifications
+    window.requestNotificationPermission = async () => {
+        if (!('Notification' in window)) {
+            showToast('Ваш браузер не поддерживает уведомления', 'error');
+            return;
+        }
+        
+        try {
+            const permission = await Notification.requestPermission();
+            
+            if (permission === 'granted') {
+                showToast('Уведомления включены! 🔔', 'success');
+                closeNotificationBanner();
+                
+                // Send test notification
+                new Notification('TeenX Hub', {
+                    body: 'Теперь вы будете получать уведомления о новых вакансиях!',
+                    icon: 'https://ui-avatars.com/api/?name=TX&background=7c3aed&color=fff&size=128',
+                    badge: 'https://ui-avatars.com/api/?name=TX&background=7c3aed&color=fff&size=128'
+                });
+                
+                // Save permission to user profile
+                if (currentUser) {
+                    await updateDoc(doc(db, "users", currentUser.uid), {
+                        pushNotifications: true
+                    });
+                }
+            } else {
+                showToast('Уведомления отклонены', 'info');
+                closeNotificationBanner();
+            }
+        } catch (error) {
+            console.error('Notification error:', error);
+            showToast('Ошибка включения уведомлений', 'error');
+        }
+    };
+    
+    window.closeNotificationBanner = () => {
+        document.getElementById('notificationBanner').classList.remove('active');
+        localStorage.setItem('notificationBannerClosed', 'true');
+    };
+    
+    // Show notification banner after 5 seconds
+    setTimeout(() => {
+        if (!localStorage.getItem('notificationBannerClosed') && 
+            Notification.permission === 'default' && 
+            currentUser) {
+            document.getElementById('notificationBanner').classList.add('active');
+        }
+    }, 5000);
 </script>
 </body>
 </html>
-
-

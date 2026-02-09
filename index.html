@@ -97,54 +97,248 @@
         .btn-primary:hover { background: #e2e8f0; box-shadow: 0 0 20px rgba(255,255,255,0.15); }
         
         .btn-accent {
-            background: var(--accent-gradient); color: #fff;
+            background: var(--accent-gradient); 
+            color: #fff;
             box-shadow: 0 10px 30px -10px rgba(124, 58, 237, 0.5);
+            position: relative;
+        }
+        .btn-accent:hover {
+            box-shadow: 0 15px 40px -10px rgba(124, 58, 237, 0.7), 0 0 0 1px rgba(255,255,255,0.1);
+            transform: translateY(-2px);
+        }
+        .btn-accent::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            opacity: 0;
+            transition: opacity 0.3s ease-out;
+        }
+        .btn-accent:hover::after {
+            opacity: 1;
         }
 
         /* --- HERO --- */
         .hero {
-            min-height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            text-align: center; padding-top: 60px;
+            min-height: 90vh; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center;
+            text-align: center; 
+            padding-top: 60px;
+            position: relative;
+        }
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            animation: pulse 4s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+            50% { opacity: 0.8; transform: translateX(-50%) scale(1.1); }
         }
         .hero-label {
-            font-size: 13px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
-            color: var(--primary-light); margin-bottom: 24px; opacity: 0; animation: fadeUp 1s forwards;
+            font-size: 13px; 
+            font-weight: 700; 
+            letter-spacing: 3px; 
+            text-transform: uppercase;
+            color: var(--primary-light); 
+            margin-bottom: 24px; 
+            opacity: 0; 
+            animation: fadeUp 1s forwards;
+            position: relative;
+            display: inline-block;
+        }
+        .hero-label::after {
+            content: "";
+            position: absolute;
+            bottom: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 2px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
         }
         .hero h1 {
-            font-size: clamp(48px, 6vw, 86px); line-height: 1.05; font-weight: 800; margin-bottom: 24px;
-            letter-spacing: -2px; /* Вытянули текст */
-            background: linear-gradient(180deg, #fff 0%, #94a3b8 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            opacity: 0; animation: fadeUp 1s 0.2s forwards;
+            font-size: clamp(48px, 6vw, 86px); 
+            line-height: 1.05; 
+            font-weight: 800; 
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.9) 50%, #94a3b8 100%);
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0; 
+            animation: fadeUp 1s 0.2s forwards;
         }
         .hero p {
-            font-size: 18px; color: var(--text-secondary); max-width: 540px; margin-bottom: 40px;
-            opacity: 0; animation: fadeUp 1s 0.4s forwards;
+            font-size: clamp(16px, 2vw, 18px); 
+            color: var(--text-secondary); 
+            max-width: 540px; 
+            margin-bottom: 40px;
+            opacity: 0; 
+            animation: fadeUp 1s 0.4s forwards;
+            line-height: 1.7;
         }
 
         /* --- SECTIONS --- */
-        .section { padding: 100px 0; }
-        .section-title { font-size: 36px; font-weight: 700; margin-bottom: 60px; text-align: center; }
+        .section { padding: 100px 0; position: relative; }
+        .section-title { 
+            font-size: clamp(32px, 4vw, 42px); 
+            font-weight: 800; 
+            margin-bottom: 60px; 
+            text-align: center;
+            letter-spacing: -1px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.8) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
 
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
         .feature-card {
-            background: var(--surface); border: 1px solid var(--border); padding: 32px; border-radius: 24px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid var(--border); 
+            padding: 32px; 
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
             transition: border-color 0.35s ease-out, background 0.35s ease-out, transform 0.35s ease-out, box-shadow 0.35s ease-out, opacity 0.55s ease-out, filter 0.35s ease-out;
             opacity: 0;
             transform: translateY(18px);
+        }
+        .feature-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--accent-gradient);
+            opacity: 0;
+            transition: opacity 0.35s ease-out;
         }
         .feature-card.visible {
             opacity: 1;
             transform: translateY(0);
         }
         .feature-card:hover { 
-            border-color: rgba(255,255,255,0.2); 
-            transform: translateY(-5px) translateZ(0);
-            box-shadow: 0 22px 55px rgba(15, 23, 42, 0.9);
-            filter: saturate(1.1);
+            border-color: rgba(124, 58, 237, 0.4); 
+            transform: translateY(-8px) translateZ(0);
+            box-shadow: 0 25px 60px rgba(124, 58, 237, 0.25), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            filter: saturate(1.15) brightness(1.05);
         }
-        .feature-card h3 { font-size: 20px; margin-bottom: 12px; }
-        .feature-card p { color: var(--text-secondary); font-size: 15px; }
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        .feature-card h3 { 
+            font-size: 20px; 
+            margin-bottom: 12px; 
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        .feature-card p { color: var(--text-secondary); font-size: 15px; line-height: 1.6; }
+
+        /* --- STATS --- */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 32px;
+            padding: 40px 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 32px 24px;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            transition: transform 0.3s ease-out, box-shadow 0.3s ease-out;
+        }
+        .stat-item:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(124, 58, 237, 0.2);
+        }
+        .stat-number {
+            font-size: clamp(36px, 5vw, 48px);
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* --- STEPS --- */
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 40px;
+        }
+        .step-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.08) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 32px;
+            position: relative;
+            transition: transform 0.35s ease-out, box-shadow 0.35s ease-out, border-color 0.35s ease-out;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        .step-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .step-card:hover {
+            transform: translateY(-6px);
+            border-color: rgba(124, 58, 237, 0.4);
+            box-shadow: 0 25px 60px rgba(124, 58, 237, 0.2);
+        }
+        .step-number {
+            font-size: 64px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+        .step-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.3px;
+        }
+        .step-card p {
+            color: var(--text-secondary);
+            font-size: 15px;
+            line-height: 1.6;
+        }
 
         /* --- PRO FAQ --- */
         .faq-item {
@@ -157,24 +351,98 @@
             opacity: 1;
             transform: translateY(0);
         }
-        .faq-item[open] { background: rgba(255,255,255,0.05); border-color: var(--primary-light); box-shadow: 0 18px 45px rgba(15,23,42,0.9); }
+        .faq-item[open] { 
+            background: rgba(255,255,255,0.05); 
+            border-color: var(--primary-light); 
+            box-shadow: 0 18px 45px rgba(15,23,42,0.9);
+            animation: faqOpen 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
         .faq-item summary {
             padding: 24px; cursor: pointer; list-style: none; font-weight: 600; font-size: 18px;
             display: flex; justify-content: space-between; align-items: center;
+            transition: color 0.25s ease-out;
         }
-        .faq-item p { padding: 0 24px 24px; color: var(--text-secondary); font-size: 15px; line-height: 1.7; }
+        .faq-item summary:hover { color: var(--primary-light); }
+        .faq-item summary::marker { display: none; }
+        .faq-item summary::-webkit-details-marker { display: none; }
+        .faq-item p { 
+            padding: 0 24px 24px; 
+            color: var(--text-secondary); 
+            font-size: 15px; 
+            line-height: 1.7;
+            animation: faqContentSlide 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes faqOpen {
+            from { 
+                transform: scale(0.98);
+                box-shadow: 0 0 0 rgba(124, 58, 237, 0);
+            }
+            to { 
+                transform: scale(1);
+                box-shadow: 0 18px 45px rgba(15,23,42,0.9);
+            }
+        }
+        @keyframes faqContentSlide {
+            from { 
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
         /* --- STICKY FOOTER CTA --- */
         .sticky-cta {
-            background: linear-gradient(to bottom, #000, #2e1065);
-            padding: 120px 0 60px; text-align: center;
+            background: linear-gradient(to bottom, #000 0%, #1a0a2e 50%, #2e1065 100%);
+            padding: 120px 0 60px; 
+            text-align: center;
             border-top: 1px solid var(--border);
-            position: relative; overflow: hidden;
+            position: relative; 
+            overflow: hidden;
+        }
+        .sticky-cta::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.2) 0%, transparent 50%);
+            pointer-events: none;
         }
         .cta-box {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
-            padding: 60px; border-radius: 32px; max-width: 800px; margin: 0 auto;
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            padding: 60px 40px; 
+            border-radius: 32px; 
+            max-width: 800px; 
+            margin: 0 auto;
             backdrop-filter: blur(20px);
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(124, 58, 237, 0.1);
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease-out;
+            position: relative;
+        }
+        .cta-box:hover {
+            box-shadow: 0 35px 90px rgba(124, 58, 237, 0.3), 0 0 0 1px rgba(124, 58, 237, 0.2);
+            transform: translateY(-4px);
+        }
+        .cta-box.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .cta-box h2 {
+            font-size: clamp(28px, 4vw, 36px);
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 16px;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         /* --- APP UI --- */
@@ -288,6 +556,28 @@
         <button class="btn btn-accent" style="padding: 18px 36px; font-size: 16px;" onclick="openAuthModal()">Начать карьеру</button>
     </div>
 
+    <!-- Статистика -->
+    <div class="section container" style="padding: 60px 0;">
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="stat-number" data-target="500">0</div>
+                <div class="stat-label">Активных вакансий</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="150">0</div>
+                <div class="stat-label">Подростков на платформе</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="50">0</div>
+                <div class="stat-label">Проверенных работодателей</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number" data-target="98">0</div>
+                <div class="stat-label">% довольных пользователей</div>
+            </div>
+        </div>
+    </div>
+
     <div class="section container">
         <h2 class="section-title">Принципы работы</h2>
         <div class="grid-3">
@@ -302,6 +592,28 @@
             <div class="feature-card">
                 <h3>🔒 Безопасность данных</h3>
                 <p>Ваши личные данные защищены сквозным шифрованием. Мы не передаем контакты третьим лицам без вашего согласия.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Как это работает -->
+    <div class="section container" style="max-width: 900px;">
+        <h2 class="section-title">Как это работает</h2>
+        <div class="steps-grid">
+            <div class="step-card">
+                <div class="step-number">01</div>
+                <h3>Регистрация</h3>
+                <p>Создайте профиль за 2 минуты. Подтвердите возраст и загрузите документы для верификации.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">02</div>
+                <h3>Поиск вакансий</h3>
+                <p>Просматривайте проверенные вакансии с указанием зарплаты, возраста и требований.</p>
+            </div>
+            <div class="step-card">
+                <div class="step-number">03</div>
+                <h3>Отклик и работа</h3>
+                <p>Связывайтесь с работодателем через WhatsApp, подписывайте договор и начинайте работать.</p>
             </div>
         </div>
     </div>
@@ -341,9 +653,9 @@
     <div class="sticky-cta">
         <div class="container">
             <div class="cta-box">
-                <h2 style="font-size: 32px; margin-bottom: 20px;">Готовы к первому доходу?</h2>
-                <p style="color: var(--text-secondary); margin-bottom: 30px;">Более 500 вакансий ждут вашего отклика уже сегодня.</p>
-                <button class="btn btn-accent" style="width: 100%; max-width: 300px;" onclick="openAuthModal()">Создать аккаунт</button>
+                <h2>Готовы к первому доходу?</h2>
+                <p style="color: var(--text-secondary); margin-bottom: 30px; font-size: 17px;">Более 500 вакансий ждут вашего отклика уже сегодня.</p>
+                <button class="btn btn-accent" style="width: 100%; max-width: 300px; padding: 18px 36px; font-size: 16px;" onclick="openAuthModal()">Создать аккаунт</button>
             </div>
         </div>
     </div>
@@ -405,24 +717,11 @@
         </button>
         <div style="text-align:center; color:var(--text-secondary); margin-bottom:20px; font-size:12px;">ИЛИ ЧЕРЕЗ EMAIL</div>
         
-        <div id="regBlock" style="display:none;">
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:10px;">
-                <button id="rTeen" class="btn" style="border:1px solid var(--border);" onclick="setRole('teen')">Соискатель</button>
-                <button id="rBoss" class="btn" style="border:1px solid var(--border);" onclick="setRole('boss')">Работодатель</button>
-            </div>
-            <input id="regName" placeholder="ФИО">
-            <input id="regPhone" placeholder="Телефон">
-            <input id="regBirth" type="date">
-        </div>
-
         <input id="email" placeholder="Email">
         <input id="pass" type="password" placeholder="Пароль">
         
         <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="handleEmail()">Продолжить</button>
         
-        <div style="text-align:center; margin-top:15px;">
-            <span style="color:var(--text-secondary); cursor:pointer; font-size:13px;" onclick="toggleReg()">Нет аккаунта? Регистрация</span>
-        </div>
         <button class="btn" style="width:100%; margin-top:10px; background:transparent; color:var(--text-secondary);" onclick="closeModals()">Закрыть</button>
     </div>
 </div>
@@ -470,26 +769,11 @@
     const ADMIN = "admin.alikhan@gmail.com";
 
     let currentUser = null;
-    let isReg = false;
-    let role = 'teen';
 
     // UI HELPER
     window.openAuthModal = () => document.getElementById('modalAuth').classList.add('visible');
     window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('visible'));
     window.openModal = (id) => document.getElementById(id).classList.add('visible');
-    
-    window.toggleReg = () => {
-        isReg = !isReg;
-        document.getElementById('regBlock').style.display = isReg ? 'block' : 'none';
-    };
-    
-    window.setRole = (r) => {
-        role = r;
-        document.getElementById('rTeen').style.background = r === 'teen' ? '#fff' : 'transparent';
-        document.getElementById('rTeen').style.color = r === 'teen' ? '#000' : '#fff';
-        document.getElementById('rBoss').style.background = r === 'boss' ? '#fff' : 'transparent';
-        document.getElementById('rBoss').style.color = r === 'boss' ? '#000' : '#fff';
-    };
 
     window.switchTab = (tab) => {
         document.querySelectorAll('.app-tab').forEach(t => t.style.display = 'none');
@@ -508,9 +792,39 @@
         });
     }, { threshold: 0.15 });
 
+    // Анимация счетчиков статистики
+    function animateCounter(element, target, duration = 2000) {
+        const start = 0;
+        const increment = target / (duration / 16);
+        let current = start;
+        
+        const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+                element.textContent = target + (target === 98 ? '%' : '');
+                clearInterval(timer);
+            } else {
+                element.textContent = Math.floor(current) + (target === 98 ? '%' : '');
+            }
+        }, 16);
+    }
+
+    // Observer для статистики
+    const statsObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const statNumber = entry.target.querySelector('.stat-number');
+                const target = parseInt(statNumber.getAttribute('data-target'));
+                animateCounter(statNumber, target);
+                statsObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.5 });
+
     // Запускаем наблюдение после первой отрисовки DOM
     window.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.feature-card, .faq-item').forEach(el => revealObserver.observe(el));
+        document.querySelectorAll('.feature-card, .faq-item, .cta-box, .step-card').forEach(el => revealObserver.observe(el));
+        document.querySelectorAll('.stat-item').forEach(el => statsObserver.observe(el));
     });
 
     // AUTH
@@ -571,22 +885,50 @@
     };
 
     window.handleEmail = async () => {
-        const email = document.getElementById('email').value;
+        const email = document.getElementById('email').value.trim();
         const pass = document.getElementById('pass').value;
+        
+        if (!email || !pass) {
+            alert("Заполните все поля");
+            return;
+        }
+        
         try {
-            if (isReg) {
-                const res = await createUserWithEmailAndPassword(auth, email, pass);
-                await setDoc(doc(db, "users", res.user.uid), {
-                    uid: res.user.uid, 
-                    name: document.getElementById('regName').value,
-                    phone: document.getElementById('regPhone').value,
-                    type: role, verified: 'no', email
-                });
-            } else {
-                await signInWithEmailAndPassword(auth, email, pass);
-            }
+            // Пробуем войти
+            await signInWithEmailAndPassword(auth, email, pass);
             closeModals();
-        } catch (e) { alert(e.message); }
+        } catch (e) {
+            // Если пользователь не найден - регистрируем
+            if (e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential') {
+                try {
+                    const res = await createUserWithEmailAndPassword(auth, email, pass);
+                    // Создаём профиль в Firestore
+                    await setDoc(doc(db, "users", res.user.uid), {
+                        uid: res.user.uid,
+                        name: email.split('@')[0], // Используем часть email как имя по умолчанию
+                        email: email,
+                        type: 'teen', // По умолчанию соискатель
+                        verified: 'no',
+                        avatar: ''
+                    });
+                    closeModals();
+                } catch (regError) {
+                    if (regError.code === 'auth/email-already-in-use') {
+                        alert("Этот email уже используется. Попробуйте войти с паролем.");
+                    } else if (regError.code === 'auth/weak-password') {
+                        alert("Пароль слишком слабый. Используйте минимум 6 символов.");
+                    } else {
+                        alert(`Ошибка регистрации: ${regError.message}`);
+                    }
+                }
+            } else if (e.code === 'auth/wrong-password') {
+                alert("Неверный пароль. Проверьте правильность ввода.");
+            } else if (e.code === 'auth/invalid-email') {
+                alert("Неверный формат email.");
+            } else {
+                alert(`Ошибка входа: ${e.message}`);
+            }
+        }
     };
 
     window.handleLogout = () => signOut(auth);
@@ -667,3 +1009,4 @@
 </script>
 </body>
 </html>
+

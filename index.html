@@ -46,6 +46,65 @@
             100% { transform: rotate(360deg) translate(0,0); }
         }
 
+        /* Animated Particles */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(139, 92, 246, 0.6);
+            border-radius: 50%;
+            animation: float linear infinite;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.8);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) translateX(0) scale(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px) scale(1);
+                opacity: 0;
+            }
+        }
+
+        .particle:nth-child(1) { left: 10%; animation-duration: 15s; animation-delay: 0s; }
+        .particle:nth-child(2) { left: 20%; animation-duration: 18s; animation-delay: 2s; }
+        .particle:nth-child(3) { left: 30%; animation-duration: 12s; animation-delay: 4s; }
+        .particle:nth-child(4) { left: 40%; animation-duration: 20s; animation-delay: 1s; }
+        .particle:nth-child(5) { left: 50%; animation-duration: 16s; animation-delay: 3s; }
+        .particle:nth-child(6) { left: 60%; animation-duration: 14s; animation-delay: 5s; }
+        .particle:nth-child(7) { left: 70%; animation-duration: 19s; animation-delay: 2s; }
+        .particle:nth-child(8) { left: 80%; animation-duration: 17s; animation-delay: 4s; }
+        .particle:nth-child(9) { left: 90%; animation-duration: 13s; animation-delay: 1s; }
+        .particle:nth-child(10) { left: 15%; animation-duration: 21s; animation-delay: 3s; }
+        .particle:nth-child(11) { left: 25%; animation-duration: 16s; animation-delay: 0s; }
+        .particle:nth-child(12) { left: 35%; animation-duration: 18s; animation-delay: 5s; }
+        .particle:nth-child(13) { left: 45%; animation-duration: 14s; animation-delay: 2s; }
+        .particle:nth-child(14) { left: 55%; animation-duration: 20s; animation-delay: 4s; }
+        .particle:nth-child(15) { left: 65%; animation-duration: 15s; animation-delay: 1s; }
+        .particle:nth-child(16) { left: 75%; animation-duration: 19s; animation-delay: 3s; }
+        .particle:nth-child(17) { left: 85%; animation-duration: 17s; animation-delay: 0s; }
+        .particle:nth-child(18) { left: 95%; animation-duration: 13s; animation-delay: 5s; }
+        .particle:nth-child(19) { left: 5%; animation-duration: 22s; animation-delay: 2s; }
+        .particle:nth-child(20) { left: 50%; animation-duration: 16s; animation-delay: 4s; }
+
         /* --- LAYOUT --- */
         .container { max-width: 1000px; margin: 0 auto; padding: 0 24px; }
         
@@ -122,6 +181,27 @@
         .btn-accent:hover::after {
             opacity: 1;
         }
+
+        .btn-ghost {
+            background: rgba(255,255,255,0.05);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+        .btn-ghost:hover {
+            background: rgba(255,255,255,0.08);
+            border-color: rgba(255,255,255,0.15);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .badge-pending { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+        .badge-verified { background: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .badge-rejected { background: rgba(239, 68, 68, 0.1); color: #ef4444; }
 
         /* --- HERO --- */
         .hero {
@@ -501,14 +581,138 @@
 
         @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* Mobile Nav */
+        /* Sidebar Navigation (Desktop) */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 80px;
+            height: 100vh;
+            background: rgba(8, 8, 8, 0.98);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 0;
+            z-index: 1001;
+        }
+        
+        .sidebar-logo {
+            width: 48px;
+            height: 48px;
+            background: var(--accent-gradient);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 20px;
+            margin-bottom: 48px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 8px 20px rgba(124, 58, 237, 0.3);
+            color: #fff;
+            letter-spacing: -1px;
+        }
+        .sidebar-logo:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(124, 58, 237, 0.5);
+        }
+        
+        .sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 100%;
+            padding: 0 16px;
+        }
+        
+        .nav-item {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.9);
+            transform: translateX(4px);
+        }
+        
+        .nav-item.active {
+            background: var(--accent-gradient);
+            color: #fff;
+            box-shadow: 0 8px 24px rgba(124, 58, 237, 0.5);
+        }
+        
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            left: -16px;
+            width: 4px;
+            height: 28px;
+            background: var(--primary-light);
+            border-radius: 0 4px 4px 0;
+        }
+        
+        .sidebar-divider {
+            width: 32px;
+            height: 1px;
+            background: var(--border);
+            margin: 20px 0;
+        }
+        
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 16px;
+        }
+        
+        /* Main content offset for sidebar */
+        #app-view {
+            margin-left: 80px;
+            min-height: 100vh;
+        }
+        
+        /* Hide sidebar on mobile, show bottom tabs */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            #app-view {
+                margin-left: 0;
+                padding-bottom: 100px;
+            }
+        }
+        
+        /* Bottom Navigation (Mobile Only) */
         .bottom-tabs {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(20, 20, 20, 0.9); backdrop-filter: blur(20px);
-            padding: 8px 10px; border-radius: 100px; border: 1px solid var(--border);
-            display: flex; gap: 10px; z-index: 900;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(20, 20, 20, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 8px 10px;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+            display: none;
+            gap: 10px;
+            z-index: 900;
             box-shadow: 0 18px 45px rgba(15, 23, 42, 0.9);
         }
+        
         .tab-icon {
             cursor: pointer;
             opacity: 0.55;
@@ -519,23 +723,454 @@
             align-items: center;
             justify-content: center;
         }
+        
         .tab-icon.active {
             opacity: 1;
             color: var(--primary-light);
             background: radial-gradient(circle at top, rgba(148, 163, 184, 0.35), rgba(15, 23, 42, 1));
             box-shadow: 0 14px 35px rgba(15, 23, 42, 0.95);
         }
+        
         .tab-icon:active {
             transform: translateY(1px) scale(0.95);
             box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.75), 0 0 24px rgba(124, 58, 237, 0.8);
+        }
+        
+        @media (max-width: 768px) {
+            .bottom-tabs {
+                display: flex;
+            }
+        }
+
+        /* Verification Section */
+        .verify-box {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(15, 23, 42, 0.8) 100%);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            padding: 24px;
+            border-radius: 16px;
+            margin-top: 20px;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 32px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 12px;
+        }
+        .upload-area:hover {
+            border-color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .admin-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .role-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .role-btn {
+            flex: 1;
+            padding: 16px;
+            border-radius: 12px;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        .role-btn.selected {
+            border-color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin: 16px 0;
+        }
+
+        .warning-box h4 {
+            color: #ef4444;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .doc-selector {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .doc-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .doc-option:hover {
+            border-color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.05);
+        }
+
+        .doc-option input[type="radio"] {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .doc-option.selected {
+            border-color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .terms-box {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 16px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .terms-box h3 {
+            font-size: 18px;
+            margin-bottom: 16px;
+            color: var(--primary-light);
+        }
+
+        .terms-box h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 16px;
+            margin-bottom: 8px;
+        }
+
+        .terms-box p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            margin: 16px 0;
+            padding: 16px;
+            background: rgba(124, 58, 237, 0.05);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-top: 2px;
+            cursor: pointer;
+        }
+
+        .checkbox-wrapper label {
+            font-size: 14px;
+            line-height: 1.5;
+            cursor: pointer;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(20, 20, 20, 0.98);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 16px 20px;
+            min-width: 300px;
+            max-width: 400px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
+            pointer-events: auto;
+            animation: toastSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .toast.success {
+            border-left: 3px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 3px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 3px solid var(--primary-light);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .toast.removing {
+            animation: toastSlideOut 0.3s ease-out forwards;
+        }
+
+        @keyframes toastSlideOut {
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.08) 50%, rgba(255,255,255,0.03) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 12px;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        .skeleton-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            padding: 24px;
+            border-radius: 20px;
+            margin-bottom: 16px;
+        }
+
+        .skeleton-title {
+            height: 20px;
+            width: 60%;
+            margin-bottom: 12px;
+        }
+
+        .skeleton-text {
+            height: 14px;
+            width: 40%;
+            margin-bottom: 16px;
+        }
+
+        .skeleton-paragraph {
+            height: 14px;
+            width: 100%;
+            margin-bottom: 8px;
+        }
+
+        .skeleton-button {
+            height: 44px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        /* Enhanced Profile Card */
+        .profile-card {
+            background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid rgba(124, 58, 237, 0.2);
+            border-radius: 24px;
+            padding: 40px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+
+        .profile-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 120px;
+            background: var(--accent-gradient);
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .profile-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .profile-avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+        }
+
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #222;
+            overflow: hidden;
+            border: 4px solid rgba(124, 58, 237, 0.3);
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .profile-status-badge {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--bg);
+            border: 3px solid var(--bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .profile-name {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .profile-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .profile-status.verified {
+            background: rgba(16, 185, 129, 0.15);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .profile-status.pending {
+            background: rgba(251, 191, 36, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+
+        .profile-status.unverified {
+            background: rgba(148, 163, 184, 0.15);
+            color: #94a3b8;
+            border: 1px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
         }
     </style>
 </head>
 <body>
 
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
 <div class="ambient-bg">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
 </div>
 
 <header>
@@ -668,31 +1303,114 @@
             <div id="jobList"></div>
         </div>
 
-        <div id="tab-profile" class="app-tab" style="display:none;">
-            <div style="text-align:center; padding: 40px 0;">
-                <div style="width:100px; height:100px; margin:0 auto 20px; border-radius:50%; background:#222; overflow:hidden;">
-                    <img id="pAvatar" style="width:100%; height:100%; object-fit:cover;">
-                </div>
-                <h2 id="pName">...</h2>
-                <p id="pStatus" style="margin: 10px 0; color: var(--text-secondary);"></p>
+        <div id="tab-support" class="app-tab" style="display:none;">
+            <div style="text-align:center; padding:60px 20px;">
+                <div style="font-size:64px; margin-bottom:20px;">💬</div>
+                <h2 style="margin-bottom:16px;">Поддержка</h2>
+                <p style="color:var(--text-secondary); margin-bottom:32px; max-width:400px; margin-left:auto; margin-right:auto;">Возникли вопросы? Свяжитесь с нами через удобный канал</p>
                 
-                <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
-                    <button class="btn btn-primary" onclick="openModal('modalEdit')">Редактировать</button>
-                    <button class="btn" style="background:rgba(239,68,68,0.1); color:#ef4444;" onclick="handleLogout()">Выйти</button>
+                <div style="display:flex; flex-direction:column; gap:12px; max-width:400px; margin:0 auto;">
+                    <a href="https://t.me/teenxsupport" target="_blank" class="btn btn-primary" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/></svg>
+                        Telegram
+                    </a>
+                    <a href="https://wa.me/77001234567" target="_blank" class="btn btn-ghost" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                        WhatsApp
+                    </a>
+                    <a href="mailto:support@teenx.kz" class="btn btn-ghost" style="text-decoration:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
+                        Email
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-profile" class="app-tab" style="display:none;">
+            <div style="padding: 40px 0;">
+                <div class="profile-card">
+                    <div class="profile-content">
+                        <div class="profile-avatar-wrapper">
+                            <div class="profile-avatar">
+                                <img id="pAvatar" style="width:100%; height:100%; object-fit:cover;">
+                            </div>
+                            <div class="profile-status-badge" id="pStatusBadge">✓</div>
+                        </div>
+                        <div style="text-align:center;">
+                            <h2 class="profile-name" id="pName">...</h2>
+                            <div class="profile-status" id="pStatus"></div>
+                        </div>
+                        <div class="profile-actions">
+                            <button class="btn btn-primary" onclick="openModal('modalEdit')">✏️ Редактировать</button>
+                            <button class="btn btn-ghost" onclick="handleLogout()">🚪 Выйти</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="verifySection" style="display:none;">
+                    <div class="verify-box">
+                        <h3 style="margin-bottom:12px; font-size:18px;">Верификация аккаунта</h3>
+                        <p style="color:var(--text-secondary); font-size:14px; margin-bottom:16px;">Для доступа к контактам работодателей необходимо подтвердить возраст</p>
+                        <button class="btn btn-accent" style="width:100%;" onclick="openModal('modalVerify')">🔐 Пройти верификацию</button>
+                    </div>
+                </div>
+
+                <div id="bossPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
+                    <h3 style="color: var(--primary-light); margin-bottom:15px;">Панель работодателя</h3>
+                    <button class="btn btn-accent" style="width:100%;" onclick="openModal('modalJob')">+ Создать вакансию</button>
+                    <div id="myJobsList" style="margin-top:20px;"></div>
                 </div>
 
                 <div id="adminPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
-                    <h3 style="color: var(--primary-light); margin-bottom:15px;">Панель управления</h3>
-                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
-                        <button class="btn btn-primary" onclick="openModal('modalJob')">+ Вакансия</button>
-                        <button class="btn" style="background:#222;" onclick="renderTrash()">Архив</button>
+                    <h3 style="color: var(--primary-light); margin-bottom:15px;">🛡️ Админ-панель</h3>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px;">
+                        <button class="btn btn-primary" onclick="showAdminTab('jobs')">Вакансии</button>
+                        <button class="btn btn-primary" onclick="showAdminTab('users')">Верификация</button>
                     </div>
-                    <div id="trashList" style="margin-top:20px;"></div>
+                    
+                    <div id="adminJobsTab" style="display:none;">
+                        <h4 style="margin-bottom:12px;">Модерация вакансий</h4>
+                        <div id="pendingJobsList"></div>
+                        <h4 style="margin:20px 0 12px;">Корзина</h4>
+                        <div id="trashList"></div>
+                    </div>
+                    
+                    <div id="adminUsersTab" style="display:none;">
+                        <h4 style="margin-bottom:12px;">Запросы на верификацию</h4>
+                        <div id="pendingUsersList"></div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Sidebar Navigation (Desktop) -->
+    <div class="sidebar">
+        <div class="sidebar-logo">TX</div>
+        
+        <div class="sidebar-nav">
+            <div class="nav-item active" id="side-jobs" onclick="switchTab('jobs')" title="Вакансии">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-3a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path></svg>
+            </div>
+            <div class="nav-item" id="side-profile" onclick="switchTab('profile')" title="Профиль">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+            </div>
+            <div class="nav-item" id="side-support" onclick="switchTab('support')" title="Поддержка">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+        </div>
+        
+        <div class="sidebar-divider"></div>
+        
+        <div class="sidebar-bottom">
+            <div class="nav-item" onclick="handleLogout()" title="Выйти">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation (Mobile) -->
     <div class="bottom-tabs">
         <div class="tab-icon active" id="nav-jobs" onclick="switchTab('jobs')">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 7h-3a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2H4a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path></svg>
@@ -700,12 +1418,29 @@
         <div class="tab-icon" id="nav-profile" onclick="switchTab('profile')">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
+        <div class="tab-icon" id="nav-support" onclick="switchTab('support')">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
     </div>
 </div>
 
 <div id="modalAuth" class="modal">
     <div class="modal-box">
         <h2 style="text-align:center; margin-bottom:24px;">Вход в TeenX</h2>
+        
+        <div class="role-selector">
+            <div class="role-btn selected" id="roleTeenBtn" onclick="selectRole('teen')">
+                <div style="font-size:24px; margin-bottom:8px;">👤</div>
+                <div style="font-weight:600;">Подросток</div>
+                <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Ищу работу</div>
+            </div>
+            <div class="role-btn" id="roleBossBtn" onclick="selectRole('boss')">
+                <div style="font-size:24px; margin-bottom:8px;">💼</div>
+                <div style="font-weight:600;">Работодатель</div>
+                <div style="font-size:11px; color:var(--text-secondary); margin-top:4px;">Размещаю вакансии</div>
+            </div>
+        </div>
+        
         <button class="btn" style="width:100%; background:#fff; color:#000; margin-bottom:20px; font-weight:700;" onclick="handleGoogle()">
             <svg width="18" height="18" viewBox="0 0 18 18" style="margin-right:8px;">
                 <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
@@ -720,6 +1455,11 @@
         <input id="email" placeholder="Email">
         <input id="pass" type="password" placeholder="Пароль">
         
+        <div class="checkbox-wrapper">
+            <input type="checkbox" id="acceptTerms">
+            <label for="acceptTerms">Я принимаю <a href="#" onclick="event.preventDefault(); openModal('modalTerms');" style="color:var(--primary-light); text-decoration:underline;">Условия использования и Политику конфиденциальности</a></label>
+        </div>
+        
         <button class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="handleEmail()">Продолжить</button>
         
         <button class="btn" style="width:100%; margin-top:10px; background:transparent; color:var(--text-secondary);" onclick="closeModals()">Закрыть</button>
@@ -728,13 +1468,90 @@
 
 <div id="modalJob" class="modal">
     <div class="modal-box">
-        <h3>Новая вакансия</h3>
-        <input id="jTitle" placeholder="Должность">
-        <input id="jAge" placeholder="Возраст (14+)">
-        <input id="jPrice" placeholder="Оплата">
-        <textarea id="jDesc" placeholder="Описание" style="height:100px;"></textarea>
+        <h3 style="margin-bottom:20px;">Новая вакансия</h3>
+        <input id="jTitle" placeholder="Должность (например: Промоутер)">
+        <input id="jAge" placeholder="Возраст (например: 14+)">
+        <input id="jPrice" placeholder="Оплата (например: 50,000₸/мес)">
+        <input id="jPhone" placeholder="WhatsApp (например: 77001234567)">
+        <textarea id="jDesc" placeholder="Описание вакансии" style="height:100px;"></textarea>
         <button class="btn btn-primary" style="width:100%" onclick="createJob()">Опубликовать</button>
         <button class="btn" style="width:100%; margin-top:10px; background:transparent;" onclick="closeModals()">Отмена</button>
+    </div>
+</div>
+
+<div id="modalVerify" class="modal">
+    <div class="modal-box" style="max-width:500px;">
+        <h3 style="margin-bottom:20px; font-size:20px;">Подтверждение личности</h3>
+        
+        <div class="warning-box">
+            <h4>⚠️ ВАЖНО! Прочитайте перед загрузкой</h4>
+            <p style="color:#fca5a5; font-size:13px; line-height:1.6; margin:0;">
+                Для безопасности мы должны убедиться, что тебе есть 14 лет.<br><br>
+                <strong>ОБЯЗАТЕЛЬНО ЗАМАЖЬТЕ или ЗАКРОЙТЕ свой ИИН на фото!</strong><br>
+                Нам нужны только <strong>Имя и Дата рождения</strong>.
+            </p>
+        </div>
+
+        <div style="margin:20px 0;">
+            <label style="display:block; margin-bottom:12px; font-weight:600; font-size:14px;">Выберите тип документа:</label>
+            <div class="doc-selector">
+                <label class="doc-option" id="docOption1" onclick="selectDocType('id')">
+                    <input type="radio" name="docType" value="id" checked>
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">Удостоверение личности</div>
+                        <div style="font-size:12px; color:var(--text-secondary);">Для возраста 16+</div>
+                    </div>
+                </label>
+                <label class="doc-option" id="docOption2" onclick="selectDocType('birth')">
+                    <input type="radio" name="docType" value="birth">
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">Свидетельство о рождении</div>
+                        <div style="font-size:12px; color:var(--text-secondary);">Для возраста 14-16</div>
+                    </div>
+                </label>
+            </div>
+        </div>
+
+        <div class="upload-area" onclick="document.getElementById('verifyDocInput').click()" style="margin:20px 0;">
+            <input type="file" id="verifyDocInput" accept="image/jpeg,image/jpg,image/png" style="display:none;" onchange="handleVerifyUpload()">
+            <div style="font-size:40px; margin-bottom:8px;">📄</div>
+            <div style="font-weight:600;">Нажмите, чтобы загрузить фото документа</div>
+            <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">JPG, PNG до 5MB</div>
+        </div>
+        
+        <div id="verifyFileName" style="text-align:center; margin-bottom:16px; font-size:13px; color:var(--primary-light);"></div>
+        <div id="verifyStatus" style="margin-bottom:16px; text-align:center;"></div>
+
+        <button class="btn btn-primary" id="submitVerifyBtn" style="width:100%;" onclick="submitVerification()" disabled>Отправить на проверку</button>
+        <button class="btn" style="width:100%; margin-top:10px; background:transparent;" onclick="closeModals()">Отмена</button>
+    </div>
+</div>
+
+<div id="modalTerms" class="modal">
+    <div class="modal-box" style="max-width:600px;">
+        <div class="terms-box">
+            <h3>📋 Условия использования TeenX Hub</h3>
+            
+            <h4>1. Общие положения</h4>
+            <p>TeenX Hub является исключительно информационной онлайн-платформой и не является работодателем, агентством по трудоустройству или стороной трудовых отношений. Платформа предоставляет возможность размещения и поиска предложений о работе между пользователями.</p>
+            
+            <h4>2. Финансовые расчёты</h4>
+            <p>TeenX Hub не участвует в финансовых расчётах между пользователями, не принимает, не хранит и не переводит денежные средства. Все вопросы, связанные с оплатой труда, решаются напрямую между подростком и работодателем.</p>
+            
+            <h4>3. Условия труда и законодательство</h4>
+            <p>Ответственность за соблюдение требований Трудового кодекса Республики Казахстан (включая ст. 31, 69), условий труда и техники безопасности полностью лежит на работодателе. Платформа не несёт ответственности за условия работы и их соответствие законодательству.</p>
+            
+            <h4>4. Верификация</h4>
+            <p>TeenX Hub осуществляет проверку БИН организаций в целях снижения рисков, однако не гарантирует добросовестность всех пользователей. Пользователи самостоятельно оценивают риски при взаимодействии друг с другом.</p>
+            
+            <h4>5. Ответственность сторон</h4>
+            <p>Платформа не несёт ответственности за действия пользователей, достоверность предоставляемой информации и последствия взаимодействия между подростками и работодателями.</p>
+            
+            <h4>6. Возрастные ограничения</h4>
+            <p>Подростки подтверждают, что их участие соответствует законодательству Республики Казахстан и осуществляется с согласия законных представителей, если это требуется.</p>
+        </div>
+        
+        <button class="btn btn-primary" style="width:100%; margin-top:16px;" onclick="closeModals()">Понятно</button>
     </div>
 </div>
 
@@ -751,7 +1568,8 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyD7-uqvnY8lb8Xb3DIJTn3VdAeMXR7A-qM",
@@ -765,21 +1583,135 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
     const ADMIN = "admin.alikhan@gmail.com";
 
     let currentUser = null;
+    let selectedRole = 'teen';
+    
+    // Toast Notification System
+    function showToast(message, type = 'info', title = '') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        const icons = {
+            success: '✅',
+            error: '❌',
+            info: 'ℹ️'
+        };
+        
+        const titles = {
+            success: title || 'Успешно',
+            error: title || 'Ошибка',
+            info: title || 'Информация'
+        };
+        
+        toast.innerHTML = `
+            <div class="toast-icon">${icons[type]}</div>
+            <div class="toast-content">
+                <div class="toast-title">${titles[type]}</div>
+                <div class="toast-message">${message}</div>
+            </div>
+        `;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.classList.add('removing');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
 
     // UI HELPER
     window.openAuthModal = () => document.getElementById('modalAuth').classList.add('visible');
     window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('visible'));
     window.openModal = (id) => document.getElementById(id).classList.add('visible');
+    
+    window.selectRole = (role) => {
+        selectedRole = role;
+        document.getElementById('roleTeenBtn').classList.toggle('selected', role === 'teen');
+        document.getElementById('roleBossBtn').classList.toggle('selected', role === 'boss');
+    };
+    
+    let selectedDocType = 'id';
+    let verifyFile = null;
+    
+    window.selectDocType = (type) => {
+        selectedDocType = type;
+        document.getElementById('docOption1').classList.toggle('selected', type === 'id');
+        document.getElementById('docOption2').classList.toggle('selected', type === 'birth');
+        document.querySelectorAll('input[name="docType"]').forEach(input => {
+            input.checked = input.value === type;
+        });
+    };
+    
+    window.handleVerifyUpload = () => {
+        const file = document.getElementById('verifyDocInput').files[0];
+        if (!file) return;
+        
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой. Максимум 5MB');
+            return;
+        }
+        
+        verifyFile = file;
+        document.getElementById('verifyFileName').textContent = `✅ ${file.name}`;
+        document.getElementById('submitVerifyBtn').disabled = false;
+    };
+    
+    window.submitVerification = async () => {
+        if (!verifyFile) {
+            alert('Выберите файл для загрузки');
+            return;
+        }
+        
+        const statusEl = document.getElementById('verifyStatus');
+        const btn = document.getElementById('submitVerifyBtn');
+        btn.disabled = true;
+        statusEl.innerHTML = '<div style="color:var(--primary-light);">⏳ Загрузка документа...</div>';
+        
+        try {
+            const storageRef = ref(storage, `documents/${currentUser.uid}/${Date.now()}_${verifyFile.name}`);
+            await uploadBytes(storageRef, verifyFile);
+            const url = await getDownloadURL(storageRef);
+            
+            await updateDoc(doc(db, "users", currentUser.uid), {
+                docUrl: url,
+                docType: selectedDocType,
+                verified: 'pending'
+            });
+            
+            statusEl.innerHTML = '<div style="color:#10b981;">✅ Документы отправлены! Ожидайте решения.</div>';
+            setTimeout(() => {
+                closeModals();
+                verifyFile = null;
+                document.getElementById('verifyFileName').textContent = '';
+                document.getElementById('verifyStatus').innerHTML = '';
+                document.getElementById('submitVerifyBtn').disabled = true;
+                renderApp();
+            }, 2000);
+        } catch (error) {
+            console.error('Upload error:', error);
+            statusEl.innerHTML = '<div style="color:#ef4444;">❌ Ошибка загрузки. Попробуйте снова</div>';
+            btn.disabled = false;
+        }
+    };
 
     window.switchTab = (tab) => {
         document.querySelectorAll('.app-tab').forEach(t => t.style.display = 'none');
         document.getElementById('tab-'+tab).style.display = 'block';
+        
+        // Update both sidebar and bottom nav
         document.querySelectorAll('.tab-icon').forEach(i => i.classList.remove('active'));
-        document.getElementById('nav-'+tab).classList.add('active');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        
+        const bottomNav = document.getElementById('nav-'+tab);
+        const sideNav = document.getElementById('side-'+tab);
+        
+        if (bottomNav) bottomNav.classList.add('active');
+        if (sideNav) sideNav.classList.add('active');
     };
 
     // Reveal on scroll (для плавного появления блоков как на Swipy)
@@ -833,11 +1765,23 @@
             const snap = await getDoc(doc(db, "users", user.uid));
             if (!snap.exists()) {
                 await setDoc(doc(db, "users", user.uid), {
-                    uid: user.uid, name: user.displayName, email: user.email, 
-                    type: 'teen', verified: 'no', avatar: user.photoURL
+                    uid: user.uid, 
+                    name: user.displayName || user.email.split('@')[0], 
+                    email: user.email, 
+                    type: selectedRole,
+                    verified: 'no', 
+                    avatar: user.photoURL || '',
+                    phone: '',
+                    docUrl: ''
                 });
             }
-            currentUser = snap.exists() ? snap.data() : { name: user.displayName };
+            currentUser = snap.exists() ? snap.data() : { 
+                uid: user.uid,
+                name: user.displayName, 
+                email: user.email,
+                type: selectedRole,
+                verified: 'no'
+            };
             
             document.getElementById('landing-view').style.display = 'none';
             document.getElementById('app-view').style.display = 'block';
@@ -862,9 +1806,11 @@
                     uid: user.uid,
                     name: user.displayName || 'Пользователь',
                     email: user.email,
-                    type: 'teen', // По умолчанию соискатель
+                    type: selectedRole,
                     verified: 'no',
-                    avatar: user.photoURL || ''
+                    avatar: user.photoURL || '',
+                    phone: '',
+                    docUrl: ''
                 });
             }
             closeModals();
@@ -887,9 +1833,15 @@
     window.handleEmail = async () => {
         const email = document.getElementById('email').value.trim();
         const pass = document.getElementById('pass').value;
+        const termsAccepted = document.getElementById('acceptTerms').checked;
         
         if (!email || !pass) {
             alert("Заполните все поля");
+            return;
+        }
+        
+        if (!termsAccepted) {
+            alert("Необходимо принять условия использования");
             return;
         }
         
@@ -905,11 +1857,13 @@
                     // Создаём профиль в Firestore
                     await setDoc(doc(db, "users", res.user.uid), {
                         uid: res.user.uid,
-                        name: email.split('@')[0], // Используем часть email как имя по умолчанию
+                        name: email.split('@')[0],
                         email: email,
-                        type: 'teen', // По умолчанию соискатель
+                        type: selectedRole,
                         verified: 'no',
-                        avatar: ''
+                        avatar: '',
+                        phone: '',
+                        docUrl: ''
                     });
                     closeModals();
                 } catch (regError) {
@@ -935,78 +1889,353 @@
 
     // APP FUNCTIONS
     async function renderApp() {
-        // Profile
-        document.getElementById('pName').innerText = currentUser.name;
-        if(currentUser.avatar) document.getElementById('pAvatar').src = currentUser.avatar;
-        document.getElementById('pStatus').innerText = currentUser.verified === 'yes' ? "Статус: Подтвержден ✅" : "Статус: Не подтвержден";
-        
-        if (currentUser.email === ADMIN) document.getElementById('adminPanel').style.display = 'block';
+        // Refresh user data
+        const userSnap = await getDoc(doc(db, "users", auth.currentUser.uid));
+        if (userSnap.exists()) {
+            currentUser = userSnap.data();
+        }
 
-        // Jobs
-        const snap = await getDocs(collection(db, "jobs"));
+        // Profile - Enhanced Digital ID Card
+        document.getElementById('pName').innerText = currentUser.name || 'Пользователь';
+        if(currentUser.avatar) document.getElementById('pAvatar').src = currentUser.avatar;
+        
+        const statusEl = document.getElementById('pStatus');
+        const badgeEl = document.getElementById('pStatusBadge');
+        
+        if (currentUser.verified === 'yes') {
+            statusEl.innerHTML = '✓ Верифицирован';
+            statusEl.className = 'profile-status verified';
+            badgeEl.textContent = '✓';
+            badgeEl.style.background = '#10b981';
+        } else if (currentUser.verified === 'pending') {
+            statusEl.innerHTML = '⏳ На проверке';
+            statusEl.className = 'profile-status pending';
+            badgeEl.textContent = '⏳';
+            badgeEl.style.background = '#fbbf24';
+        } else {
+            statusEl.innerHTML = '○ Не подтвержден';
+            statusEl.className = 'profile-status unverified';
+            badgeEl.textContent = '○';
+            badgeEl.style.background = '#94a3b8';
+        }
+        
+        // Show verification section for teens who aren't verified
+        if (currentUser.type === 'teen' && currentUser.verified !== 'yes') {
+            document.getElementById('verifySection').style.display = 'block';
+        } else {
+            document.getElementById('verifySection').style.display = 'none';
+        }
+        
+        // Show boss panel
+        if (currentUser.type === 'boss') {
+            document.getElementById('bossPanel').style.display = 'block';
+            renderMyJobs();
+        }
+        
+        // Show admin panel
+        if (currentUser.email === ADMIN) {
+            document.getElementById('adminPanel').style.display = 'block';
+        }
+
+        // Jobs - Show skeleton loaders first
         const list = document.getElementById('jobList');
+        list.innerHTML = `
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-paragraph"></div>
+                <div class="skeleton skeleton-button"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton skeleton-title"></div>
+                <div class="skeleton skeleton-text"></div>
+                <div class="skeleton skeleton-paragraph"></div>
+                <div class="skeleton skeleton-button"></div>
+            </div>
+        `;
+        
+        const snap = await getDocs(collection(db, "jobs"));
         list.innerHTML = '';
+        
+        if (snap.empty) {
+            list.innerHTML = `
+                <div style="text-align:center; padding:80px 20px;">
+                    <div style="font-size:64px; margin-bottom:16px; opacity:0.3;">💼</div>
+                    <h3 style="margin-bottom:8px;">Пока нет активных вакансий</h3>
+                    <p style="color:var(--text-secondary); font-size:14px;">Новые предложения появятся совсем скоро</p>
+                </div>
+            `;
+            return;
+        }
+        
         snap.forEach(d => {
             const j = d.data();
             if (j.status !== 'active') return;
             const card = document.createElement('div');
             card.className = 'job-card';
+            
+            let contactBtn = '';
+            if (currentUser.type === 'teen') {
+                if (currentUser.verified === 'yes') {
+                    contactBtn = `<a href="https://wa.me/${j.phone}" target="_blank" class="btn btn-primary" style="width:100%; text-decoration:none;">Написать в WhatsApp</a>`;
+                } else {
+                    contactBtn = `<button class="btn btn-ghost" style="width:100%;" onclick="openModal('modalVerify')">🔒 Требуется верификация</button>`;
+                }
+            } else {
+                contactBtn = `<a href="https://wa.me/${j.phone}" target="_blank" class="btn btn-primary" style="width:100%; text-decoration:none;">Написать в WhatsApp</a>`;
+            }
+            
             card.innerHTML = `
                 <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
-                    <h3 style="font-size:18px;">${j.title}</h3>
+                    <h3 style="font-size:18px; font-weight:700;">${j.title}</h3>
                     <span class="price-tag">${j.price}</span>
                 </div>
                 <div style="font-size:13px; color:#aaa; margin-bottom:15px;">${j.age} • Уральск</div>
-                <p style="font-size:14px; color:#ccc; margin-bottom:20px;">${j.desc}</p>
-                <a href="https://wa.me/${j.phone}" target="_blank" class="btn btn-primary" style="width:100%; text-decoration:none;">Откликнуться</a>
+                <p style="font-size:14px; color:#ccc; margin-bottom:20px; line-height:1.6;">${j.desc}</p>
+                ${contactBtn}
             `;
             list.appendChild(card);
-            // запустить анимацию появления карточки
             requestAnimationFrame(() => {
                 card.classList.add('visible');
             });
         });
     }
 
-    // ADMIN
+    // JOB CREATION
     window.createJob = async () => {
+        const title = document.getElementById('jTitle').value.trim();
+        const price = document.getElementById('jPrice').value.trim();
+        const desc = document.getElementById('jDesc').value.trim();
+        const age = document.getElementById('jAge').value.trim();
+        const phone = document.getElementById('jPhone').value.trim();
+        
+        if (!title || !price || !desc || !age || !phone) {
+            showToast('Заполните все поля', 'error');
+            return;
+        }
+        
+        const status = (currentUser.email === ADMIN) ? 'active' : 'pending';
+        
         await addDoc(collection(db, "jobs"), {
-            title: document.getElementById('jTitle').value,
-            price: document.getElementById('jPrice').value,
-            desc: document.getElementById('jDesc').value,
-            age: document.getElementById('jAge').value,
-            phone: currentUser.phone || '777',
-            status: 'active' // Сразу активна для админа
+            title,
+            price,
+            desc,
+            age,
+            phone,
+            status,
+            employerId: currentUser.uid,
+            createdAt: new Date().toISOString()
         });
-        alert("Опубликовано!"); closeModals(); renderApp();
+        
+        document.getElementById('jTitle').value = '';
+        document.getElementById('jPrice').value = '';
+        document.getElementById('jDesc').value = '';
+        document.getElementById('jAge').value = '';
+        document.getElementById('jPhone').value = '';
+        
+        showToast(
+            status === 'active' ? 'Вакансия успешно опубликована' : 'Вакансия отправлена на модерацию',
+            'success'
+        );
+        closeModals();
+        renderApp();
     };
 
+    // BOSS FUNCTIONS
+    async function renderMyJobs() {
+        const snap = await getDocs(collection(db, "jobs"));
+        const list = document.getElementById('myJobsList');
+        list.innerHTML = '';
+        
+        let hasJobs = false;
+        snap.forEach(d => {
+            const j = d.data();
+            if (j.employerId !== currentUser.uid || j.status === 'deleted') return;
+            hasJobs = true;
+            
+            const statusBadge = j.status === 'pending' 
+                ? '<span class="badge badge-pending">На модерации</span>' 
+                : '<span class="badge badge-verified">Активна</span>';
+            
+            list.innerHTML += `
+                <div class="admin-card">
+                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
+                        <h4 style="font-size:16px; font-weight:600;">${j.title}</h4>
+                        ${statusBadge}
+                    </div>
+                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:8px;">${j.price} • ${j.age}</div>
+                    <div style="font-size:13px; color:var(--text-secondary);">${j.desc.substring(0, 80)}...</div>
+                </div>
+            `;
+        });
+        
+        if (!hasJobs) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px;">У вас пока нет вакансий</div>';
+        }
+    }
+    
+    // ADMIN FUNCTIONS
+    window.showAdminTab = (tab) => {
+        document.getElementById('adminJobsTab').style.display = tab === 'jobs' ? 'block' : 'none';
+        document.getElementById('adminUsersTab').style.display = tab === 'users' ? 'block' : 'none';
+        
+        if (tab === 'jobs') {
+            renderPendingJobs();
+            renderTrash();
+        } else {
+            renderPendingUsers();
+        }
+    };
+    
+    async function renderPendingJobs() {
+        const snap = await getDocs(collection(db, "jobs"));
+        const list = document.getElementById('pendingJobsList');
+        list.innerHTML = '';
+        
+        let hasPending = false;
+        snap.forEach(d => {
+            const j = d.data();
+            if (j.status !== 'pending') return;
+            hasPending = true;
+            
+            list.innerHTML += `
+                <div class="admin-card">
+                    <h4 style="font-size:16px; font-weight:600; margin-bottom:8px;">${j.title}</h4>
+                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:4px;">💰 ${j.price} • 👤 ${j.age}</div>
+                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:4px;">📱 ${j.phone}</div>
+                    <p style="font-size:14px; color:var(--text-secondary); margin-bottom:12px;">${j.desc}</p>
+                    <div class="admin-actions">
+                        <button class="btn btn-primary" style="flex:1; padding:10px;" onclick="approveJob('${d.id}')">✅ Одобрить</button>
+                        <button class="btn" style="flex:1; padding:10px; background:rgba(239,68,68,0.1); color:#ef4444;" onclick="deleteJob('${d.id}')">❌ Удалить</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        if (!hasPending) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px;">Нет вакансий на модерации</div>';
+        }
+    }
+    
+    async function renderPendingUsers() {
+        const snap = await getDocs(collection(db, "users"));
+        const list = document.getElementById('pendingUsersList');
+        list.innerHTML = '';
+        
+        let hasPending = false;
+        snap.forEach(d => {
+            const u = d.data();
+            if (u.verified !== 'pending' || !u.docUrl) return;
+            hasPending = true;
+            
+            list.innerHTML += `
+                <div class="admin-card">
+                    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+                        <img src="${u.avatar || 'https://via.placeholder.com/50'}" style="width:50px; height:50px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <h4 style="font-size:16px; font-weight:600;">${u.name}</h4>
+                            <div style="font-size:13px; color:var(--text-secondary);">${u.email}</div>
+                        </div>
+                    </div>
+                    <a href="${u.docUrl}" target="_blank" class="btn btn-ghost" style="width:100%; margin-bottom:12px;">📄 Посмотреть документ</a>
+                    <div class="admin-actions">
+                        <button class="btn btn-primary" style="flex:1; padding:10px;" onclick="approveUser('${u.uid}')">✅ Подтвердить</button>
+                        <button class="btn" style="flex:1; padding:10px; background:rgba(239,68,68,0.1); color:#ef4444;" onclick="rejectUser('${u.uid}')">❌ Отклонить</button>
+                    </div>
+                </div>
+            `;
+        });
+        
+        if (!hasPending) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px;">Нет запросов на верификацию</div>';
+        }
+    }
+    
     window.renderTrash = async () => {
         const snap = await getDocs(collection(db, "jobs"));
         const list = document.getElementById('trashList');
         list.innerHTML = '';
+        
+        let hasDeleted = false;
         snap.forEach(d => {
             const j = d.data();
-            list.innerHTML += `<div style="padding:10px; border:1px solid #333; margin-bottom:5px; border-radius:8px;">
-                ${j.title} (${j.status}) 
-                <button onclick="delJob('${d.id}')">Удалить</button>
-            </div>`;
+            if (j.status !== 'deleted') return;
+            hasDeleted = true;
+            
+            list.innerHTML += `
+                <div class="admin-card">
+                    <h4 style="font-size:14px; font-weight:600; margin-bottom:8px;">${j.title}</h4>
+                    <div style="font-size:12px; color:var(--text-secondary); margin-bottom:12px;">${j.price} • ${j.age}</div>
+                    <div class="admin-actions">
+                        <button class="btn btn-primary" style="flex:1; padding:8px; font-size:13px;" onclick="restoreJob('${d.id}')">♻️ Восстановить</button>
+                        <button class="btn" style="flex:1; padding:8px; font-size:13px; background:rgba(239,68,68,0.1); color:#ef4444;" onclick="permanentDeleteJob('${d.id}')">🗑️ Удалить навсегда</button>
+                    </div>
+                </div>
+            `;
         });
+        
+        if (!hasDeleted) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px;">Корзина пуста</div>';
+        }
     };
     
-    window.delJob = async(id) => { 
-        await updateDoc(doc(db, "jobs", id), { status: 'deleted' }); 
-        renderTrash(); 
+    window.approveJob = async (id) => {
+        await updateDoc(doc(db, "jobs", id), { status: 'active' });
+        showToast('Вакансия одобрена и опубликована', 'success');
+        showAdminTab('jobs');
+    };
+    
+    window.deleteJob = async (id) => {
+        await updateDoc(doc(db, "jobs", id), { status: 'deleted' });
+        showToast('Вакансия перемещена в корзину', 'info');
+        showAdminTab('jobs');
+    };
+    
+    window.restoreJob = async (id) => {
+        await updateDoc(doc(db, "jobs", id), { status: 'pending' });
+        showToast('Вакансия восстановлена', 'success');
+        showAdminTab('jobs');
+    };
+    
+    window.permanentDeleteJob = async (id) => {
+        if (confirm('Удалить вакансию навсегда? Это действие нельзя отменить.')) {
+            await deleteDoc(doc(db, "jobs", id));
+            showToast('Вакансия удалена навсегда', 'info');
+            showAdminTab('jobs');
+        }
+    };
+    
+    window.approveUser = async (uid) => {
+        await updateDoc(doc(db, "users", uid), { verified: 'yes' });
+        showToast('Пользователь успешно верифицирован', 'success');
+        showAdminTab('users');
+    };
+    
+    window.rejectUser = async (uid) => {
+        await updateDoc(doc(db, "users", uid), { verified: 'no', docUrl: '' });
+        showToast('Верификация отклонена', 'info');
+        showAdminTab('users');
     };
 
     window.saveProfile = async () => {
-        const name = document.getElementById('eName').value;
-        const phone = document.getElementById('ePhone').value;
-        if(name) await updateDoc(doc(db, "users", currentUser.uid), { name });
-        if(phone) await updateDoc(doc(db, "users", currentUser.uid), { phone });
-        location.reload();
+        const name = document.getElementById('eName').value.trim();
+        const phone = document.getElementById('ePhone').value.trim();
+        
+        const updates = {};
+        if (name) updates.name = name;
+        if (phone) updates.phone = phone;
+        
+        if (Object.keys(updates).length > 0) {
+            await updateDoc(doc(db, "users", currentUser.uid), updates);
+            showToast('Профиль успешно обновлен', 'success');
+            closeModals();
+            renderApp();
+        } else {
+            showToast('Заполните хотя бы одно поле', 'error');
+        }
     };
 </script>
 </body>
 </html>
+
 

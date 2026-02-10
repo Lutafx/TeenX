@@ -1,6 +1,3 @@
-# Firebase Private Keys - НИКОГДА НЕ ЗАГРУЖАЙ В GIT!
-serviceAccountKey.json
-
 # Python
 __pycache__/
 *.py[cod]
@@ -11,8 +8,27 @@ env/
 venv/
 ENV/
 build/
+develop-eggs/
 dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
 *.egg-info/
+.installed.cfg
+*.egg
+
+# Firebase
+serviceAccountKey.json
+
+# Environment
+.env
+.env.local
 
 # IDE
 .vscode/
@@ -24,9 +40,6 @@ dist/
 .DS_Store
 Thumbs.db
 
-# Logs
-*.log
+# Netlify
+.netlify/
 
-# Environment variables
-.env
-.env.local

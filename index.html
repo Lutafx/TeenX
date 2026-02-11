@@ -205,6 +205,17 @@
             background: rgba(255,255,255,0.08);
             border-color: rgba(255,255,255,0.15);
         }
+        .btn-cancel {
+            background: rgba(239, 68, 68, 0.15);
+            color: #ef4444;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            font-weight: 600;
+        }
+        .btn-cancel:hover {
+            background: rgba(239, 68, 68, 0.25);
+            border-color: rgba(239, 68, 68, 0.5);
+            transform: translateY(-2px);
+        }
 
         .badge {
             display: inline-block;
@@ -1972,7 +1983,7 @@
                     <p style="color: #93c5fd; font-size: 14px; margin-bottom: 16px;">
                         Этот документ обязателен по ст. 31 ТК РК. Без подписи родителя договор будет недействителен.
                     </p>
-                    <a href="documents/consent_under_16.txt" download="Согласие_родителей_14-16.txt" class="btn btn-accent" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    <a href="consent_under_16.txt" download="Согласие_родителей_14-16.txt" class="btn btn-accent" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -2024,7 +2035,7 @@
                     <p style="color: #93c5fd; font-size: 14px; margin-bottom: 16px;">
                         По закону РК, в 16 лет подросток может подписывать договор сам, но работодатель обязан соблюдать ограничения по часам.
                     </p>
-                    <a href="documents/contract_16_18.txt" download="Трудовой_договор_16-18.txt" class="btn btn-accent" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                    <a href="contract_16_18.txt" download="Трудовой_договор_16-18.txt" class="btn btn-accent" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
                         <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                             <polyline points="7 10 12 15 17 10"></polyline>
@@ -2506,9 +2517,14 @@
                 </p>
             </div>
 
-            <input id="verifyAge" type="number" min="14" max="18" placeholder="Ваш возраст *" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;">
+            <input id="verifyBirthdate" type="date" placeholder="Дата рождения *" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;" onchange="calculateAge()">
+            <p style="font-size: 12px; color: #94a3b8; margin-bottom: 4px;">
+                Укажите вашу дату рождения по свидетельству
+            </p>
+            
+            <input id="verifyAge" type="number" min="14" max="18" placeholder="Ваш возраст (рассчитается автоматически)" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;" readonly>
             <p style="font-size: 12px; color: #94a3b8; margin-bottom: 16px;">
-                Укажите ваш полный возраст (от 14 до 18 лет)
+                Возраст рассчитывается автоматически и обновляется каждый день рождения
             </p>
 
             <div style="margin:20px 0;">
@@ -3018,6 +3034,9 @@
                 type: selectedRole,
                 verified: 'no'
             };
+            
+            // Auto-update age based on birthdate
+            await updateUserAge(currentUser);
             
             document.getElementById('landing-view').style.display = 'none';
             document.getElementById('app-view').style.display = 'block';
@@ -3897,6 +3916,54 @@
         }
     };
 
+    // CALCULATE AGE FROM BIRTHDATE
+    window.calculateAge = () => {
+        const birthdateInput = document.getElementById('verifyBirthdate');
+        const ageInput = document.getElementById('verifyAge');
+        
+        if (!birthdateInput.value) {
+            ageInput.value = '';
+            return;
+        }
+        
+        const birthdate = new Date(birthdateInput.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthdate.getFullYear();
+        const monthDiff = today.getMonth() - birthdate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+            age--;
+        }
+        
+        ageInput.value = age;
+        
+        if (age < 14) {
+            alert('К сожалению, по законодательству РК работать можно только с 14 лет');
+        } else if (age > 18) {
+            alert('Эта платформа предназначена для подростков 14-18 лет');
+        }
+    };
+
+    // AUTO-UPDATE USER AGE ON LOGIN
+    async function updateUserAge(user) {
+        if (!user.birthdate || user.type !== 'teen') return;
+        
+        const birthdate = new Date(user.birthdate);
+        const today = new Date();
+        let age = today.getFullYear() - birthdate.getFullYear();
+        const monthDiff = today.getMonth() - birthdate.getMonth();
+        
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+            age--;
+        }
+        
+        // Update age if changed
+        if (user.age !== age) {
+            await updateDoc(doc(db, "users", user.uid), { age: age });
+            user.age = age;
+        }
+    }
+
     // SHOW CORRECT VERIFICATION SECTION
     window.openModal = (modalId) => {
         if (modalId === 'modalVerify' && currentUser) {
@@ -3934,17 +4001,25 @@
                 submittedAt: new Date().toISOString()
             };
 
-            // FOR TEENS - ADD AGE
+            // FOR TEENS - ADD AGE AND BIRTHDATE
             if (currentUser.type === 'teen') {
+                const birthdate = document.getElementById('verifyBirthdate').value;
                 const age = parseInt(document.getElementById('verifyAge').value);
                 
+                if (!birthdate) {
+                    alert('Укажите дату рождения');
+                    statusEl.innerHTML = '';
+                    return;
+                }
+                
                 if (!age || age < 14 || age > 18) {
-                    alert('Укажите корректный возраст (от 14 до 18 лет)');
+                    alert('Возраст должен быть от 14 до 18 лет');
                     statusEl.innerHTML = '';
                     return;
                 }
                 
                 verificationData.age = age;
+                verificationData.birthdate = birthdate;
             }
 
             // FOR EMPLOYERS - ADD BIN AND COMPANY INFO

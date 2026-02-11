@@ -2667,7 +2667,7 @@
     const db = getFirestore(app);
     const storage = getStorage(app);
     const provider = new GoogleAuthProvider();
-    const ADMIN = "admin.alikhan@gmail.com";
+    const ADMIN = "querty482901@gmail.com";
 
     let currentUser = null;
     let selectedRole = 'teen';
@@ -2722,7 +2722,7 @@
     };
     
     let selectedDocType = 'id';
-    let verifyFile = null;
+    let uploadedFile = null;
     
     window.selectDocType = (type) => {
         selectedDocType = type;
@@ -2742,49 +2742,11 @@
             return;
         }
         
-        verifyFile = file;
+        uploadedFile = file;
         document.getElementById('verifyFileName').textContent = `✅ ${file.name}`;
         document.getElementById('submitVerifyBtn').disabled = false;
     };
     
-    window.submitVerification = async () => {
-        if (!verifyFile) {
-            alert('Выберите файл для загрузки');
-            return;
-        }
-        
-        const statusEl = document.getElementById('verifyStatus');
-        const btn = document.getElementById('submitVerifyBtn');
-        btn.disabled = true;
-        statusEl.innerHTML = '<div style="color:var(--primary-light);">⏳ Загрузка документа...</div>';
-        
-        try {
-            const storageRef = ref(storage, `documents/${currentUser.uid}/${Date.now()}_${verifyFile.name}`);
-            await uploadBytes(storageRef, verifyFile);
-            const url = await getDownloadURL(storageRef);
-            
-            await updateDoc(doc(db, "users", currentUser.uid), {
-                docUrl: url,
-                docType: selectedDocType,
-                verified: 'pending'
-            });
-            
-            statusEl.innerHTML = '<div style="color:#10b981;">✅ Документы отправлены! Ожидайте решения.</div>';
-            setTimeout(() => {
-                closeModals();
-                verifyFile = null;
-                document.getElementById('verifyFileName').textContent = '';
-                document.getElementById('verifyStatus').innerHTML = '';
-                document.getElementById('submitVerifyBtn').disabled = true;
-                renderApp();
-            }, 2000);
-        } catch (error) {
-            console.error('Upload error:', error);
-            statusEl.innerHTML = '<div style="color:#ef4444;">❌ Ошибка загрузки. Попробуйте снова</div>';
-            btn.disabled = false;
-        }
-    };
-
     window.switchTab = (tab) => {
         document.querySelectorAll('.app-tab').forEach(t => t.style.display = 'none');
         document.getElementById('tab-'+tab).style.display = 'block';

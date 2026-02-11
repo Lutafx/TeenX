@@ -3512,7 +3512,7 @@
         let hasPending = false;
         snap.forEach(d => {
             const u = d.data();
-            if (u.verified !== 'pending' || !u.docUrl) return;
+            if (u.verified !== 'pending') return;
             hasPending = true;
             
             list.innerHTML += `
@@ -3522,9 +3522,27 @@
                         <div>
                             <h4 style="font-size:16px; font-weight:600;">${u.name}</h4>
                             <div style="font-size:13px; color:var(--text-secondary);">${u.email}</div>
+                            ${u.phone ? `<div style="font-size:12px; color:var(--primary-light);">📱 ${u.phone}</div>` : ''}
                         </div>
                     </div>
-                    <a href="${u.docUrl}" target="_blank" class="btn btn-ghost" style="width:100%; margin-bottom:12px;">📄 Посмотреть документ</a>
+                    
+                    ${u.docUrl && u.docUrl !== 'Не загружен' ? `
+                        <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 12px; border-radius: 8px; margin-bottom:12px;">
+                            <h5 style="color: #60a5fa; margin-bottom: 8px; font-size:14px;">📄 Документ</h5>
+                            <p style="font-size:12px; color: #93c5fd; margin:0; margin-bottom:8px;">${u.documentName || 'Документ загружен'}</p>
+                            <div style="display:flex; gap:8px;">
+                                <a href="${u.docUrl}" target="_blank" class="btn btn-ghost" style="flex:1; padding:8px; font-size:12px;">👁️ Открыть</a>
+                                <a href="https://wa.me/${u.phone ? u.phone.replace(/\D/g, '') : ''}" target="_blank" class="btn btn-primary" style="flex:1; padding:8px; font-size:12px;">💬 WhatsApp</a>
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: rgba(251, 191, 36, 0.1); border-left: 4px solid #fbbf24; padding: 12px; border-radius: 8px; margin-bottom:12px;">
+                            <h5 style="color: #fbbf24; margin-bottom: 8px; font-size:14px;">📞 Свяжитесь с пользователем</h5>
+                            <p style="font-size:12px; color: #fcd34d; margin:0; margin-bottom:8px;">Документ не загружен. Запросите через мессенджер.</p>
+                            <a href="https://wa.me/${u.phone ? u.phone.replace(/\D/g, '') : ''}" target="_blank" class="btn btn-primary" style="width:100%; padding:8px; font-size:12px;">💬 Написать в WhatsApp</a>
+                        </div>
+                    `}
+                    
                     <div class="admin-actions">
                         <button class="btn btn-primary" style="flex:1; padding:10px;" onclick="approveUser('${u.uid}')">✅ Подтвердить</button>
                         <button class="btn" style="flex:1; padding:10px; background:rgba(239,68,68,0.1); color:#ef4444;" onclick="rejectUser('${u.uid}')">❌ Отклонить</button>
@@ -3976,7 +3994,7 @@
                 
                 if (uploadResponse.ok) {
                     const uploadData = await uploadResponse.json();
-                    docUrl = uploadData.data.url;
+                    docUrl = uploadData.data.display_url; // Get direct image URL
                 } else {
                     // If ImgBB fails, continue without file
                     console.warn('File upload failed, continuing without document');

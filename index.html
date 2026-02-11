@@ -3683,7 +3683,7 @@
     };
     
     // Admin Tab Switching
-    window.switchAdminTab = (tab) => {
+    window.switchAdminTab = async (tab) => {
         document.querySelectorAll('.admin-tab').forEach(t => t.classList.remove('active'));
         event.target.classList.add('active');
         
@@ -3697,24 +3697,38 @@
         } else if (tab === 'users') {
             renderPendingUsers();
         } else if (tab === 'stats') {
-            renderAdminStats();
+            await renderAdminStats();
         }
     };
     
     // Admin Stats
     async function renderAdminStats() {
-        const usersSnap = await getDocs(collection(db, "users"));
-        const jobsSnap = await getDocs(collection(db, "jobs"));
+        // Показываем индикатор загрузки
+        document.getElementById('statTotalUsers').textContent = '...';
+        document.getElementById('statVerifiedUsers').textContent = '...';
+        document.getElementById('statTotalJobs').textContent = '...';
+        document.getElementById('statActiveJobs').textContent = '...';
         
-        const totalUsers = usersSnap.size;
-        const verifiedUsers = usersSnap.docs.filter(d => d.data().verified === 'yes').length;
-        const totalJobs = jobsSnap.size;
-        const activeJobs = jobsSnap.docs.filter(d => d.data().status === 'active').length;
-        
-        document.getElementById('statTotalUsers').textContent = totalUsers;
-        document.getElementById('statVerifiedUsers').textContent = verifiedUsers;
-        document.getElementById('statTotalJobs').textContent = totalJobs;
-        document.getElementById('statActiveJobs').textContent = activeJobs;
+        try {
+            const usersSnap = await getDocs(collection(db, "users"));
+            const jobsSnap = await getDocs(collection(db, "jobs"));
+            
+            const totalUsers = usersSnap.size;
+            const verifiedUsers = usersSnap.docs.filter(d => d.data().verified === 'yes').length;
+            const totalJobs = jobsSnap.size;
+            const activeJobs = jobsSnap.docs.filter(d => d.data().status === 'active').length;
+            
+            document.getElementById('statTotalUsers').textContent = totalUsers;
+            document.getElementById('statVerifiedUsers').textContent = verifiedUsers;
+            document.getElementById('statTotalJobs').textContent = totalJobs;
+            document.getElementById('statActiveJobs').textContent = activeJobs;
+        } catch (error) {
+            console.error('Error loading stats:', error);
+            document.getElementById('statTotalUsers').textContent = '0';
+            document.getElementById('statVerifiedUsers').textContent = '0';
+            document.getElementById('statTotalJobs').textContent = '0';
+            document.getElementById('statActiveJobs').textContent = '0';
+        }
     }
     
     // Quick Filter (Mobile Chips)

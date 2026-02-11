@@ -168,6 +168,93 @@ def reject_job(job_id, reason=''):
         return False
 
 
+def send_job_moderation_notification(job_data):
+    """Отправить уведомление админу о новой вакансии на модерации"""
+    if not ADMIN_ID or ADMIN_ID == 0:
+        print("⚠️ ADMIN_ID не настроен")
+        return
+    
+    try:
+        message = (
+            f"🆕 *НОВАЯ ВАКАНСИЯ НА МОДЕРАЦИИ*\n\n"
+            f"📋 *Должность:* {job_data.get('title', 'Не указано')}\n"
+            f"🏢 *Компания:* {job_data.get('companyName', 'Не указано')}\n"
+            f"💰 *Зарплата:* до {job_data.get('salaryTo', 0):,}₸\n"
+            f"📍 *Город:* {job_data.get('city', 'Уральск')}\n"
+            f"👤 *Возраст:* от {job_data.get('minAge', 14)} лет\n\n"
+            f"📝 *Описание компании:*\n{job_data.get('companyDescription', 'Не указано')[:200]}...\n\n"
+            f"📞 *Контакты:*\n"
+            f"• {job_data.get('contactName', 'Не указано')}\n"
+            f"• {job_data.get('phone', 'Не указано')}\n\n"
+        )
+        
+        # Добавляем БИН если есть
+        if job_data.get('employerBIN'):
+            message += f"🏛️ *БИН работодателя:* {job_data['employerBIN']}\n"
+        if job_data.get('employerCompanyName'):
+            message += f"📄 *Юр. название:* {job_data['employerCompanyName']}\n"
+        
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            types.InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_job_{job_data['id']}"),
+            types.InlineKeyboardButton("❌ Отклонить", callback_data=f"reject_job_{job_data['id']}")
+        )
+        
+        bot.send_message(
+            ADMIN_ID,
+            message,
+            parse_mode='Markdown',
+            reply_markup=markup
+        )
+        print(f"✅ Уведомление о вакансии отправлено админу")
+    except Exception as e:
+        print(f"❌ Ошибка отправки уведомления о вакансии: {e}")
+
+
+def send_verification_notification(user_data):
+    """Отправить уведомление админу о новой верификации"""
+    if not ADMIN_ID or ADMIN_ID == 0:
+        print("⚠️ ADMIN_ID не настроен")
+        return
+    
+    try:
+        user_type = "👔 Работодатель" if user_data.get('type') == 'boss' else "👤 Подросток"
+        
+        message = (
+            f"🆕 *НОВАЯ ВЕРИФИКАЦИЯ*\n\n"
+            f"👤 *Тип:* {user_type}\n"
+            f"📧 *Email:* {user_data.get('email', 'Не указан')}\n"
+            f"👨 *Имя:* {user_data.get('name', 'Не указано')}\n\n"
+        )
+        
+        # Для работодателей показываем БИН и компанию
+        if user_data.get('type') == 'boss':
+            message += (
+                f"🏛️ *БИН:* {user_data.get('bin', 'Не указан')}\n"
+                f"🏢 *Компания:* {user_data.get('companyName', 'Не указана')}\n"
+                f"👤 *Контактное лицо:* {user_data.get('contactPerson', 'Не указано')}\n"
+                f"📞 *Телефон:* {user_data.get('phone', 'Не указан')}\n\n"
+            )
+        
+        message += f"📄 *Документ:* [Открыть]({user_data.get('docUrl', '#')})"
+        
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            types.InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_user_{user_data['uid']}"),
+            types.InlineKeyboardButton("❌ Отклонить", callback_data=f"reject_user_{user_data['uid']}")
+        )
+        
+        bot.send_message(
+            ADMIN_ID,
+            message,
+            parse_mode='Markdown',
+            reply_markup=markup
+        )
+        print(f"✅ Уведомление о верификации отправлено админу")
+    except Exception as e:
+        print(f"❌ Ошибка отправки уведомления о верификации: {e}")
+
+
 # --- КОМАНДЫ БОТА ---
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
@@ -178,20 +265,24 @@ def send_welcome(message):
     markup = types.InlineKeyboardMarkup(row_width=2)
     markup.add(
         types.InlineKeyboardButton("🔍 Вакансии", callback_data="show_jobs"),
-        types.InlineKeyboardButton("🔔 Уведомления", callback_data="toggle_notifications"),
-        types.InlineKeyboardButton("👤 Профиль", callback_data="profile_info"),
-        types.InlineKeyboardButton("🛡️ Юр. помощь", callback_data="legal_help"),
-        types.InlineKeyboardButton("🌐 Открыть сайт", url="https://teenx.kz")
+        types.InlineKeyboardButton("🔔 Уведомления", callback_data="toggle_notifications")
+    )
+    markup.add(
+        types.InlineKeyboardButton("ℹ️ О платформе", callback_data="about_platform"),
+        types.InlineKeyboardButton("🆘 Поддержка", callback_data="support")
+    )
+    markup.add(
+        types.InlineKeyboardButton("🌐 Открыть сайт", url="https://teenx.pages.dev")
     )
     
     welcome_text = (
         f"👋 *Привет, {message.from_user.first_name}!*\n\n"
-        "🦄 *TeenX Hub* — твой проводник в мир легальной работы!\n\n"
+        "🦄 *TeenX Hub* — платформа легальной работы для подростков!\n\n"
         "✨ *Что я умею:*\n"
-        "• 🔔 Мгновенные уведомления о новых вакансиях\n"
-        "• 📋 Показываю только проверенные предложения\n"
-        "• ⚡ Синхронизация с сайтом в реальном времени\n"
-        "• 🛡️ Защита твоих прав\n\n"
+        "• 🔔 Уведомления о новых вакансиях\n"
+        "• 📋 Показываю проверенные предложения\n"
+        "• 💼 Помогаю найти работу быстро\n"
+        "• 🆘 Поддержка 24/7\n\n"
         "🔥 *Уведомления включены!* Ты первым узнаешь о новых вакансиях."
     )
     
@@ -298,39 +389,49 @@ def handle_query(call):
                 parse_mode="Markdown"
             )
     
-    # 3. Профиль
-    elif call.data == "profile_info":
+    # 3. О платформе
+    elif call.data == "about_platform":
+        bot.answer_callback_query(call.id)
+        about_text = (
+            "ℹ️ *О платформе TeenX Hub*\n\n"
+            "🦄 TeenX Hub — это платформа для легального трудоустройства подростков 14-18 лет.\n\n"
+            "✨ *Что мы делаем:*\n"
+            "• Проверяем работодателей\n"
+            "• Модерируем все вакансии\n"
+            "• Помогаем найти работу\n"
+            "• Защищаем твои права\n\n"
+            "📊 *Статистика:*\n"
+            "• Более 100+ вакансий\n"
+            "• Проверенные работодатели\n"
+            "• Безопасная работа\n\n"
+            "🌐 Сайт: https://teenx.pages.dev"
+        )
+        bot.send_message(call.message.chat.id, about_text, parse_mode="Markdown")
+    
+    # 4. Поддержка
+    elif call.data == "support":
         bot.answer_callback_query(call.id)
         markup = types.InlineKeyboardMarkup()
-        markup.add(types.InlineKeyboardButton("🌐 Открыть профиль", url="https://teenx.kz"))
+        markup.add(
+            types.InlineKeyboardButton("� Telegram", url="https://t.me/lutafx"),
+            types.InlineKeyboardButton("📱 WhatsApp", url="https://wa.me/77760752463")
+        )
         
+        support_text = (
+            "🆘 *Поддержка TeenX Hub*\n\n"
+            "Есть вопросы? Нужна помощь?\n"
+            "Свяжись с нами любым удобным способом:\n\n"
+            "👤 Администратор: @lutafx\n"
+            "📱 WhatsApp: +7 776 075 24 63\n"
+            "📧 Email: querty482901@gmail.com\n\n"
+            "Отвечаем быстро! 🚀"
+        )
         bot.send_message(
             call.message.chat.id,
-            "👤 *Твой профиль*\n\n"
-            "Для управления профилем и загрузки документов используй сайт.\n"
-            "Бот автоматически синхронизируется с твоим статусом верификации!",
+            support_text,
             reply_markup=markup,
             parse_mode="Markdown"
         )
-    
-    # 4. Юридическая помощь
-    elif call.data == "legal_help":
-        bot.answer_callback_query(call.id)
-        legal_text = (
-            "🛡️ *Твои права (Трудовой Кодекс РК)*\n\n"
-            "📌 *14-16 лет:*\n"
-            "• Не более 24 часов в неделю\n"
-            "• Только с согласия родителей\n"
-            "• Запрещены ночные смены (22:00-06:00)\n"
-            "• Легкий труд без вреда здоровью\n\n"
-            "📌 *16-18 лет:*\n"
-            "• Не более 36 часов в неделю\n"
-            "• Запрещены ночные смены\n"
-            "• Ежегодный отпуск 31 день\n\n"
-            "⚠️ *Если нарушают твои права:*\n"
-            "Пиши @alikhan_ceo — мы поможем!"
-        )
-        bot.send_message(call.message.chat.id, legal_text, parse_mode="Markdown")
     
     # 5. Админ - модерация
     elif call.data == "admin_moderate":
@@ -465,22 +566,41 @@ def handle_query(call):
 
 # --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
 def send_job_card(chat_id, job):
-    """Отправить красивую карточку вакансии"""
+    """Отправить анонс вакансии с ссылкой на сайт"""
+    salary = f"до {job.get('salaryTo', 0):,}₸" if job.get('salaryTo') else job.get('price', 'По договорённости')
+    
     markup = types.InlineKeyboardMarkup()
     markup.add(
-        types.InlineKeyboardButton("📱 Написать в WhatsApp", url=f"https://wa.me/{job.get('phone', '77001234567')}")
+        types.InlineKeyboardButton("🌐 Подробнее на сайте", url="https://teenx.pages.dev")
     )
     
     job_text = (
         f"💼 *{job.get('title', 'Вакансия')}*\n\n"
-        f"💰 *Зарплата:* {job.get('price', 'Не указана')}\n"
-        f"👶 *Возраст:* {job.get('age', '14+')}\n"
-        f"📍 *Город:* Уральск\n\n"
-        f"📝 *Описание:*\n{job.get('desc', 'Описание отсутствует')}\n\n"
-        f"⏰ Откликнись быстрее — места ограничены!"
+        f"💰 Зарплата: {salary}\n"
+        f"👶 Возраст: от {job.get('minAge', 14)} лет\n"
+        f"📍 Город: {job.get('city', 'Уральск')}\n\n"
+        f"📝 {job.get('responsibilities', job.get('desc', ''))[:150]}...\n\n"
+        f"🔗 *Полная информация на сайте*"
     )
     
     bot.send_message(chat_id, job_text, reply_markup=markup, parse_mode="Markdown")
+
+
+def is_user_verified(telegram_id):
+    """Проверить верифицирован ли пользователь"""
+    if not db:
+        return False
+    
+    try:
+        users_ref = db.collection('users')
+        query = users_ref.where('telegramId', '==', str(telegram_id)).where('verified', '==', 'yes').stream()
+        
+        for doc in query:
+            return True
+        return False
+    except Exception as e:
+        print(f"Error checking verification: {e}")
+        return False
 
 
 def send_verification_request(chat_id, user):
@@ -491,16 +611,31 @@ def send_verification_request(chat_id, user):
         types.InlineKeyboardButton("❌ Отклонить", callback_data=f"reject_user_{user['uid']}")
     )
     
+    # Добавляем кнопку WhatsApp если есть телефон
+    if user.get('phone'):
+        markup.add(
+            types.InlineKeyboardButton("💬 WhatsApp", url=f"https://wa.me/{user['phone'].replace(/\D/g, '')}")
+        )
+    
     caption = (
         f"👤 *Запрос на верификацию*\n\n"
         f"*Имя:* {user.get('name', 'Не указано')}\n"
         f"*Email:* {user.get('email', 'Не указан')}\n"
-        f"*Тип:* {user.get('type', 'teen')}\n"
-        f"*UID:* `{user['uid']}`"
+        f"*Тип:* {'Подросток' if user.get('type') == 'teen' else 'Работодатель'}\n"
     )
     
-    # Если есть фото документа
-    if user.get('docUrl'):
+    if user.get('phone'):
+        caption += f"*Телефон:* {user['phone']}\n"
+    
+    if user.get('age'):
+        caption += f"*Возраст:* {user['age']}\n"
+    
+    caption += f"*UID:* `{user['uid']}`\n"
+    
+    # Информация о документе
+    if user.get('docUrl') and user['docUrl'] != 'Не загружен':
+        caption += f"\n📄 *Документ:* {user.get('documentName', 'Загружен')}"
+        
         try:
             bot.send_photo(
                 chat_id,
@@ -509,14 +644,11 @@ def send_verification_request(chat_id, user):
                 reply_markup=markup,
                 parse_mode="Markdown"
             )
-        except:
-            bot.send_message(
-                chat_id,
-                caption + f"\n\n📄 [Документ]({user['docUrl']})",
-                reply_markup=markup,
-                parse_mode="Markdown"
-            )
+        except Exception as e:
+            print(f"Error sending photo: {e}")
+            bot.send_message(chat_id, caption, reply_markup=markup, parse_mode="Markdown")
     else:
+        caption += f"\n⚠️ *Документ не загружен*"
         bot.send_message(chat_id, caption, reply_markup=markup, parse_mode="Markdown")
 
 
@@ -553,6 +685,62 @@ def send_job_moderation_request(chat_id, job):
 
 
 # --- АВТОМАТИЧЕСКИЕ УВЕДОМЛЕНИЯ ---
+# Хранилище для отслеживания уже обработанных записей
+processed_jobs = set()
+processed_verifications = set()
+
+def monitor_pending_jobs():
+    """Мониторинг новых вакансий на модерации"""
+    global processed_jobs
+    
+    while True:
+        try:
+            pending_jobs = get_pending_jobs()
+            
+            for job in pending_jobs:
+                job_id = job['id']
+                # Если вакансия новая и еще не обработана
+                if job_id not in processed_jobs:
+                    print(f"📋 Новая вакансия на модерации: {job.get('title')}")
+                    send_job_moderation_notification(job)
+                    processed_jobs.add(job_id)
+            
+            # Очищаем старые записи (старше 7 дней)
+            if len(processed_jobs) > 1000:
+                processed_jobs.clear()
+                
+        except Exception as e:
+            print(f"❌ Ошибка мониторинга вакансий: {e}")
+        
+        time.sleep(30)  # Проверяем каждые 30 секунд
+
+
+def monitor_pending_verifications():
+    """Мониторинг новых верификаций"""
+    global processed_verifications
+    
+    while True:
+        try:
+            pending_users = get_pending_verifications()
+            
+            for user in pending_users:
+                user_id = user['uid']
+                # Если верификация новая и еще не обработана
+                if user_id not in processed_verifications:
+                    print(f"👤 Новая верификация: {user.get('name')} ({user.get('type')})")
+                    send_verification_notification(user)
+                    processed_verifications.add(user_id)
+            
+            # Очищаем старые записи
+            if len(processed_verifications) > 1000:
+                processed_verifications.clear()
+                
+        except Exception as e:
+            print(f"❌ Ошибка мониторинга верификаций: {e}")
+        
+        time.sleep(30)  # Проверяем каждые 30 секунд
+
+
 def check_new_jobs():
     """Проверка новых вакансий каждые 60 секунд"""
     global last_job_count
@@ -566,7 +754,7 @@ def check_new_jobs():
             if current_count > last_job_count and last_job_count > 0:
                 new_jobs_count = current_count - last_job_count
                 
-                # Отправляем уведомление всем подписчикам
+                # Отправляем уведомления всем подписчикам
                 for user_id in list(subscribers):
                     try:
                         bot.send_message(
@@ -602,10 +790,16 @@ if __name__ == "__main__":
     print(f"👤 Админ ID: {ADMIN_ID}")
     print("=" * 50)
     
-    # Запускаем фоновый поток для проверки новых вакансий
+    # Запускаем фоновые потоки для мониторинга
     notification_thread = threading.Thread(target=check_new_jobs, daemon=True)
+    job_moderation_thread = threading.Thread(target=monitor_pending_jobs, daemon=True)
+    verification_thread = threading.Thread(target=monitor_pending_verifications, daemon=True)
     notification_thread.start()
+    job_moderation_thread.start()
+    verification_thread.start()
     print("🔔 Система уведомлений запущена")
+    print("📋 Мониторинг вакансий запущен")
+    print("👤 Мониторинг верификаций запущен")
     
     # Запускаем бота
     print("⏳ Ожидаю сообщения...\n")

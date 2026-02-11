@@ -413,7 +413,7 @@ def handle_query(call):
         bot.answer_callback_query(call.id)
         markup = types.InlineKeyboardMarkup()
         markup.add(
-            types.InlineKeyboardButton("� Telegram", url="https://t.me/lutafx"),
+            types.InlineKeyboardButton("💬 Telegram", url="https://t.me/lutafx"),
             types.InlineKeyboardButton("📱 WhatsApp", url="https://wa.me/77760752463")
         )
         

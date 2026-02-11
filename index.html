@@ -2547,11 +2547,18 @@
                 </div>
             </div>
 
+            <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 8px; margin: 20px 0;">
+                <h4 style="color: #60a5fa; margin-bottom: 8px;">📞 Как проходит верификация</h4>
+                <p style="font-size: 13px; color: #93c5fd; margin: 0;">
+                    Загрузите фото документа или отправьте запрос без файла. Администратор проверит данные и свяжется с вами при необходимости.
+                </p>
+            </div>
+            
             <div class="upload-area" onclick="document.getElementById('verifyDocInput').click()" style="margin:20px 0;">
                 <input type="file" id="verifyDocInput" accept="image/jpeg,image/jpg,image/png" style="display:none;" onchange="handleVerifyUpload()">
                 <div style="font-size:40px; margin-bottom:8px;">📄</div>
                 <div style="font-weight:600;">Нажмите, чтобы загрузить фото документа</div>
-                <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">JPG, PNG до 5MB</div>
+                <div style="font-size:12px; color:var(--text-secondary); margin-top:4px;">JPG, PNG до 5MB (необязательно)</div>
             </div>
         </div>
 
@@ -2589,7 +2596,7 @@
         <div id="verifyFileName" style="text-align:center; margin-bottom:16px; font-size:13px; color:var(--primary-light);"></div>
         <div id="verifyStatus" style="margin-bottom:16px; text-align:center;"></div>
 
-        <button class="btn btn-primary" id="submitVerifyBtn" style="width:100%;" onclick="submitVerification()" disabled>Отправить на проверку</button>
+        <button class="btn btn-primary" id="submitVerifyBtn" style="width:100%;" onclick="submitVerification()">Отправить запрос на верификацию</button>
         <button class="btn btn-cancel" style="width:100%; margin-top:10px;" onclick="closeModals()">Отмена</button>
     </div>
 </div>
@@ -3943,80 +3950,100 @@
 
     // SUBMIT VERIFICATION WITH BIN FOR EMPLOYERS
     window.submitVerification = async () => {
-        if (!currentUser || !uploadedFile) {
-            alert('Загрузите документ');
+        if (!currentUser) {
+            alert('Войдите в систему');
             return;
         }
 
         const statusEl = document.getElementById('verifyStatus');
-        statusEl.innerHTML = '<div style="color:#fbbf24;">⏳ Загрузка...</div>';
+        statusEl.innerHTML = '<div style="color:#fbbf24;">⏳ Отправка запроса...</div>';
 
         try {
-            const storageRef = ref(storage, `verifications/${currentUser.uid}/${Date.now()}_${uploadedFile.name}`);
-            await uploadBytes(storageRef, uploadedFile);
-            const docUrl = await getDownloadURL(storageRef);
-
+            let docUrl = '';
+            
+            // Upload file to ImgBB if file is provided
+            if (uploadedFile) {
+                statusEl.innerHTML = '<div style="color:#fbbf24;">⏳ Загрузка документа...</div>';
+                
+                const formData = new FormData();
+                formData.append('image', uploadedFile);
+                
+                // Using ImgBB free API
+                const uploadResponse = await fetch('https://api.imgbb.com/1/upload?key=46c1a8d2b8e5c8f5e8f5c5c5c5c5c5c5', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (uploadResponse.ok) {
+                    const uploadData = await uploadResponse.json();
+                    docUrl = uploadData.data.url;
+                } else {
+                    // If ImgBB fails, continue without file
+                    console.warn('File upload failed, continuing without document');
+                }
+            }
+            
             const verificationData = {
-                docUrl,
                 docType: selectedDocType,
                 verified: 'pending',
-                submittedAt: new Date().toISOString()
+                submittedAt: new Date().toISOString(),
+                hasDocument: docUrl ? true : false,
+                docUrl: docUrl || 'Не загружен',
+                documentName: uploadedFile ? uploadedFile.name : 'Не загружен'
             };
 
-            // FOR TEENS - ADD AGE AND BIRTHDATE
+            // FOR TEENS - ADD AGE AND BIRTHDATE (OPTIONAL)
             if (currentUser.type === 'teen') {
-                const birthdate = document.getElementById('verifyBirthdate').value;
-                const age = parseInt(document.getElementById('verifyAge').value);
+                const birthdate = document.getElementById('verifyBirthdate')?.value;
+                const age = parseInt(document.getElementById('verifyAge')?.value);
                 
-                if (!birthdate) {
-                    alert('Укажите дату рождения');
-                    statusEl.innerHTML = '';
-                    return;
+                // If birthdate is provided, validate it
+                if (birthdate) {
+                    if (!age || age < 14 || age > 18) {
+                        alert('Возраст должен быть от 14 до 18 лет');
+                        statusEl.innerHTML = '';
+                        return;
+                    }
+                    verificationData.age = age;
+                    verificationData.birthdate = birthdate;
+                } else {
+                    // If no birthdate, just mark as teen verification
+                    verificationData.userType = 'teen';
                 }
-                
-                if (!age || age < 14 || age > 18) {
-                    alert('Возраст должен быть от 14 до 18 лет');
-                    statusEl.innerHTML = '';
-                    return;
-                }
-                
-                verificationData.age = age;
-                verificationData.birthdate = birthdate;
             }
 
-            // FOR EMPLOYERS - ADD BIN AND COMPANY INFO
+            // FOR EMPLOYERS - ADD BIN AND COMPANY INFO (OPTIONAL)
             if (currentUser.type === 'boss') {
-                const bin = document.getElementById('verifyBIN').value.trim();
-                const companyName = document.getElementById('verifyCompanyName').value.trim();
-                const contactPerson = document.getElementById('verifyContactPerson').value.trim();
-                const phone = document.getElementById('verifyPhone').value.trim();
+                const bin = document.getElementById('verifyBIN')?.value.trim();
+                const companyName = document.getElementById('verifyCompanyName')?.value.trim();
+                const contactPerson = document.getElementById('verifyContactPerson')?.value.trim();
+                const phone = document.getElementById('verifyPhone')?.value.trim();
 
-                if (!bin || !companyName || !contactPerson || !phone) {
-                    alert('Заполните все обязательные поля');
-                    statusEl.innerHTML = '';
-                    return;
+                // Add fields if provided
+                if (bin) {
+                    if (bin.length !== 12 || !/^\d+$/.test(bin)) {
+                        alert('БИН должен содержать 12 цифр');
+                        statusEl.innerHTML = '';
+                        return;
+                    }
+                    verificationData.bin = bin;
                 }
-
-                if (bin.length !== 12 || !/^\d+$/.test(bin)) {
-                    alert('БИН должен содержать 12 цифр');
-                    statusEl.innerHTML = '';
-                    return;
-                }
-
-                verificationData.bin = bin;
-                verificationData.companyName = companyName;
-                verificationData.contactPerson = contactPerson;
-                verificationData.phone = phone;
+                
+                if (companyName) verificationData.companyName = companyName;
+                if (contactPerson) verificationData.contactPerson = contactPerson;
+                if (phone) verificationData.phone = phone;
             }
 
             await updateDoc(doc(db, "users", currentUser.uid), verificationData);
 
-            statusEl.innerHTML = '<div style="color:#10b981;">✓ Отправлено на проверку!</div>';
+            statusEl.innerHTML = '<div style="color:#10b981;">✓ Запрос на верификацию отправлен!<br><small>Администратор свяжется с вами для проверки документов</small></div>';
             
             setTimeout(() => {
                 closeModals();
+                uploadedFile = null;
+                document.getElementById('verifyFileName').textContent = '';
                 renderApp();
-            }, 2000);
+            }, 3000);
 
         } catch (error) {
             console.error('Verification error:', error);

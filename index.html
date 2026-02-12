@@ -4797,54 +4797,69 @@
 
     // Show Admin tab for admin users
     if (currentUser && currentUser.email === ADMIN) {
-        document.getElementById('side-admin').style.display = 'flex';
-        document.getElementById('nav-admin').style.display = 'flex';
+        const sideAdmin = document.getElementById('side-admin');
+        const navAdmin = document.getElementById('nav-admin');
+        if (sideAdmin) sideAdmin.style.display = 'flex';
+        if (navAdmin) navAdmin.style.display = 'flex';
     }
 
     // ADMIN PANEL FUNCTIONS
     window.switchAdminPanel = (panel) => {
-        // Hide all panels
-        document.querySelectorAll('.admin-panel-section').forEach(p => p.style.display = 'none');
-        
-        // Remove active class from all tabs
-        document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
-        
-        // Show selected panel
-        document.getElementById(`admin-${panel}-panel`).style.display = 'block';
-        document.getElementById(`admin-${panel}-tab`).classList.add('active');
-        
-        // Load data for specific panels
-        if (panel === 'users') {
-            renderAdminUsers();
-        } else if (panel === 'jobs') {
-            renderAdminJobs();
-        } else if (panel === 'blacklist') {
-            renderAdminBlacklist();
-        } else if (panel === 'logs') {
-            refreshLogs();
+        try {
+            // Hide all panels
+            document.querySelectorAll('.admin-panel-section').forEach(p => p.style.display = 'none');
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Show selected panel
+            const panelEl = document.getElementById(`admin-${panel}-panel`);
+            const tabEl = document.getElementById(`admin-${panel}-tab`);
+            
+            if (panelEl) panelEl.style.display = 'block';
+            if (tabEl) tabEl.classList.add('active');
+            
+            // Load data for specific panels
+            if (panel === 'users') {
+                renderAdminUsers();
+            } else if (panel === 'jobs') {
+                renderAdminJobs();
+            } else if (panel === 'blacklist') {
+                renderAdminBlacklist();
+            } else if (panel === 'logs') {
+                refreshLogs();
+            }
+        } catch (error) {
+            console.error('Error switching admin panel:', error);
         }
     };
 
     // Render Admin Users
     async function renderAdminUsers() {
-        const snap = await getDocs(collection(db, "users"));
-        const list = document.getElementById('adminUsersList');
-        list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
-        
-        const users = [];
-        snap.forEach(d => {
-            const user = d.data();
-            users.push({ id: d.id, ...user });
-        });
-        
-        list.innerHTML = '';
-        
-        if (users.length === 0) {
-            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Пользователей не найдено</div>';
-            return;
-        }
-        
-        users.forEach(user => {
+        try {
+            const list = document.getElementById('adminUsersList');
+            if (!list) {
+                console.error('adminUsersList element not found');
+                return;
+            }
+            
+            list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+            
+            const snap = await getDocs(collection(db, "users"));
+            const users = [];
+            snap.forEach(d => {
+                const user = d.data();
+                users.push({ id: d.id, ...user });
+            });
+            
+            list.innerHTML = '';
+            
+            if (users.length === 0) {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Пользователей не найдено</div>';
+                return;
+            }
+            
+            users.forEach(user => {
             const statusClass = user.banned ? 'admin-status-banned' : 
                                user.verified === 'yes' ? 'admin-status-verified' : 
                                'admin-status-pending';
@@ -4880,8 +4895,15 @@
                 </div>
             `;
             
-            list.appendChild(card);
-        });
+                list.appendChild(card);
+            });
+        } catch (error) {
+            console.error('Error rendering admin users:', error);
+            const list = document.getElementById('adminUsersList');
+            if (list) {
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:#ef4444;">Ошибка загрузки пользователей</div>';
+            }
+        }
     }
 
     // Ban User

@@ -7,7 +7,15 @@ import threading
 from datetime import datetime
 import os
 import sys
+import logging
 from dotenv import load_dotenv
+
+# Отключаем все логи (кроме критических ошибок)
+logging.basicConfig(level=logging.CRITICAL)
+logging.getLogger('firebase_admin').setLevel(logging.CRITICAL)
+logging.getLogger('google').setLevel(logging.CRITICAL)
+logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+logging.getLogger('requests').setLevel(logging.CRITICAL)
 
 # Исправление кодировки для Windows
 if sys.platform == 'win32':
@@ -28,11 +36,17 @@ try:
         'storageBucket': 'teenx-hub.firebasestorage.app'
     })
     db = firestore.client()
-    print("✅ Firebase подключен!")
+    
+    # Отключаем логи Firebase
+    import logging
+    logging.getLogger('firebase_admin').setLevel(logging.CRITICAL)
+    logging.getLogger('google').setLevel(logging.CRITICAL)
+    
+    print("✅ Firebase подключен успешно")
 except Exception as e:
-    print(f"⚠️ Firebase не подключен: {e}")
-    print("Бот будет работать в ограниченном режиме")
+    print(f"❌ Ошибка Firebase: {e}")
     db = None
+    print("Бот будет работать в ограниченном режиме")
 
 bot = telebot.TeleBot(TOKEN)
 
@@ -605,6 +619,8 @@ def is_user_verified(telegram_id):
 
 def send_verification_request(chat_id, user):
     """Отправить запрос на верификацию админу"""
+    import re
+    
     markup = types.InlineKeyboardMarkup(row_width=2)
     markup.add(
         types.InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_user_{user['uid']}"),
@@ -613,8 +629,9 @@ def send_verification_request(chat_id, user):
     
     # Добавляем кнопку WhatsApp если есть телефон
     if user.get('phone'):
+        phone_clean = re.sub(r'\D', '', user['phone'])
         markup.add(
-            types.InlineKeyboardButton("💬 WhatsApp", url=f"https://wa.me/{user['phone'].replace(/\D/g, '')}")
+            types.InlineKeyboardButton("💬 WhatsApp", url=f"https://wa.me/{phone_clean}")
         )
     
     caption = (

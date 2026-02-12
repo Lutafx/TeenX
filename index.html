@@ -1787,6 +1787,159 @@
         input:checked + .slider:before {
             transform: translateX(22px);
         }
+
+        /* Admin Panel Styles */
+        .admin-tab-btn {
+            padding: 10px 16px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 8px 8px 0 0;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .admin-tab-btn:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .admin-tab-btn.active {
+            color: var(--primary-light);
+            background: rgba(124, 58, 237, 0.1);
+        }
+
+        .admin-tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--primary-light);
+        }
+
+        .admin-panel-section {
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .admin-user-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .admin-user-card:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(124, 58, 237, 0.3);
+        }
+
+        .admin-user-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .admin-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-user-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .admin-user-details h4 {
+            margin: 0 0 4px 0;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .admin-user-details p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .admin-user-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .admin-status-badge {
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .admin-status-verified {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .admin-status-pending {
+            background: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+        }
+
+        .admin-status-banned {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .admin-btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .admin-btn-ban {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .admin-btn-ban:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .admin-btn-unban {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+        }
+
+        .admin-btn-unban:hover {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        .admin-btn-verify {
+            background: rgba(59, 130, 246, 0.1);
+            color: #3b82f6;
+        }
+
+        .admin-btn-verify:hover {
+            background: rgba(59, 130, 246, 0.2);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
@@ -2167,6 +2320,93 @@
             </div>
         </div>
 
+        <div id="tab-admin" class="app-tab" style="display:none;">
+            <div style="padding: 40px 0;">
+                <h2 style="margin-bottom:24px;">⭐ Админ-панель</h2>
+                
+                <!-- Admin Stats -->
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:32px;">
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">👥</div>
+                            <div id="adminTotalUsers" style="font-size:24px; font-weight:700; color:var(--primary-light);">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Всего пользователей</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">✅</div>
+                            <div id="adminVerifiedUsers" style="font-size:24px; font-weight:700; color:#10b981;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Верифицированных</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">📋</div>
+                            <div id="adminTotalJobs" style="font-size:24px; font-weight:700; color:#f59e0b;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Вакансий</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">🚫</div>
+                            <div id="adminBannedUsers" style="font-size:24px; font-weight:700; color:#ef4444;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Забанено</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Tabs -->
+                <div style="display:flex; gap:8px; margin-bottom:24px; border-bottom:1px solid var(--border);">
+                    <button class="admin-tab-btn active" id="admin-users-tab" onclick="switchAdminPanel('users')">👥 Пользователи</button>
+                    <button class="admin-tab-btn" id="admin-jobs-tab" onclick="switchAdminPanel('jobs')">📋 Вакансии</button>
+                    <button class="admin-tab-btn" id="admin-blacklist-tab" onclick="switchAdminPanel('blacklist')">🚫 Черный список</button>
+                    <button class="admin-tab-btn" id="admin-logs-tab" onclick="switchAdminPanel('logs')">📝 Логи</button>
+                </div>
+
+                <!-- Users Management -->
+                <div id="admin-users-panel" class="admin-panel-section">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="margin:0;">Управление пользователями</h3>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="userSearchInput" placeholder="Поиск пользователя..." style="padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:rgba(255,255,255,0.05); color:var(--text);">
+                            <button class="btn btn-primary" onclick="searchUsers()">🔍 Поиск</button>
+                        </div>
+                    </div>
+                    <div id="adminUsersList"></div>
+                </div>
+
+                <!-- Jobs Management -->
+                <div id="admin-jobs-panel" class="admin-panel-section" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="margin:0;">Модерация вакансий</h3>
+                        <div style="display:flex; gap:8px;">
+                            <button class="btn btn-primary" onclick="openModal('modalJob')">➕ Создать вакансию</button>
+                        </div>
+                    </div>
+                    <div id="adminJobsList"></div>
+                </div>
+
+                <!-- Blacklist Management -->
+                <div id="admin-blacklist-panel" class="admin-panel-section" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="margin:0;">Черный список</h3>
+                        <button class="btn btn-primary" onclick="openModal('modalBlacklist')">➕ Добавить в ЧС</button>
+                    </div>
+                    <div id="adminBlacklistList"></div>
+                </div>
+
+                <!-- System Logs -->
+                <div id="admin-logs-panel" class="admin-panel-section" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <h3 style="margin:0;">Системные логи</h3>
+                        <button class="btn btn-ghost" onclick="refreshLogs()">🔄 Обновить</button>
+                    </div>
+                    <div id="adminLogsList" style="background:rgba(0,0,0,0.3); border-radius:8px; padding:16px; font-family:monospace; font-size:12px; max-height:400px; overflow-y:auto;"></div>
+                </div>
+            </div>
+        </div>
+
         <div id="tab-profile" class="app-tab" style="display:none;">
             <div style="padding: 40px 0;">
                 <div class="profile-card">
@@ -2227,52 +2467,7 @@
                     <div id="myJobsList" style="margin-top:20px;"></div>
                 </div>
 
-                <div id="adminPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
-                    <h3 style="color: var(--primary-light); margin-bottom:15px;">🛡️ Админ-панель</h3>
-                    
-                    <div class="admin-tabs">
-                        <button class="admin-tab active" onclick="switchAdminTab('jobs')">📋 Вакансии</button>
-                        <button class="admin-tab" onclick="switchAdminTab('users')">👥 Верификация</button>
-                        <button class="admin-tab" onclick="switchAdminTab('stats')">📊 Статистика</button>
-                    </div>
-                    
-                    <div id="adminJobsTab">
-                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                            <h4 style="margin-bottom:0; font-size:15px;">⏳ На модерации</h4>
-                            <button class="btn btn-primary" onclick="openAdminJobModal()" style="padding:8px 16px; font-size:13px;">➕ Создать вакансию</button>
-                        </div>
-                        <div id="pendingJobsList"></div>
-                        <h4 style="margin:20px 0 12px; font-size:15px;">🗑️ Корзина</h4>
-                        <div id="trashList"></div>
-                    </div>
-                    
-                    <div id="adminUsersTab" style="display:none;">
-                        <h4 style="margin-bottom:12px; font-size:15px;">⏳ Ожидают проверки</h4>
-                        <div id="pendingUsersList"></div>
-                    </div>
-                    
-                    <div id="adminStatsTab" style="display:none;">
-                        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(150px, 1fr)); gap:16px;">
-                            <div class="stat-item">
-                                <div class="stat-number" id="statTotalUsers">0</div>
-                                <div class="stat-label">Всего пользователей</div>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="statVerifiedUsers">0</div>
-                                <div class="stat-label">Верифицировано</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="statTotalJobs">0</div>
-                                <div class="stat-label">Всего вакансий</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-number" id="statActiveJobs">0</div>
-                                <div class="stat-label">Активных</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -2292,6 +2487,9 @@
             </div>
             <div class="nav-item" id="side-support" onclick="switchTab('support')" title="Поддержка">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+            </div>
+            <div class="nav-item" id="side-admin" onclick="switchTab('admin')" title="Админ-панель" style="display:none;">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
             </div>
         </div>
         
@@ -2336,6 +2534,9 @@
         </div>
         <div class="tab-icon" id="nav-support" onclick="switchTab('support')">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+        </div>
+        <div class="tab-icon" id="nav-admin" onclick="switchTab('admin')" style="display:none;">
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
         </div>
         <div class="tab-icon" id="nav-settings" onclick="switchTab('settings')">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M12 1v6m0 6v6M4.22 4.22l4.24 4.24m5.08 5.08l4.24 4.24M1 12h6m6 0h6M4.22 19.78l4.24-4.24m5.08-5.08l4.24-4.24"></path></svg>
@@ -3285,13 +3486,7 @@
             renderMyJobs();
         }
         
-        // Show admin panel
-        if (currentUser.email === ADMIN) {
-            document.getElementById('adminPanel').style.display = 'block';
-            // Загружаем статистику для админа
-            renderAdminStats();
-        }
-
+        
         // Jobs - Show skeleton loaders first
         const list = document.getElementById('jobList');
         list.innerHTML = `
@@ -4428,6 +4623,9 @@
             renderMyJobsForEmployer();
         } else if (tab === 'profile') {
             updateProfileProgress();
+        } else if (tab === 'admin') {
+            updateAdminStats();
+            switchAdminPanel('users');
         }
     };
 
@@ -4599,6 +4797,366 @@
         document.getElementById('side-myjobs').style.display = 'flex';
         document.getElementById('nav-myjobs').style.display = 'flex';
     }
+
+    // Show Admin tab for admin users
+    if (currentUser && currentUser.email === ADMIN) {
+        document.getElementById('side-admin').style.display = 'flex';
+        document.getElementById('nav-admin').style.display = 'flex';
+    }
+
+    // ADMIN PANEL FUNCTIONS
+    window.switchAdminPanel = (panel) => {
+        // Hide all panels
+        document.querySelectorAll('.admin-panel-section').forEach(p => p.style.display = 'none');
+        
+        // Remove active class from all tabs
+        document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
+        
+        // Show selected panel
+        document.getElementById(`admin-${panel}-panel`).style.display = 'block';
+        document.getElementById(`admin-${panel}-tab`).classList.add('active');
+        
+        // Load data for specific panels
+        if (panel === 'users') {
+            renderAdminUsers();
+        } else if (panel === 'jobs') {
+            renderAdminJobs();
+        } else if (panel === 'blacklist') {
+            renderAdminBlacklist();
+        } else if (panel === 'logs') {
+            refreshLogs();
+        }
+    };
+
+    // Render Admin Users
+    async function renderAdminUsers() {
+        const snap = await getDocs(collection(db, "users"));
+        const list = document.getElementById('adminUsersList');
+        list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+        
+        const users = [];
+        snap.forEach(d => {
+            const user = d.data();
+            users.push({ id: d.id, ...user });
+        });
+        
+        list.innerHTML = '';
+        
+        if (users.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Пользователей не найдено</div>';
+            return;
+        }
+        
+        users.forEach(user => {
+            const statusClass = user.banned ? 'admin-status-banned' : 
+                               user.verified === 'yes' ? 'admin-status-verified' : 
+                               'admin-status-pending';
+            
+            const statusText = user.banned ? 'Забанен' : 
+                              user.verified === 'yes' ? 'Верифицирован' : 
+                              'На проверке';
+            
+            const card = document.createElement('div');
+            card.className = 'admin-user-card';
+            
+            card.innerHTML = `
+                <div class="admin-user-header">
+                    <div class="admin-user-info">
+                        <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff&size=48`}" 
+                             alt="Avatar" class="admin-user-avatar">
+                        <div class="admin-user-details">
+                            <h4>${user.name || 'Без имени'}</h4>
+                            <p>${user.email} • ${user.type === 'teen' ? 'Подросток' : 'Работодатель'}</p>
+                        </div>
+                    </div>
+                    <span class="admin-status-badge ${statusClass}">${statusText}</span>
+                </div>
+                <div class="admin-user-actions">
+                    ${user.banned ? 
+                        `<button class="admin-btn-small admin-btn-unban" onclick="unbanUser('${user.id}')">✅ Разбанить</button>` :
+                        `<button class="admin-btn-small admin-btn-ban" onclick="banUser('${user.id}')">🚫 Забанить</button>`
+                    }
+                    ${user.verified !== 'yes' && !user.banned ? 
+                        `<button class="admin-btn-small admin-btn-verify" onclick="verifyUser('${user.id}')">✅ Верифицировать</button>` : ''
+                    }
+                    <button class="admin-btn-small" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;" onclick="viewUserDetails('${user.id}')">👁️ Детали</button>
+                </div>
+            `;
+            
+            list.appendChild(card);
+        });
+    }
+
+    // Ban User
+    window.banUser = async (userId) => {
+        if (!confirm('Вы уверены, что хотите забанить этого пользователя?')) return;
+        
+        try {
+            await updateDoc(doc(db, 'users', userId), { 
+                banned: true,
+                bannedAt: new Date().toISOString(),
+                bannedBy: currentUser.uid
+            });
+            
+            showToast('🚫 Пользователь забанен', 'success');
+            renderAdminUsers();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error banning user:', error);
+            alert('Ошибка бана пользователя');
+        }
+    };
+
+    // Unban User
+    window.unbanUser = async (userId) => {
+        if (!confirm('Вы уверены, что хотите разбанить этого пользователя?')) return;
+        
+        try {
+            await updateDoc(doc(db, 'users', userId), { 
+                banned: false,
+                unbannedAt: new Date().toISOString(),
+                unbannedBy: currentUser.uid
+            });
+            
+            showToast('✅ Пользователь разбанен', 'success');
+            renderAdminUsers();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error unbanning user:', error);
+            alert('Ошибка разбана пользователя');
+        }
+    };
+
+    // Verify User
+    window.verifyUser = async (userId) => {
+        try {
+            await updateDoc(doc(db, 'users', userId), { 
+                verified: 'yes',
+                verifiedAt: new Date().toISOString(),
+                verifiedBy: currentUser.uid
+            });
+            
+            showToast('✅ Пользователь верифицирован', 'success');
+            renderAdminUsers();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error verifying user:', error);
+            alert('Ошибка верификации пользователя');
+        }
+    };
+
+    // View User Details
+    window.viewUserDetails = (userId) => {
+        // Implementation for viewing detailed user information
+        alert(`Детали пользователя: ${userId}`);
+    };
+
+    // Search Users
+    window.searchUsers = async () => {
+        const query = document.getElementById('userSearchInput').value.toLowerCase();
+        if (!query) {
+            renderAdminUsers();
+            return;
+        }
+        
+        const snap = await getDocs(collection(db, "users"));
+        const list = document.getElementById('adminUsersList');
+        list.innerHTML = '';
+        
+        let found = false;
+        snap.forEach(d => {
+            const user = d.data();
+            if (user.name?.toLowerCase().includes(query) || 
+                user.email?.toLowerCase().includes(query)) {
+                found = true;
+                // Render user card (reuse from renderAdminUsers)
+            }
+        });
+        
+        if (!found) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Пользователи не найдены</div>';
+        }
+    };
+
+    // Render Admin Jobs
+    async function renderAdminJobs() {
+        const snap = await getDocs(collection(db, "jobs"));
+        const list = document.getElementById('adminJobsList');
+        list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+        
+        const jobs = [];
+        snap.forEach(d => {
+            const job = d.data();
+            if (job.status !== 'deleted') {
+                jobs.push({ id: d.id, ...job });
+            }
+        });
+        
+        list.innerHTML = '';
+        
+        if (jobs.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Вакансий не найдено</div>';
+            return;
+        }
+        
+        jobs.forEach(job => {
+            const statusBadge = job.status === 'pending' ? 
+                '<span class="badge badge-pending">На модерации</span>' : 
+                job.status === 'active' ? 
+                '<span class="badge badge-verified">Активна</span>' : 
+                '<span class="badge" style="background:rgba(239,68,68,0.1); color:#ef4444;">Отклонена</span>';
+            
+            const card = document.createElement('div');
+            card.className = 'admin-user-card';
+            
+            card.innerHTML = `
+                <div class="admin-user-header">
+                    <div>
+                        <h4 style="margin:0 0 8px 0;">${job.title}</h4>
+                        <p style="margin:0; color:var(--text-secondary); font-size:13px;">
+                            ${job.companyName || 'Компания'} • ${job.city || 'Город'}
+                        </p>
+                    </div>
+                    ${statusBadge}
+                </div>
+                <div class="admin-user-actions">
+                    ${job.status === 'pending' ? 
+                        `<button class="admin-btn-small admin-btn-verify" onclick="approveJob('${job.id}')">✅ Одобрить</button>` : ''
+                    }
+                    <button class="admin-btn-small" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;" onclick="rejectJob('${job.id}')">❌ Отклонить</button>
+                    <button class="admin-btn-small" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;" onclick="deleteJob('${job.id}')">🗑️ Удалить</button>
+                </div>
+            `;
+            
+            list.appendChild(card);
+        });
+    }
+
+    // Render Admin Blacklist
+    async function renderAdminBlacklist() {
+        const snap = await getDocs(collection(db, "users"));
+        const list = document.getElementById('adminBlacklistList');
+        list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+        
+        const bannedUsers = [];
+        snap.forEach(d => {
+            const user = d.data();
+            if (user.banned) {
+                bannedUsers.push({ id: d.id, ...user });
+            }
+        });
+        
+        list.innerHTML = '';
+        
+        if (bannedUsers.length === 0) {
+            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Черный список пуст</div>';
+            return;
+        }
+        
+        bannedUsers.forEach(user => {
+            const card = document.createElement('div');
+            card.className = 'admin-user-card';
+            
+            card.innerHTML = `
+                <div class="admin-user-header">
+                    <div class="admin-user-info">
+                        <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=ef4444&color=fff&size=48`}" 
+                             alt="Avatar" class="admin-user-avatar">
+                        <div class="admin-user-details">
+                            <h4>${user.name || 'Без имени'}</h4>
+                            <p>${user.email} • Забанен: ${new Date(user.bannedAt).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                    <span class="admin-status-badge admin-status-banned">Забанен</span>
+                </div>
+                <div class="admin-user-actions">
+                    <button class="admin-btn-small admin-btn-unban" onclick="unbanUser('${user.id}')">✅ Разбанить</button>
+                </div>
+            `;
+            
+            list.appendChild(card);
+        });
+    }
+
+    // Refresh Logs
+    window.refreshLogs = () => {
+        const logsList = document.getElementById('adminLogsList');
+        const logs = [
+            `[${new Date().toISOString()}] 🚀 Admin panel accessed by ${currentUser.email}`,
+            `[${new Date().toISOString()}] 👥 Total users: ${document.getElementById('adminTotalUsers').textContent}`,
+            `[${new Date().toISOString()}] ✅ Verified users: ${document.getElementById('adminVerifiedUsers').textContent}`,
+            `[${new Date().toISOString()}] 📋 Total jobs: ${document.getElementById('adminTotalJobs').textContent}`,
+            `[${new Date().toISOString()}] 🚫 Banned users: ${document.getElementById('adminBannedUsers').textContent}`,
+        ];
+        
+        logsList.innerHTML = logs.join('\n');
+    };
+
+    // Update Admin Stats
+    async function updateAdminStats() {
+        const usersSnap = await getDocs(collection(db, "users"));
+        const jobsSnap = await getDocs(collection(db, "jobs"));
+        
+        let totalUsers = 0;
+        let verifiedUsers = 0;
+        let bannedUsers = 0;
+        
+        usersSnap.forEach(d => {
+            const user = d.data();
+            totalUsers++;
+            if (user.verified === 'yes') verifiedUsers++;
+            if (user.banned) bannedUsers++;
+        });
+        
+        let totalJobs = 0;
+        jobsSnap.forEach(d => {
+            const job = d.data();
+            if (job.status !== 'deleted') totalJobs++;
+        });
+        
+        document.getElementById('adminTotalUsers').textContent = totalUsers;
+        document.getElementById('adminVerifiedUsers').textContent = verifiedUsers;
+        document.getElementById('adminTotalJobs').textContent = totalJobs;
+        document.getElementById('adminBannedUsers').textContent = bannedUsers;
+    }
+
+    // Approve Job
+    window.approveJob = async (jobId) => {
+        try {
+            await updateDoc(doc(db, 'jobs', jobId), { 
+                status: 'active',
+                approvedAt: new Date().toISOString(),
+                approvedBy: currentUser.uid
+            });
+            
+            showToast('✅ Вакансия одобрена', 'success');
+            renderAdminJobs();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error approving job:', error);
+            alert('Ошибка одобрения вакансии');
+        }
+    };
+
+    // Reject Job
+    window.rejectJob = async (jobId) => {
+        if (!confirm('Вы уверены, что хотите отклонить эту вакансию?')) return;
+        
+        try {
+            await updateDoc(doc(db, 'jobs', jobId), { 
+                status: 'rejected',
+                rejectedAt: new Date().toISOString(),
+                rejectedBy: currentUser.uid
+            });
+            
+            showToast('❌ Вакансия отклонена', 'success');
+            renderAdminJobs();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error rejecting job:', error);
+            alert('Ошибка отклонения вакансии');
+        }
+    };
 </script>
 </body>
 </html>

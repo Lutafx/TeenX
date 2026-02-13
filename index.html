@@ -3004,6 +3004,8 @@
     const ADMIN = "querty482901@gmail.com";
 
     let currentUser = null;
+    let uploadedFile = null;
+    let currentEditingJobId = null;
     let selectedRole = 'teen';
     let allJobs = [];
     let currentFilter = 'all';
@@ -3056,7 +3058,6 @@
     };
     
     let selectedDocType = 'id';
-    let uploadedFile = null;
     
     window.selectDocType = (type) => {
         selectedDocType = type;
@@ -5068,7 +5069,7 @@
             card.className = 'admin-user-card';
             
             card.innerHTML = `
-                <div class="admin-user-header">
+                <div class="admin-user-header" onclick="viewUserDetails('${user.id}')" style="cursor:pointer;">
                     <div class="admin-user-info">
                         <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff&size=48`}" 
                              alt="Avatar" class="admin-user-avatar">
@@ -5081,14 +5082,14 @@
                 </div>
                 <div class="admin-user-actions">
                     ${user.verificationDoc ? 
-                        `<button class="admin-btn-small" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;" onclick="viewVerificationDocs('${user.id}')">📄 Документы</button>` : ''
+                        `<button class="admin-btn-small" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;" onclick="event.stopPropagation(); viewVerificationDocs('${user.id}')">📄 Документы</button>` : ''
                     }
                     ${user.banned ? 
-                        `<button class="admin-btn-small admin-btn-unban" onclick="unbanUser('${user.id}')">✅ Разбанить</button>` :
-                        `<button class="admin-btn-small admin-btn-ban" onclick="banUser('${user.id}')">🚫 Забанить</button>`
+                        `<button class="admin-btn-small admin-btn-unban" onclick="event.stopPropagation(); unbanUser('${user.id}')">✅ Разбанить</button>` :
+                        `<button class="admin-btn-small admin-btn-ban" onclick="event.stopPropagation(); banUser('${user.id}')">🚫 Забанить</button>`
                     }
                     ${user.verified !== 'yes' && !user.banned ? 
-                        `<button class="admin-btn-small admin-btn-verify" onclick="verifyUser('${user.id}')">✅ Верифицировать</button>` : ''
+                        `<button class="admin-btn-small admin-btn-verify" onclick="event.stopPropagation(); verifyUser('${user.id}')">✅ Верифицировать</button>` : ''
                     }
                 </div>
             `;
@@ -5103,6 +5104,98 @@
             }
         }
     }
+
+    // View User Details
+    window.viewUserDetails = async (userId) => {
+        try {
+            const userSnap = await getDoc(doc(db, 'users', userId));
+            if (!userSnap.exists()) {
+                alert('Пользователь не найден');
+                return;
+            }
+            
+            const user = userSnap.data();
+            
+            // Show user details in a modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-box" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+                    <h3 style="margin-bottom:20px;">👤 Детали пользователя</h3>
+                    
+                    <div style="display:flex; align-items:center; gap:16px; margin-bottom:20px;">
+                        <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff&size=80`}" 
+                             alt="Avatar" style="width:80px; height:80px; border-radius:50%; object-fit:cover;">
+                        <div>
+                            <h4 style="margin:0 0 8px 0; font-size:20px;">${user.name || 'Без имени'}</h4>
+                            <p style="margin:0; color:var(--text-secondary);">${user.email}</p>
+                            <p style="margin:4px 0 0 0; color:var(--text-secondary); font-size:14px;">
+                                ${user.type === 'teen' ? '👤 Подросток' : '💼 Работодатель'}
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+                        <div>
+                            <strong>📞 Телефон:</strong> ${user.phone || 'Не указан'}<br>
+                            <strong>🎂 Возраст:</strong> ${user.age || 'Не указан'}<br>
+                            <strong>📅 Дата рождения:</strong> ${user.birthdate || 'Не указана'}<br>
+                            <strong>🏙️ Город:</strong> ${user.city || 'Не указан'}
+                        </div>
+                        <div>
+                            <strong>✅ Статус:</strong> 
+                            ${user.banned ? '🚫 Забанен' : 
+                              user.verified === 'yes' ? '✅ Верифицирован' : 
+                              '⏳ На проверке'}<br>
+                            <strong>📅 Зарегистрирован:</strong> ${new Date(user.createdAt || Date.now()).toLocaleDateString()}<br>
+                            <strong>📊 ID:</strong> ${userId}<br>
+                            ${user.bin ? `<strong>🏢 БИН:</strong> ${user.bin}<br>` : ''}
+                            ${user.companyName ? `<strong>🏢 Компания:</strong> ${user.companyName}<br>` : ''}
+                        </div>
+                    </div>
+                    
+                    ${user.about ? `
+                    <div style="margin-bottom:20px;">
+                        <strong>📝 О себе:</strong><br>
+                        <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; margin-top:8px;">
+                            ${user.about}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    ${user.skills ? `
+                    <div style="margin-bottom:20px;">
+                        <strong>🎯 Навыки:</strong><br>
+                        <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; margin-top:8px;">
+                            ${user.skills}
+                        </div>
+                    </div>
+                    ` : ''}
+                    
+                    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                        <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Закрыть</button>
+                        ${user.verificationDoc ? 
+                            `<button class="btn" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;" onclick="this.closest('.modal').remove(); viewVerificationDocs('${userId}')">📄 Документы верификации</button>` : ''
+                        }
+                        ${user.banned ? 
+                            `<button class="btn admin-btn-unban" onclick="this.closest('.modal').remove(); unbanUser('${userId}')">✅ Разбанить</button>` :
+                            `<button class="btn admin-btn-ban" onclick="this.closest('.modal').remove(); banUser('${userId}')">🚫 Забанить</button>`
+                        }
+                        ${user.verified !== 'yes' && !user.banned ? 
+                            `<button class="btn admin-btn-verify" onclick="this.closest('.modal').remove(); verifyUser('${userId}')">✅ Верифицировать</button>` : ''
+                        }
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+        } catch (error) {
+            console.error('Error viewing user:', error);
+            alert('Ошибка загрузки пользователя');
+        }
+    };
 
     // Ban User
     window.banUser = async (userId) => {
@@ -5339,27 +5432,200 @@
             card.className = 'admin-user-card';
             
             card.innerHTML = `
-                <div class="admin-user-header">
+                <div class="admin-user-header" onclick="viewJobDetails('${job.id}')" style="cursor:pointer;">
                     <div>
                         <h4 style="margin:0 0 8px 0;">${job.title}</h4>
                         <p style="margin:0; color:var(--text-secondary); font-size:13px;">
                             ${job.companyName || 'Компания'} • ${job.city || 'Город'}
+                        </p>
+                        <p style="margin:4px 0 0 0; color:var(--text-secondary); font-size:12px;">
+                            💰 ${job.salaryFrom || 0} - ${job.salaryTo || 0} ₸ • 👥 ${job.minAge || 14}+ лет
                         </p>
                     </div>
                     ${statusBadge}
                 </div>
                 <div class="admin-user-actions">
                     ${job.status === 'pending' ? 
-                        `<button class="admin-btn-small admin-btn-verify" onclick="approveJob('${job.id}')">✅ Одобрить</button>` : ''
+                        `<button class="admin-btn-small admin-btn-verify" onclick="event.stopPropagation(); approveJob('${job.id}')">✅ Принять</button>
+                         <button class="admin-btn-small" style="background: rgba(251,191,36,0.15); color:#f59e0b; border:1px solid #f59e0b;" onclick="event.stopPropagation(); rejectJob('${job.id}')">❌ Отклонить</button>` :
+                        job.status === 'active' ?
+                        `<button class="admin-btn-small" style="background: rgba(251,191,36,0.15); color:#f59e0b; border:1px solid #f59e0b;" onclick="event.stopPropagation(); rejectJob('${job.id}')">❌ Отклонить</button>` :
+                        `<button class="admin-btn-small admin-btn-verify" onclick="event.stopPropagation(); approveJob('${job.id}')">✅ Принять</button>`
                     }
-                    <button class="admin-btn-small" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;" onclick="rejectJob('${job.id}')">❌ Отклонить</button>
-                    <button class="admin-btn-small" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;" onclick="deleteJob('${job.id}')">🗑️ Удалить</button>
+                    <button class="admin-btn-small" style="background: rgba(124,58,237,0.15); color:#7c3aed; border:1px solid #7c3aed;" onclick="event.stopPropagation(); editJob('${job.id}')">✏️ Редактировать</button>
+                    <button class="admin-btn-small" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="event.stopPropagation(); deleteJob('${job.id}')">🗑️ Удалить</button>
                 </div>
             `;
             
             list.appendChild(card);
         });
     }
+
+    // View Job Details
+    window.viewJobDetails = async (jobId) => {
+        try {
+            const jobSnap = await getDoc(doc(db, 'jobs', jobId));
+            if (!jobSnap.exists()) {
+                alert('Вакансия не найдена');
+                return;
+            }
+            
+            const job = jobSnap.data();
+            
+            // Show job details in a modal
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.style.display = 'flex';
+            modal.innerHTML = `
+                <div class="modal-box" style="max-width:800px; max-height:90vh; overflow-y:auto;">
+                    <h3 style="margin-bottom:20px;">📋 Детали вакансии</h3>
+                    
+                    <div style="background:rgba(59,130,246,0.1); border-left:4px solid #3b82f6; padding:16px; border-radius:8px; margin-bottom:20px;">
+                        <h4 style="color:#60a5fa; margin-bottom:8px;">${job.title}</h4>
+                        <p style="color:#93c5fd; margin:0;">${job.companyName} • ${job.city}</p>
+                    </div>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:20px;">
+                        <div>
+                            <strong>💰 Зарплата:</strong> ${job.salaryFrom} - ${job.salaryTo} ₸<br>
+                            <strong>📅 График:</strong> ${job.schedule}<br>
+                            <strong>⏰ Часы:</strong> ${job.workingHours}<br>
+                            <strong>🏢 Формат:</strong> ${job.workFormat}
+                        </div>
+                        <div>
+                            <strong>👤 Возраст:</strong> от ${job.minAge} лет<br>
+                            <strong>💼 Опыт:</strong> ${job.experience}<br>
+                            <strong>📞 Телефон:</strong> ${job.phone}<br>
+                            <strong>📧 Email:</strong> ${job.contactEmail || 'Не указан'}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <strong>📝 Описание:</strong><br>
+                        <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; margin-top:8px;">
+                            ${job.responsibilities || 'Не указано'}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-bottom:20px;">
+                        <strong>🎯 Требования:</strong><br>
+                        <div style="background:rgba(0,0,0,0.2); padding:12px; border-radius:8px; margin-top:8px;">
+                            ${job.requirements || 'Не указано'}
+                        </div>
+                    </div>
+                    
+                    <div style="display:flex; gap:12px;">
+                        <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Закрыть</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+        } catch (error) {
+            console.error('Error viewing job:', error);
+            alert('Ошибка загрузки вакансии');
+        }
+    };
+
+    // Edit Job
+    window.editJob = async (jobId) => {
+        try {
+            const jobSnap = await getDoc(doc(db, 'jobs', jobId));
+            if (!jobSnap.exists()) {
+                alert('Вакансия не найдена');
+                return;
+            }
+            
+            const job = jobSnap.data();
+            currentEditingJobId = jobId;
+            
+            // Fill job modal with existing data
+            document.getElementById('jTitle').value = job.title || '';
+            document.getElementById('jCompanyName').value = job.companyName || '';
+            document.getElementById('jCompanyDescription').value = job.companyDescription || '';
+            document.getElementById('jCity').value = job.city || '';
+            document.getElementById('jSalaryFrom').value = job.salaryFrom || '';
+            document.getElementById('jSalaryTo').value = job.salaryTo || '';
+            document.getElementById('jPaymentType').value = job.paymentType || 'на руки';
+            document.getElementById('jPaymentSchedule').value = job.paymentSchedule || '2 раза в месяц';
+            document.getElementById('jExperience').value = job.experience || 'Без опыта';
+            document.getElementById('jEmploymentType').value = job.employmentType || 'Полная занятость';
+            document.getElementById('jSchedule').value = job.schedule || '5/2';
+            document.getElementById('jWorkingHours').value = job.workingHours || '4 часа';
+            document.getElementById('jWorkFormat').value = job.workFormat || 'офис';
+            document.getElementById('jMinAge').value = job.minAge || '14';
+            document.getElementById('jResponsibilities').value = job.responsibilities || '';
+            document.getElementById('jRequirements').value = job.requirements || '';
+            document.getElementById('jBenefits').value = job.benefits || '';
+            document.getElementById('jContactName').value = job.contactName || '';
+            document.getElementById('jPhone').value = job.phone || '';
+            document.getElementById('jContactEmail').value = job.contactEmail || '';
+            
+            // Change modal title and button
+            document.querySelector('#modalJob h2').textContent = '✏️ Редактировать вакансию';
+            document.getElementById('jobSaveBtn').textContent = '💾 Сохранить изменения';
+            document.getElementById('jobSaveBtn').onclick = updateJob;
+            
+            openModal('modalJob');
+            
+        } catch (error) {
+            console.error('Error editing job:', error);
+            alert('Ошибка загрузки вакансии');
+        }
+    };
+
+    // Update Job
+    window.updateJob = async () => {
+        if (!currentEditingJobId) return;
+        
+        try {
+            const jobData = {
+                title: document.getElementById('jTitle').value.trim(),
+                companyName: document.getElementById('jCompanyName').value.trim(),
+                companyDescription: document.getElementById('jCompanyDescription').value.trim(),
+                city: document.getElementById('jCity').value.trim(),
+                salaryFrom: parseInt(document.getElementById('jSalaryFrom').value),
+                salaryTo: parseInt(document.getElementById('jSalaryTo').value),
+                paymentType: document.getElementById('jPaymentType').value,
+                paymentSchedule: document.getElementById('jPaymentSchedule').value,
+                experience: document.getElementById('jExperience').value,
+                employmentType: document.getElementById('jEmploymentType').value,
+                schedule: document.getElementById('jSchedule').value,
+                workingHours: document.getElementById('jWorkingHours').value,
+                workFormat: document.getElementById('jWorkFormat').value,
+                minAge: parseInt(document.getElementById('jMinAge').value),
+                responsibilities: document.getElementById('jResponsibilities').value.trim(),
+                requirements: document.getElementById('jRequirements').value.trim(),
+                benefits: document.getElementById('jBenefits').value.trim(),
+                contactName: document.getElementById('jContactName').value.trim(),
+                phone: document.getElementById('jPhone').value.trim(),
+                contactEmail: document.getElementById('jContactEmail').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+            
+            if (!jobData.title || !jobData.salaryFrom || !jobData.salaryTo || !jobData.phone) {
+                alert('Заполните все обязательные поля');
+                return;
+            }
+            
+            await updateDoc(doc(db, 'jobs', currentEditingJobId), jobData);
+            
+            alert('✅ Вакансия обновлена!');
+            closeModals();
+            renderAdminJobs();
+            currentEditingJobId = null;
+            
+            // Reset modal
+            document.querySelector('#modalJob h2').textContent = 'Добавить вакансию';
+            document.getElementById('jobSaveBtn').textContent = 'Отправить на модерацию';
+            document.getElementById('jobSaveBtn').onclick = createJobDetailed;
+            
+        } catch (error) {
+            console.error('Error updating job:', error);
+            alert('Ошибка обновления вакансии');
+        }
+    };
 
     // Render Admin Blacklist
     async function renderAdminBlacklist() {

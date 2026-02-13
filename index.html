@@ -5280,13 +5280,21 @@
                 
                 ${user.verificationDoc ? `
                     <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
-                        <h4 style="margin:0 0 12px 0;">📄 Документ верификации</h4>
+                        <h4 style="margin:0 0 12px 0;">📄 Документ верификации ${user.type === 'boss' ? '(подтверждающий БИН)' : ''}</h4>
                         <div style="text-align:center;">
                             ${user.verificationDoc.endsWith('.pdf') ? 
                                 `<a href="${user.verificationDoc}" target="_blank" class="btn btn-primary" style="display:inline-block; margin:10px;">📄 Открыть PDF</a>` :
                                 `<img src="${user.verificationDoc}" style="max-width:100%; border-radius:8px; margin-top:12px;" alt="Документ верификации">`
                             }
                         </div>
+                        ${user.type === 'boss' ? `
+                            <div style="margin-top:16px; padding:12px; background:rgba(251,191,36,0.1); border-left:4px solid #fbbf24; border-radius:4px;">
+                                <p style="margin:0; font-size:13px; color:#fcd34d;">
+                                    <strong>🏢 Верификация работодателя:</strong><br>
+                                    Документ должен подтверждать БИН ${user.BIN || 'указанный в профиле'} и легитимность компании "${user.companyName || 'указанной в профиле'}"
+                                </p>
+                            </div>
+                        ` : ''}
                     </div>
                 ` : '<p style="color:var(--text-secondary);">Документы не загружены</p>'}
             `;
@@ -5447,7 +5455,8 @@
                 <div class="admin-user-actions">
                     ${job.status === 'pending' ? 
                         `<button class="admin-btn-small admin-btn-verify" onclick="event.stopPropagation(); approveJob('${job.id}')">✅ Принять</button>
-                         <button class="admin-btn-small" style="background: rgba(251,191,36,0.15); color:#f59e0b; border:1px solid #f59e0b;" onclick="event.stopPropagation(); rejectJob('${job.id}')">❌ Отклонить</button>` :
+                         <button class="admin-btn-small" style="background: rgba(251,191,36,0.15); color:#f59e0b; border:1px solid #f59e0b;" onclick="event.stopPropagation(); rejectJob('${job.id}')">❌ Отклонить</button>
+                         <button class="admin-btn-small" style="background: rgba(107,114,128,0.15); color:var(--text-secondary); border:1px solid #6b7280;" onclick="event.stopPropagation(); cancelJob('${job.id}')">🚫 Отмена</button>` :
                         job.status === 'active' ?
                         `<button class="admin-btn-small" style="background: rgba(251,191,36,0.15); color:#f59e0b; border:1px solid #f59e0b;" onclick="event.stopPropagation(); rejectJob('${job.id}')">❌ Отклонить</button>` :
                         `<button class="admin-btn-small admin-btn-verify" onclick="event.stopPropagation(); approveJob('${job.id}')">✅ Принять</button>`
@@ -5459,7 +5468,27 @@
             
             list.appendChild(card);
         });
-    }
+    };
+
+    // Cancel Job
+    window.cancelJob = async (jobId) => {
+        if (!confirm('Вы уверены, что хотите отменить эту вакансию?')) return;
+        
+        try {
+            await updateDoc(doc(db, 'jobs', jobId), { 
+                status: 'cancelled',
+                cancelledAt: new Date().toISOString(),
+                cancelledBy: currentUser.uid
+            });
+            
+            showToast('🚫 Вакансия отменена', 'success');
+            renderAdminJobs();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error cancelling job:', error);
+            alert('Ошибка отмены вакансии');
+        }
+    };
 
     // View Job Details
     window.viewJobDetails = async (jobId) => {
@@ -5548,8 +5577,8 @@
             document.getElementById('jSalaryFrom').value = job.salaryFrom || '';
             document.getElementById('jSalaryTo').value = job.salaryTo || '';
             document.getElementById('jPaymentType').value = job.paymentType || 'на руки';
-            document.getElementById('jPaymentSchedule').value = job.paymentSchedule || '2 раза в месяц';
-            document.getElementById('jExperience').value = job.experience || 'Без опыта';
+            document.getElementById('jPaymentSchedule').value = job.paymentSchedule || 'два раза в месяц';
+            document.getElementById('jExperience').value = job.experience || 'не требуется';
             document.getElementById('jEmploymentType').value = job.employmentType || 'Полная занятость';
             document.getElementById('jSchedule').value = job.schedule || '5/2';
             document.getElementById('jWorkingHours').value = job.workingHours || '4 часа';

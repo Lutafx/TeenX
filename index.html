@@ -2494,7 +2494,19 @@
 
                 <div id="bossPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
                     <h3 style="color: var(--primary-light); margin-bottom:15px;">💼 Панель работодателя</h3>
-                    <button class="btn btn-accent" style="width:100%;" onclick="openRegularJobModal()">➕ Создать вакансию</button>
+                    
+                    <!-- For unverified employers -->
+                    <div id="unverifiedBossMessage" style="display:none; background:rgba(251,191,36,0.1); border-left:4px solid #fbbf24; padding:16px; border-radius:8px; margin-bottom:20px;">
+                        <h4 style="color:#fbbf24; margin-bottom:8px;">⚠️ Требуется верификация</h4>
+                        <p style="color:#fcd34d; font-size:14px; margin:0;">Для создания вакансий необходимо подтвердить данные вашей организации</p>
+                        <button class="btn" style="margin-top:12px; background:#fbbf24; color:#000; font-weight:600;" onclick="openModal('modalVerify')">📋 Пройти верификацию</button>
+                    </div>
+                    
+                    <!-- For verified employers -->
+                    <div id="verifiedBossActions">
+                        <button class="btn btn-accent" style="width:100%;" onclick="openRegularJobModal()">➕ Создать вакансию</button>
+                    </div>
+                    
                     <div id="myJobsList" style="margin-top:20px;"></div>
                 </div>
 
@@ -2936,8 +2948,8 @@
         </div>
         
         <div style="display:flex; gap:12px; flex-wrap:wrap;">
-            <button class="btn btn-primary" style="flex:1; min-width:150px;" onclick="approveVerification()">✅ Одобрить</button>
-            <button class="btn" style="flex:1; min-width:150px; background:rgba(251,191,36,0.15); color:#f59e0b; border:2px solid #f59e0b;" onclick="rejectVerification()">❌ Отклонить</button>
+            <button class="btn btn-primary" style="flex:1; min-width:150px; font-weight:700;" onclick="approveVerification()">✅ Одобрить</button>
+            <button class="btn" style="flex:1; min-width:150px; background:#f59e0b !important; color:#000 !important; border:3px solid #f59e0b !important; font-weight:700; box-shadow:0 4px 12px rgba(245,158,11,0.4) !important;" onclick="rejectVerification()">❌ ОТКЛОНИТЬ</button>
             <button class="btn" style="flex:1; min-width:150px; background:rgba(239,68,68,0.15); color:#ef4444; border:2px solid #ef4444;" onclick="banUserFromDocs()">🚫 Забанить</button>
             <button class="btn btn-cancel" style="min-width:120px;" onclick="closeModals()">Закрыть</button>
         </div>
@@ -3554,16 +3566,30 @@
             document.getElementById('verifySection').style.display = 'none';
         }
         
-        // Show My Jobs tab for employers
+        // Show boss panel for all employers, but with different content
         if (currentUser && currentUser.type === 'boss') {
-            document.getElementById('side-myjobs').style.display = 'flex';
-            document.getElementById('nav-myjobs').style.display = 'flex';
-        }
-        
-        // Show boss panel
-        if (currentUser.type === 'boss') {
             document.getElementById('bossPanel').style.display = 'block';
-            renderMyJobs();
+            
+            if (currentUser.verified === 'yes') {
+                // VERIFIED employer - show full functionality
+                document.getElementById('side-myjobs').style.display = 'flex';
+                document.getElementById('nav-myjobs').style.display = 'flex';
+                document.getElementById('unverifiedBossMessage').style.display = 'none';
+                document.getElementById('verifiedBossActions').style.display = 'block';
+                renderMyJobs();
+            } else {
+                // UNVERIFIED employer - show verification prompt
+                document.getElementById('side-myjobs').style.display = 'none';
+                document.getElementById('nav-myjobs').style.display = 'none';
+                document.getElementById('unverifiedBossMessage').style.display = 'block';
+                document.getElementById('verifiedBossActions').style.display = 'none';
+                document.getElementById('myJobsList').innerHTML = '';
+            }
+        } else {
+            // Hide for teens
+            document.getElementById('side-myjobs').style.display = 'none';
+            document.getElementById('nav-myjobs').style.display = 'none';
+            document.getElementById('bossPanel').style.display = 'none';
         }
         
         // Show Admin tab for admin users
@@ -4752,6 +4778,30 @@
             await updateAdminStats();
             switchAdminPanel('users');
         }
+    };
+
+    // OPEN REGULAR JOB MODAL WITH VERIFICATION CHECK
+    window.openRegularJobModal = () => {
+        if (!currentUser) {
+            alert('Войдите в систему');
+            return;
+        }
+
+        // CHECK IF USER IS EMPLOYER
+        if (currentUser.type !== 'boss') {
+            alert('⚠️ Только работодатели могут создавать вакансии!');
+            return;
+        }
+
+        // CHECK IF EMPLOYER IS VERIFIED
+        if (currentUser.verified !== 'yes') {
+            alert('⚠️ Для создания вакансий необходимо пройти верификацию!\n\nПожалуйста, подтвердите данные вашей организации (БИН, название компании).');
+            setTimeout(() => openModal('modalVerify'), 300);
+            return;
+        }
+
+        // OPEN JOB MODAL
+        openModal('modalJob');
     };
 
     // RENDER MY JOBS FOR EMPLOYER WITH EDIT/DELETE

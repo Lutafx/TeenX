@@ -2312,7 +2312,7 @@
                         </div>
                         
                         <h3 style="margin:32px 0 16px; font-size:16px;">Аккаунт</h3>
-                        <button class="btn btn-ghost" style="width:100%; justify-content:flex-start; color:#ef4444;" onclick="confirmDeleteAccount()">
+                        <button class="btn" style="width:100%; justify-content:flex-start; background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid rgba(239,68,68,0.3);" onclick="confirmDeleteAccount()">
                             🗑️ Удалить аккаунт
                         </button>
                     </div>
@@ -2322,7 +2322,7 @@
 
         <div id="tab-admin" class="app-tab" style="display:none;">
             <div style="padding: 40px 0;">
-                <h2 style="margin-bottom:24px;">⭐ Админ-панель</h2>
+                <h2 style="margin-bottom:24px;">🛡️ Админ-панель</h2>
                 
                 <!-- Admin Stats -->
                 <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-bottom:32px;">
@@ -2367,10 +2367,10 @@
                 <!-- Users Management -->
                 <div id="admin-users-panel" class="admin-panel-section">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                        <h3 style="margin:0;">Управление пользователями</h3>
+                        <h3 style="margin:0;">📋 Запросы на верификацию</h3>
                         <div style="display:flex; gap:8px;">
-                            <input type="text" id="userSearchInput" placeholder="Поиск пользователя..." style="padding:8px 12px; border:1px solid var(--border); border-radius:8px; background:rgba(255,255,255,0.05); color:var(--text);">
-                            <button class="btn btn-primary" onclick="searchUsers()">🔍 Поиск</button>
+                            <button class="btn" style="background:rgba(255,255,255,0.05);" onclick="renderAdminUsers('all')">Все пользователи</button>
+                            <button class="btn btn-primary" onclick="renderAdminUsers('pending')">На проверке</button>
                         </div>
                     </div>
                     <div id="adminUsersList"></div>
@@ -2462,8 +2462,8 @@
                 </div>
 
                 <div id="bossPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
-                    <h3 style="color: var(--primary-light); margin-bottom:15px;">Панель работодателя</h3>
-                    <button class="btn btn-accent" style="width:100%;" onclick="openRegularJobModal()">+ Создать вакансию</button>
+                    <h3 style="color: var(--primary-light); margin-bottom:15px;">💼 Панель работодателя</h3>
+                    <button class="btn btn-accent" style="width:100%;" onclick="openRegularJobModal()">➕ Создать вакансию</button>
                     <div id="myJobsList" style="margin-top:20px;"></div>
                 </div>
 
@@ -2486,7 +2486,7 @@
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
             </div>
             <div class="nav-item" id="side-admin" onclick="switchTab('admin')" title="Админ-панель" style="display:none;">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
             </div>
             <div class="nav-item" id="side-support" onclick="switchTab('support')" title="Поддержка">
                 <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -2533,7 +2533,7 @@
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
         </div>
         <div class="tab-icon" id="nav-admin" onclick="switchTab('admin')" style="display:none;">
-            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" y1="19" x2="12" y2="23"></line><line x1="8" y1="23" x2="16" y2="23"></line></svg>
+            <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
         </div>
         <div class="tab-icon" id="nav-support" onclick="switchTab('support')">
             <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
@@ -2896,18 +2896,34 @@
     </div>
 </div>
 
+<div id="modalVerifyDocs" class="modal">
+    <div class="modal-box" style="max-width:800px;">
+        <h3 style="margin-bottom:20px;">📄 Документы верификации</h3>
+        
+        <div id="verifyDocsContent" style="margin-bottom:20px;">
+            <!-- User info will be loaded here -->
+        </div>
+        
+        <div style="display:flex; gap:12px;">
+            <button class="btn btn-primary" style="flex:1;" onclick="approveVerification()">✅ Одобрить верификацию</button>
+            <button class="btn" style="flex:1; background:rgba(239,68,68,0.1); color:#ef4444;" onclick="rejectVerification()">❌ Отклонить</button>
+            <button class="btn btn-cancel" onclick="closeModals()">Закрыть</button>
+        </div>
+    </div>
+</div>
+
 <div id="modalEdit" class="modal">
     <div class="modal-box">
         <h3 style="margin-bottom:20px;">✏️ Редактировать профиль</h3>
         
         <div class="profile-field">
             <label>Имя *</label>
-            <input id="eFirstName" placeholder="Например: Алихан">
+            <input id="eFirstName" placeholder="Имя">
         </div>
         
         <div class="profile-field">
             <label>Фамилия *</label>
-            <input id="eLastName" placeholder="Например: Маликов">
+            <input id="eLastName" placeholder="Фамилия">
         </div>
         
         <div class="profile-field">
@@ -2917,7 +2933,7 @@
         </div>
         
         <button class="btn btn-primary" style="width:100%; margin-top:10px;" onclick="saveProfile()">💾 Сохранить изменения</button>
-        <button class="btn" style="width:100%; margin-top:10px; background:transparent;" onclick="closeModals()">Отмена</button>
+        <button class="btn btn-cancel" style="width:100%; margin-top:10px;" onclick="closeModals()">Отмена</button>
     </div>
 </div>
 
@@ -3426,6 +3442,35 @@
     };
 
     window.handleLogout = () => signOut(auth);
+
+    // Confirm Delete Account
+    window.confirmDeleteAccount = async () => {
+        const confirmed = confirm('⚠️ ВНИМАНИЕ!\n\nВы действительно хотите удалить свой аккаунт?\n\nЭто действие необратимо. Все ваши данные будут удалены навсегда.\n\nНажмите OK для подтверждения удаления.');
+        
+        if (!confirmed) return;
+        
+        const doubleConfirm = confirm('Вы абсолютно уверены? Это последнее предупреждение!');
+        
+        if (!doubleConfirm) return;
+        
+        try {
+            // Delete user data from Firestore
+            await deleteDoc(doc(db, 'users', auth.currentUser.uid));
+            
+            // Delete user authentication
+            await auth.currentUser.delete();
+            
+            alert('✅ Ваш аккаунт успешно удален');
+            window.location.reload();
+        } catch (error) {
+            console.error('Error deleting account:', error);
+            if (error.code === 'auth/requires-recent-login') {
+                alert('⚠️ Для удаления аккаунта необходимо повторно войти в систему.\n\nПожалуйста, выйдите и войдите снова, затем повторите попытку.');
+            } else {
+                alert('Ошибка удаления аккаунта: ' + error.message);
+            }
+        }
+    };
 
     // APP FUNCTIONS
     async function renderApp() {
@@ -4836,7 +4881,7 @@
     };
 
     // Render Admin Users
-    async function renderAdminUsers() {
+    async function renderAdminUsers(filter = 'pending') {
         try {
             const list = document.getElementById('adminUsersList');
             if (!list) {
@@ -4850,13 +4895,18 @@
             const users = [];
             snap.forEach(d => {
                 const user = d.data();
-                users.push({ id: d.id, ...user });
+                // Filter based on verification status
+                if (filter === 'pending' && user.verified === 'pending') {
+                    users.push({ id: d.id, ...user });
+                } else if (filter === 'all') {
+                    users.push({ id: d.id, ...user });
+                }
             });
             
             list.innerHTML = '';
             
             if (users.length === 0) {
-                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Пользователей не найдено</div>';
+                list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Запросов на верификацию нет</div>';
                 return;
             }
             
@@ -4885,6 +4935,9 @@
                     <span class="admin-status-badge ${statusClass}">${statusText}</span>
                 </div>
                 <div class="admin-user-actions">
+                    ${user.verified === 'pending' && user.verificationDoc ? 
+                        `<button class="admin-btn-small" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;" onclick="viewVerificationDocs('${user.id}')">📄 Документы</button>` : ''
+                    }
                     ${user.banned ? 
                         `<button class="admin-btn-small admin-btn-unban" onclick="unbanUser('${user.id}')">✅ Разбанить</button>` :
                         `<button class="admin-btn-small admin-btn-ban" onclick="banUser('${user.id}')">🚫 Забанить</button>`
@@ -4892,7 +4945,6 @@
                     ${user.verified !== 'yes' && !user.banned ? 
                         `<button class="admin-btn-small admin-btn-verify" onclick="verifyUser('${user.id}')">✅ Верифицировать</button>` : ''
                     }
-                    <button class="admin-btn-small" style="background: rgba(107, 114, 128, 0.1); color: #6b7280;" onclick="viewUserDetails('${user.id}')">👁️ Детали</button>
                 </div>
             `;
             
@@ -4965,10 +5017,94 @@
         }
     };
 
-    // View User Details
-    window.viewUserDetails = (userId) => {
-        // Implementation for viewing detailed user information
-        alert(`Детали пользователя: ${userId}`);
+    // View Verification Documents
+    let currentVerifyUserId = null;
+    
+    window.viewVerificationDocs = async (userId) => {
+        try {
+            currentVerifyUserId = userId;
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            const user = userDoc.data();
+            
+            const content = document.getElementById('verifyDocsContent');
+            content.innerHTML = `
+                <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px; margin-bottom:20px;">
+                    <h4 style="margin:0 0 12px 0;">Информация о пользователе</h4>
+                    <p><strong>Имя:</strong> ${user.name || 'Не указано'}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Тип:</strong> ${user.type === 'teen' ? 'Подросток' : 'Работодатель'}</p>
+                    ${user.age ? `<p><strong>Возраст:</strong> ${user.age} лет</p>` : ''}
+                    ${user.phone ? `<p><strong>Телефон:</strong> ${user.phone}</p>` : ''}
+                    ${user.birthdate ? `<p><strong>Дата рождения:</strong> ${user.birthdate}</p>` : ''}
+                    ${user.BIN ? `<p><strong>БИН:</strong> ${user.BIN}</p>` : ''}
+                    ${user.companyName ? `<p><strong>Компания:</strong> ${user.companyName}</p>` : ''}
+                </div>
+                
+                ${user.verificationDoc ? `
+                    <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
+                        <h4 style="margin:0 0 12px 0;">📄 Документ верификации</h4>
+                        <div style="text-align:center;">
+                            ${user.verificationDoc.endsWith('.pdf') ? 
+                                `<a href="${user.verificationDoc}" target="_blank" class="btn btn-primary" style="display:inline-block; margin:10px;">📄 Открыть PDF</a>` :
+                                `<img src="${user.verificationDoc}" style="max-width:100%; border-radius:8px; margin-top:12px;" alt="Документ верификации">`
+                            }
+                        </div>
+                    </div>
+                ` : '<p style="color:var(--text-secondary);">Документы не загружены</p>'}
+            `;
+            
+            openModal('modalVerifyDocs');
+        } catch (error) {
+            console.error('Error loading verification docs:', error);
+            alert('Ошибка загрузки документов');
+        }
+    };
+    
+    // Approve Verification
+    window.approveVerification = async () => {
+        if (!currentVerifyUserId) return;
+        
+        try {
+            await updateDoc(doc(db, 'users', currentVerifyUserId), { 
+                verified: 'yes',
+                verifiedAt: new Date().toISOString(),
+                verifiedBy: currentUser.uid
+            });
+            
+            showToast('✅ Верификация одобрена', 'success');
+            closeModals();
+            renderAdminUsers('pending');
+            updateAdminStats();
+            currentVerifyUserId = null;
+        } catch (error) {
+            console.error('Error approving verification:', error);
+            alert('Ошибка одобрения верификации');
+        }
+    };
+    
+    // Reject Verification
+    window.rejectVerification = async () => {
+        if (!currentVerifyUserId) return;
+        
+        const reason = prompt('Укажите причину отклонения (необязательно):');
+        
+        try {
+            await updateDoc(doc(db, 'users', currentVerifyUserId), { 
+                verified: 'rejected',
+                rejectedAt: new Date().toISOString(),
+                rejectedBy: currentUser.uid,
+                rejectionReason: reason || 'Не указана'
+            });
+            
+            showToast('❌ Верификация отклонена', 'success');
+            closeModals();
+            renderAdminUsers('pending');
+            updateAdminStats();
+            currentVerifyUserId = null;
+        } catch (error) {
+            console.error('Error rejecting verification:', error);
+            alert('Ошибка отклонения верификации');
+        }
     };
 
     // Search Users
@@ -5180,4 +5316,3 @@
 </script>
 </body>
 </html>
-

@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>TeenX — Платформа трудоустройства</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Первая платформа в Казахстане для трудоустройства подростков 14-18 лет. Безопасно, легально, просто.">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TeenX">
+    <link rel="manifest" href="/manifest.json">
+    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=TX&background=7c3aed&color=fff&size=180">
+    
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     
     <style>
@@ -5841,6 +5851,91 @@
             alert('Ошибка отклонения вакансии');
         }
     };
+
+    // Register Service Worker for PWA
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(registration => {
+                    console.log('✅ Service Worker registered:', registration);
+                })
+                .catch(error => {
+                    console.log('❌ Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    // Install PWA prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // Show install button after 5 seconds
+        setTimeout(() => {
+            if (deferredPrompt && !localStorage.getItem('pwaInstallDismissed')) {
+                showInstallPrompt();
+            }
+        }, 5000);
+    });
+
+    function showInstallPrompt() {
+        const installBanner = document.createElement('div');
+        installBanner.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #7c3aed 0%, #2563eb 100%);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(124, 58, 237, 0.3);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            max-width: 90%;
+            animation: slideUp 0.3s ease-out;
+        `;
+        
+        installBanner.innerHTML = `
+            <div style="font-size: 32px;">📱</div>
+            <div style="flex: 1;">
+                <div style="font-weight: 700; margin-bottom: 4px;">Установить приложение TeenX</div>
+                <div style="font-size: 13px; opacity: 0.9;">Быстрый доступ с главного экрана</div>
+            </div>
+            <button id="installBtn" style="background: white; color: #7c3aed; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer;">
+                Установить
+            </button>
+            <button id="dismissBtn" style="background: transparent; color: white; border: none; padding: 10px; cursor: pointer; font-size: 20px;">
+                ✕
+            </button>
+        `;
+        
+        document.body.appendChild(installBanner);
+        
+        document.getElementById('installBtn').addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response: ${outcome}`);
+                deferredPrompt = null;
+                installBanner.remove();
+            }
+        });
+        
+        document.getElementById('dismissBtn').addEventListener('click', () => {
+            installBanner.remove();
+            localStorage.setItem('pwaInstallDismissed', 'true');
+        });
+    }
+
+    // Track app install
+    window.addEventListener('appinstalled', () => {
+        console.log('✅ PWA installed successfully!');
+        showToast('🎉 Приложение установлено!', 'success');
+    });
 </script>
 </body>
 </html>

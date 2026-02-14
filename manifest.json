@@ -1,0 +1,60 @@
+{
+  "name": "TeenX Hub - Работа для подростков",
+  "short_name": "TeenX",
+  "description": "Первая платформа в Казахстане для трудоустройства подростков 14-18 лет",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#7c3aed",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://ui-avatars.com/api/?name=TX&background=7c3aed&color=fff&size=192",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://ui-avatars.com/api/?name=TX&background=7c3aed&color=fff&size=512",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "social"],
+  "screenshots": [
+    {
+      "src": "https://ui-avatars.com/api/?name=TeenX+Jobs&background=7c3aed&color=fff&size=1080",
+      "sizes": "1080x1920",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Вакансии",
+      "short_name": "Вакансии",
+      "description": "Просмотр доступных вакансий",
+      "url": "/?tab=jobs",
+      "icons": [
+        {
+          "src": "https://ui-avatars.com/api/?name=Jobs&background=7c3aed&color=fff&size=96",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Профиль",
+      "short_name": "Профиль",
+      "description": "Мой профиль",
+      "url": "/?tab=profile",
+      "icons": [
+        {
+          "src": "https://ui-avatars.com/api/?name=Profile&background=7c3aed&color=fff&size=96",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false
+}

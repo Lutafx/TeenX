@@ -4847,25 +4847,22 @@
         try {
             let docUrl = '';
             
-            // Upload file to ImgBB if file is provided
+            // Upload file to Firebase Storage
             if (uploadedFile) {
                 statusEl.innerHTML = '<div style="color:#fbbf24;">⏳ Загрузка документа...</div>';
                 
-                const formData = new FormData();
-                formData.append('image', uploadedFile);
-                
-                // Using ImgBB free API
-                const uploadResponse = await fetch('https://api.imgbb.com/1/upload?key=46c1a8d2b8e5c8f5e8f5c5c5c5c5c5c5', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (uploadResponse.ok) {
-                    const uploadData = await uploadResponse.json();
-                    docUrl = uploadData.data.display_url; // Get direct image URL
-                } else {
-                    // If ImgBB fails, continue without file
-                    console.warn('File upload failed, continuing without document');
+                try {
+                    const fileExt = uploadedFile.name.split('.').pop();
+                    const fileName = `verification_docs/${currentUser.uid}_${Date.now()}.${fileExt}`;
+                    const storageRef = ref(storage, fileName);
+                    
+                    await uploadBytes(storageRef, uploadedFile);
+                    docUrl = await getDownloadURL(storageRef);
+                    console.log('✅ Документ загружен в Firebase Storage:', docUrl);
+                } catch (uploadErr) {
+                    console.error('❌ Ошибка загрузки в Firebase Storage:', uploadErr);
+                    statusEl.innerHTML = '<div style="color:#ef4444;">❌ Ошибка загрузки документа. Попробуйте ещё раз.</div>';
+                    return;
                 }
             }
             

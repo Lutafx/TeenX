@@ -1975,7 +1975,7 @@
 
         /* Show language switcher only on mobile */
         @media (max-width: 768px) {
-            .lang-btn {
+            .lang-switcher {
                 display: block !important;
             }
         }
@@ -2017,16 +2017,23 @@
 <header>
     <div class="container header-inner">
         <div style="display:flex; align-items:center; gap:16px;">
-            <div class="logo">Teen<span>X</span></div>
+            <div class="logo" data-translate="header.logo">Teen<span>X</span> — Платформа трудоустройства</div>
             <div class="job-counter" id="jobCounter" style="display:none;">
-                🔥 <span id="jobCount">0</span> вакансий
+                🔥 <span id="jobCount">0</span> <span data-translate="jobs.active_jobs">вакансий</span>
             </div>
-            <button class="lang-btn" onclick="switchLang()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display: none;">
-                <span id="currentLang">RU</span>
-            </button>
+            <div class="lang-switcher" style="position:relative; display:none;">
+                <button id="langToggleBtn" onclick="toggleLangMenu()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display:flex; align-items:center; gap:4px;">
+                    🌍 <span id="currentLang">RU</span> ▾
+                </button>
+                <div id="langDropdown" style="display:none; position:absolute; top:36px; right:0; background:#1a1a2e; border:1px solid rgba(255,255,255,0.15); border-radius:10px; overflow:hidden; min-width:140px; z-index:9999; box-shadow: 0 8px 24px rgba(0,0,0,0.5);">
+                    <div onclick="selectLanguage('ru','RU','🇷🇺')" style="padding:10px 14px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:13px; color:white; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">🇷🇺 Русский</div>
+                    <div onclick="selectLanguage('kk','KZ','🇰🇿')" style="padding:10px 14px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:13px; color:white; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">🇰🇿 Қазақша</div>
+                    <div onclick="selectLanguage('en','EN','🇬🇧')" style="padding:10px 14px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:13px; color:white; transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='transparent'">🇬🇧 English</div>
+                </div>
+            </div>
         </div>
         <div id="authHeaderBtn">
-            <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;" onclick="openAuthModal()">Войти</button>
+            <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;" onclick="openAuthModal()" data-translate="header.auth_btn">Войти</button>
         </div>
     </div>
 </header>
@@ -3122,7 +3129,9 @@
     </div>
 </div>
 
-<script type="module">
+<script src="translations.js"></script>
+    
+    <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getFirestore, collection, addDoc, doc, setDoc, getDoc, getDocs, updateDoc, query, where, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
@@ -3464,7 +3473,8 @@
     }
 
     function parsePrice(priceStr) {
-        const match = priceStr.match(/\d+/);
+        if (!priceStr) return 0;
+        const match = String(priceStr).match(/\d+/);
         return match ? parseInt(match[0]) : 0;
     }
 
@@ -6418,7 +6428,7 @@
             instructions = 'Найдите в меню браузера опцию "Установить приложение" или "Добавить на главный экран"';
         }
 
-        showToast('📱 ' + instructions, 'info', 8000);
+        showToast('📱 ' + instructions, 'info', 'Установка');
     };
 
     // Check PWA install status on page load
@@ -6887,25 +6897,50 @@
         }
     };
 
-    // Simple language switcher for mobile
-    let currentLangIndex = 0;
-    const languages = ['RU', 'KZ', 'EN'];
-    const langCodes = ['ru', 'kk', 'en'];
-    
-    window.switchLang = () => {
-        currentLangIndex = (currentLangIndex + 1) % languages.length;
-        const newLang = languages[currentLangIndex];
-        const newLangCode = langCodes[currentLangIndex];
-        
-        document.getElementById('currentLang').textContent = newLang;
-        
-        // For mobile - use Google Translate URL
-        if (window.innerWidth <= 768) {
-            const currentUrl = window.location.href;
-            const googleTranslateUrl = `https://translate.google.com/translate?sl=auto&tl=${newLangCode}&u=${encodeURIComponent(currentUrl)}`;
-            window.open(googleTranslateUrl, '_blank');
+    // Language switcher for mobile — 3 languages with Google Translate
+    window.toggleLangMenu = () => {
+        const dropdown = document.getElementById('langDropdown');
+        if (dropdown) {
+            dropdown.style.display = dropdown.style.display === 'none' ? 'block' : 'none';
         }
     };
+
+    window.selectLanguage = (langCode, langLabel, flag) => {
+        // Update button label
+        document.getElementById('currentLang').textContent = langLabel;
+        // Close dropdown
+        document.getElementById('langDropdown').style.display = 'none';
+        
+        // Save choice
+        localStorage.setItem('language', langCode === 'kk' ? 'kz' : langCode);
+        
+        // Apply local translations from translations.js
+        if (typeof switchLanguage === 'function') {
+            switchLanguage(langCode === 'kk' ? 'kz' : langCode);
+        }
+        
+        // For non-Russian — open Google Translate to translate the whole page
+        if (langCode !== 'ru') {
+            const baseUrl = window.location.origin + window.location.pathname;
+            const googleTranslateUrl = `https://translate.google.com/translate?sl=ru&tl=${langCode}&u=${encodeURIComponent(baseUrl)}`;
+            window.open(googleTranslateUrl, '_self');
+        } else {
+            // If Russian selected, reload original page (remove Google Translate frame)
+            const baseUrl = window.location.origin + window.location.pathname;
+            if (window.location.href !== baseUrl) {
+                window.location.href = baseUrl;
+            }
+        }
+    };
+
+    // Close lang dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+        const switcher = document.querySelector('.lang-switcher');
+        if (switcher && !switcher.contains(e.target)) {
+            const dropdown = document.getElementById('langDropdown');
+            if (dropdown) dropdown.style.display = 'none';
+        }
+    });
 
     // Initialize auth button click handler
     document.addEventListener('DOMContentLoaded', () => {

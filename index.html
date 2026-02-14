@@ -6163,51 +6163,7 @@
         }
     };
 
-    // Render Admin Blacklist
-    async function renderAdminBlacklist() {
-        const snap = await getDocs(collection(db, "users"));
-        const list = document.getElementById('adminBlacklistList');
-        list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
-        
-        const bannedUsers = [];
-        snap.forEach(d => {
-            const user = d.data();
-            if (user.banned) {
-                bannedUsers.push({ id: d.id, ...user });
-            }
-        });
-        
-        list.innerHTML = '';
-        
-        if (bannedUsers.length === 0) {
-            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">Черный список пуст</div>';
-            return;
-        }
-        
-        bannedUsers.forEach(user => {
-            const card = document.createElement('div');
-            card.className = 'admin-user-card';
-            
-            card.innerHTML = `
-                <div class="admin-user-header">
-                    <div class="admin-user-info">
-                        <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=ef4444&color=fff&size=48`}" 
-                             alt="Avatar" class="admin-user-avatar">
-                        <div class="admin-user-details">
-                            <h4>${user.name || 'Без имени'}</h4>
-                            <p>${user.email} • Забанен: ${new Date(user.bannedAt).toLocaleDateString()}</p>
-                        </div>
-                    </div>
-                    <span class="admin-status-badge admin-status-banned">Забанен</span>
-                </div>
-                <div class="admin-user-actions">
-                    <button class="admin-btn-small admin-btn-unban" onclick="unbanUser('${user.id}')">✅ Разбанить</button>
-                </div>
-            `;
-            
-            list.appendChild(card);
-        });
-    }
+    // Render Admin Blacklist (main implementation is below in BLACKLIST FUNCTIONS section)
 
     // Refresh Logs
     window.refreshLogs = () => {

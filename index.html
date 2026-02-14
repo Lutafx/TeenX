@@ -2365,6 +2365,20 @@
                     </div>
                     <div class="profile-card">
                         <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">👤</div>
+                            <div id="adminTeenUsers" style="font-size:24px; font-weight:700; color:#60a5fa;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Подростков</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">💼</div>
+                            <div id="adminBossUsers" style="font-size:24px; font-weight:700; color:#f59e0b;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Работодателей</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
                             <div style="font-size:32px; margin-bottom:8px;">✅</div>
                             <div id="adminVerifiedUsers" style="font-size:24px; font-weight:700; color:#10b981;">0</div>
                             <div style="font-size:13px; color:var(--text-secondary);">Верифицированных</div>
@@ -2372,9 +2386,23 @@
                     </div>
                     <div class="profile-card">
                         <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">⏳</div>
+                            <div id="adminPendingUsers" style="font-size:24px; font-weight:700; color:#a78bfa;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">На проверке</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
                             <div style="font-size:32px; margin-bottom:8px;">📋</div>
                             <div id="adminTotalJobs" style="font-size:24px; font-weight:700; color:#f59e0b;">0</div>
-                            <div style="font-size:13px; color:var(--text-secondary);">Вакансий</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Всего вакансий</div>
+                        </div>
+                    </div>
+                    <div class="profile-card">
+                        <div style="padding:20px; text-align:center;">
+                            <div style="font-size:32px; margin-bottom:8px;">✨</div>
+                            <div id="adminActiveJobs" style="font-size:24px; font-weight:700; color:#10b981;">0</div>
+                            <div style="font-size:13px; color:var(--text-secondary);">Активных</div>
                         </div>
                     </div>
                     <div class="profile-card">
@@ -3165,16 +3193,34 @@
         
         const searchTerm = document.getElementById('searchInput')?.value.toLowerCase() || '';
         let filtered = allJobs.filter(job => {
-            const matchesSearch = job.title.toLowerCase().includes(searchTerm) || job.desc.toLowerCase().includes(searchTerm);
-            const matchesAge = currentFilter === 'all' || job.age.includes(currentFilter);
+            const jobTitle = job.title?.toLowerCase() || '';
+            const jobDesc = (job.desc || job.responsibilities || '')?.toLowerCase() || '';
+            const matchesSearch = jobTitle.includes(searchTerm) || jobDesc.includes(searchTerm);
+            
+            // Fix age filtering - support both old (age string) and new (minAge number) format
+            let matchesAge = currentFilter === 'all';
+            if (!matchesAge) {
+                const filterAge = parseInt(currentFilter);
+                const jobMinAge = job.minAge || parseInt(job.age) || 14;
+                matchesAge = jobMinAge <= filterAge;
+            }
+            
             return matchesSearch && matchesAge && job.status === 'active';
         });
 
-        // Sort
+        // Sort - support both old and new salary formats
         if (currentSort === 'price-high') {
-            filtered.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
+            filtered.sort((a, b) => {
+                const priceA = a.salaryTo || a.salaryFrom || parsePrice(a.price) || 0;
+                const priceB = b.salaryTo || b.salaryFrom || parsePrice(b.price) || 0;
+                return priceB - priceA;
+            });
         } else if (currentSort === 'price-low') {
-            filtered.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
+            filtered.sort((a, b) => {
+                const priceA = a.salaryFrom || parsePrice(a.price) || 0;
+                const priceB = b.salaryFrom || parsePrice(b.price) || 0;
+                return priceA - priceB;
+            });
         } else if (currentSort === 'newest') {
             filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
         }
@@ -5722,25 +5768,39 @@
         const jobsSnap = await getDocs(collection(db, "jobs"));
         
         let totalUsers = 0;
+        let teenUsers = 0;
+        let bossUsers = 0;
         let verifiedUsers = 0;
+        let pendingUsers = 0;
         let bannedUsers = 0;
         
         usersSnap.forEach(d => {
             const user = d.data();
             totalUsers++;
+            if (user.type === 'teen') teenUsers++;
+            if (user.type === 'boss') bossUsers++;
             if (user.verified === 'yes') verifiedUsers++;
+            if (user.verified === 'pending') pendingUsers++;
             if (user.banned) bannedUsers++;
         });
         
         let totalJobs = 0;
+        let activeJobs = 0;
         jobsSnap.forEach(d => {
             const job = d.data();
-            if (job.status !== 'deleted') totalJobs++;
+            if (job.status !== 'deleted') {
+                totalJobs++;
+                if (job.status === 'active') activeJobs++;
+            }
         });
         
         document.getElementById('adminTotalUsers').textContent = totalUsers;
+        document.getElementById('adminTeenUsers').textContent = teenUsers;
+        document.getElementById('adminBossUsers').textContent = bossUsers;
         document.getElementById('adminVerifiedUsers').textContent = verifiedUsers;
+        document.getElementById('adminPendingUsers').textContent = pendingUsers;
         document.getElementById('adminTotalJobs').textContent = totalJobs;
+        document.getElementById('adminActiveJobs').textContent = activeJobs;
         document.getElementById('adminBannedUsers').textContent = bannedUsers;
     }
 

@@ -2432,11 +2432,11 @@
                 </div>
 
                 <!-- Admin Tabs -->
-                <div style="display:flex; gap:8px; margin-bottom:24px; border-bottom:1px solid var(--border);">
+                <div style="display:flex; gap:8px; margin-bottom:24px; border-bottom:1px solid var(--border); flex-wrap:wrap;">
                     <button class="admin-tab-btn active" id="admin-users-tab" onclick="switchAdminPanel('users')">👥 Пользователи</button>
                     <button class="admin-tab-btn" id="admin-jobs-tab" onclick="switchAdminPanel('jobs')">📋 Вакансии</button>
                     <button class="admin-tab-btn" id="admin-blacklist-tab" onclick="switchAdminPanel('blacklist')">🚫 Черный список</button>
-                    <button class="admin-tab-btn" id="admin-logs-tab" onclick="switchAdminPanel('logs')">📝 Логи</button>
+                    <button class="admin-tab-btn" id="admin-trash-tab" onclick="switchAdminPanel('trash')">🗑️ Корзина</button>
                 </div>
 
                 <!-- Users Management -->
@@ -2452,7 +2452,7 @@
                             <button id="filterBosses" class="btn admin-filter-btn" style="background:rgba(245,158,11,0.2); color:#f59e0b;" onclick="switchUserFilter('boss')">💼 Работ.</button>
                         </div>
                     </div>
-                    <div id="adminUsersList" style="max-height:600px; overflow-y:auto; padding-right:8px;"></div>
+                    <div id="adminUsersList" style="max-height:800px; overflow-y:auto; padding-right:8px;"></div>
                 </div>
 
                 <!-- Jobs Management -->
@@ -2475,13 +2475,29 @@
                     <div id="adminBlacklistList"></div>
                 </div>
 
-                <!-- System Logs -->
-                <div id="admin-logs-panel" class="admin-panel-section" style="display:none;">
+                <!-- Trash Bin -->
+                <div id="admin-trash-panel" class="admin-panel-section" style="display:none;">
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-                        <h3 style="margin:0;">Системные логи</h3>
-                        <button class="btn btn-ghost" onclick="refreshLogs()">🔄 Обновить</button>
+                        <h3 style="margin:0;">🗑️ Корзина (удаленные вакансии)</h3>
+                        <button class="btn btn-ghost" onclick="renderTrash()">🔄 Обновить</button>
                     </div>
-                    <div id="adminLogsList" style="background:rgba(0,0,0,0.3); border-radius:8px; padding:16px; font-family:monospace; font-size:12px; max-height:400px; overflow-y:auto;"></div>
+                    <div id="adminTrashList" style="max-height:600px; overflow-y:auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal: Add to Blacklist -->
+        <div id="modalBlacklist" class="modal">
+            <div class="modal-box" style="max-width: 500px;">
+                <h2 style="margin-bottom: 24px;">🚫 Добавить в черный список</h2>
+                
+                <input id="blacklistEmail" type="email" placeholder="Email пользователя" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;">
+                
+                <textarea id="blacklistReason" placeholder="Причина блокировки (необязательно)" rows="3" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 20px; resize: vertical;"></textarea>
+                
+                <div style="display: flex; gap: 12px;">
+                    <button class="btn btn-primary" style="flex: 1; background: rgba(239, 68, 68, 0.2); color: #ef4444;" onclick="addToBlacklist()">🚫 Добавить в ЧС</button>
+                    <button class="btn btn-cancel" style="flex: 1;" onclick="closeModals()">Отмена</button>
                 </div>
             </div>
         </div>
@@ -2779,7 +2795,7 @@
         </div>
         
         <div style="display: flex; gap: 12px;">
-            <button class="btn btn-primary" style="flex: 1;" id="jobSaveBtn">Отправить на модерацию</button>
+            <button class="btn btn-primary" style="flex: 1;" id="jobSaveBtn" onclick="saveJob()">Отправить на модерацию</button>
             <button class="btn btn-cancel" style="flex: 1;" onclick="closeModals()">Отмена</button>
         </div>
     </div>
@@ -3168,9 +3184,23 @@
     }
 
     // UI HELPER
-    window.openAuthModal = () => document.getElementById('modalAuth').classList.add('visible');
+    window.openAuthModal = () => {
+        const modal = document.getElementById('modalAuth');
+        if (modal) {
+            modal.classList.add('visible');
+        } else {
+            console.error('Modal Auth not found');
+        }
+    };
     window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('visible'));
-    window.openModal = (id) => document.getElementById(id).classList.add('visible');
+    window.openModal = (id) => {
+        const modal = document.getElementById(id);
+        if (modal) {
+            modal.classList.add('visible');
+        } else {
+            console.error('Modal not found:', id);
+        }
+    };
     
     window.selectRole = (role) => {
         selectedRole = role;
@@ -3912,12 +3942,13 @@
     let currentJobData = null;
     let currentJobId = null;
 
-    window.showJobDetails = (jobId) => {
+    window.showJobDetails = async (jobId) => {
         const job = allJobs.find(j => j.id === jobId);
         if (!job) return;
         
         currentJobId = jobId;
         currentJobData = job;
+        currentJobIdForReview = jobId;
         
         // Форматируем зарплату красиво
         let salaryText = '';
@@ -3945,6 +3976,9 @@
         document.getElementById('detailMinAge').textContent = job.minAge || '14';
         
         openModal('modalJobDetail');
+        
+        // Load reviews after modal opens
+        await loadReviews(jobId);
     };
 
     // OPEN APPLICATION FORM
@@ -4879,8 +4913,8 @@
         }
     };
 
-    // CHECK VERIFICATION BEFORE POSTING JOB
-    window.createJobDetailed = async () => {
+    // SAVE JOB FUNCTION
+    window.saveJob = async () => {
         if (!currentUser) {
             alert('Войдите в систему');
             return;
@@ -4927,11 +4961,15 @@
             return;
         }
         
-        await addDoc(collection(db, 'jobs'), jobData);
-        
-        alert('✅ Вакансия отправлена на модерацию!\n\nАдминистратор проверит её в течение 24 часов.');
-        closeModals();
-        renderApp();
+        try {
+            await addDoc(collection(db, 'jobs'), jobData);
+            showToast('✅ Вакансия отправлена на модерацию!', 'success');
+            closeModals();
+            renderApp();
+        } catch (error) {
+            console.error('Error creating job:', error);
+            showToast('❌ Ошибка создания вакансии', 'error');
+        }
     };
 
     // SWITCH TAB FUNCTION
@@ -5171,8 +5209,8 @@
                 renderAdminJobs();
             } else if (panel === 'blacklist') {
                 renderAdminBlacklist();
-            } else if (panel === 'logs') {
-                refreshLogs();
+            } else if (panel === 'trash') {
+                renderTrash();
             }
         } catch (error) {
             console.error('Error switching admin panel:', error);
@@ -5248,8 +5286,8 @@
             card.className = 'admin-user-card';
             
             card.innerHTML = `
-                <div class="admin-user-header" onclick="viewUserDetails('${user.id}')" style="cursor:pointer;">
-                    <div class="admin-user-info">
+                <div class="admin-user-header" style="cursor:pointer;">
+                    <div class="admin-user-info" onclick="viewUserProfile('${user.id}')">
                         <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff&size=48`}" 
                              alt="Avatar" class="admin-user-avatar">
                         <div class="admin-user-details">
@@ -6458,6 +6496,53 @@
             'profile': 'Профиль',
             'messages': 'Сообщения',
             'settings': 'Настройки',
+            'admin': 'Админ',
+            'support': 'Поддержка',
+            'documents': 'Документы',
+            'my_jobs': 'Мои вакансии',
+            'logout': 'Выйти',
+            
+            // Job Actions
+            'create_job': 'Создать вакансию',
+            'apply': 'Откликнуться',
+            'view_details': 'Подробнее',
+            'edit': 'Редактировать',
+            'delete': 'Удалить',
+            'restore': 'Восстановить',
+            'delete_forever': 'Удалить навсегда',
+            
+            // Status
+            'verified': 'Верифицирован',
+            'pending': 'На проверке',
+            'rejected': 'Отклонен',
+            'active': 'Активна',
+            'banned': 'Забанен',
+            
+            // Admin
+            'users': 'Пользователи',
+            'blacklist': 'Черный список',
+            'trash': 'Корзина',
+            'approve': 'Одобрить',
+            'reject': 'Отклонить',
+            'ban': 'Забанить',
+            'unban': 'Разбанить',
+            
+            // Common
+            'salary': 'Зарплата',
+            'age': 'Возраст',
+            'city': 'Город',
+            'phone': 'Телефон',
+            'email': 'Email',
+            'save': 'Сохранить',
+            'cancel': 'Отмена',
+            'close': 'Закрыть',
+            'search': 'Поиск',
+            'filter': 'Фильтр',
+            'sort': 'Сортировка',
+            'reviews': 'Отзывы',
+            'rating': 'Рейтинг',
+            'no_reviews': 'Нет отзывов',
+            'write_review': 'Оставить отзыв',
             
             // Job
             'salary': 'Зарплата',
@@ -6490,32 +6575,6 @@
             'hero_title': 'Қазақстандағы 14-18 жастағы жасөспірімдерді жұмысқа орналастыруға арналған алғашқы платформа',
             'hero_subtitle': 'Қауіпсіз, заңды, қарапайым',
             'get_started': 'Бастау',
-            
-            // Features
-            'feature1_title': '⚖️ Заңдық тазалық',
-            'feature1_desc': 'Барлық бос орындар ҚР заңнамасына сәйкес',
-            'feature2_title': '💼 Мансаптық баспалдақ',
-            'feature2_desc': 'Сәтті мансапқа алғашқы қадам',
-            'feature3_title': '🔒 Деректерді қорғау',
-            'feature3_desc': 'Жеке ақпаратты қорғау',
-            
-            // Auth
-            'select_role': 'Рөлді таңдаңыз',
-            'teen': 'Жасөспірім (14-18 жас)',
-            'boss': 'Жұмыс беруші',
-            'email_placeholder': 'Email',
-            'password_placeholder': 'Құпиясөз',
-            'sign_in': 'Кіру',
-            'register': 'Тіркелу',
-            
-            // Navigation
-            'jobs': 'Бос орындар',
-            'profile': 'Профиль',
-            'messages': 'Хабарламалар',
-            'settings': 'Баптаулар',
-            
-            // Job
-            'salary': 'Жалақы',
             'age': 'Жас',
             'city': 'Қала',
             'apply': 'Жауап беру',
@@ -6813,7 +6872,7 @@
                     <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
                         <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
                             <div>
-                                <div style="font-weight: 600; margin-bottom: 4px;">${review.userName}</div>
+                                <div style="font-weight: 600; margin-bottom: 4px; cursor: pointer; color: var(--primary-light); text-decoration: underline;" onclick="viewUserProfile('${review.userId}')">${review.userName}</div>
                                 <div style="font-size: 12px; color: var(--text-secondary);">${timeAgo}</div>
                             </div>
                             <div style="color: #fbbf24; font-size: 18px;">
@@ -6831,15 +6890,319 @@
         }
     }
 
-    // Update showJobDetails to load reviews
-    const originalShowJobDetails = window.showJobDetails;
-    window.showJobDetails = async (jobId) => {
-        currentJobIdForReview = jobId;
-        if (originalShowJobDetails) {
-            await originalShowJobDetails(jobId);
+    // BLACKLIST FUNCTIONS
+    window.addToBlacklist = async () => {
+        const email = document.getElementById('blacklistEmail').value.trim();
+        const reason = document.getElementById('blacklistReason').value.trim();
+        
+        if (!email) {
+            alert('Введите email пользователя');
+            return;
         }
-        await loadReviews(jobId);
+        
+        try {
+            // Find user by email
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('email', '==', email));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                alert('Пользователь с таким email не найден');
+                return;
+            }
+            
+            const userDoc = querySnapshot.docs[0];
+            await updateDoc(doc(db, 'users', userDoc.id), {
+                banned: true,
+                bannedAt: new Date().toISOString(),
+                bannedBy: currentUser.uid,
+                banReason: reason || 'Не указана'
+            });
+            
+            showToast('🚫 Пользователь добавлен в черный список', 'success');
+            closeModals();
+            renderAdminBlacklist();
+        } catch (error) {
+            console.error('Error adding to blacklist:', error);
+            showToast('❌ Ошибка добавления в ЧС', 'error');
+        }
     };
+
+    async function renderAdminBlacklist() {
+        try {
+            const list = document.getElementById('adminBlacklistList');
+            list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+            
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('banned', '==', true));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);">Черный список пуст</div>';
+                return;
+            }
+            
+            let html = '';
+            querySnapshot.forEach(doc => {
+                const user = doc.data();
+                html += `
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 600; margin-bottom: 4px;">${user.name || 'Без имени'}</div>
+                                <div style="font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;">${user.email}</div>
+                                ${user.banReason ? `<div style="font-size: 12px; color: #fca5a5;">Причина: ${user.banReason}</div>` : ''}
+                            </div>
+                            <button class="btn" style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 8px 16px; font-size: 12px;" onclick="removeFromBlacklist('${doc.id}')">
+                                ✅ Убрать из ЧС
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading blacklist:', error);
+        }
+    }
+
+    window.removeFromBlacklist = async (userId) => {
+        if (!confirm('Убрать пользователя из черного списка?')) return;
+        
+        try {
+            await updateDoc(doc(db, 'users', userId), {
+                banned: false,
+                unbannedAt: new Date().toISOString(),
+                unbannedBy: currentUser.uid
+            });
+            
+            showToast('✅ Пользователь убран из ЧС', 'success');
+            renderAdminBlacklist();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error removing from blacklist:', error);
+            showToast('❌ Ошибка', 'error');
+        }
+    };
+
+    // TRASH BIN FUNCTIONS
+    async function renderTrash() {
+        try {
+            const list = document.getElementById('adminTrashList');
+            list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+            
+            const jobsRef = collection(db, 'jobs');
+            const q = query(jobsRef, where('status', '==', 'deleted'));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                list.innerHTML = '<div style="text-align:center; padding:40px; color:var(--text-secondary);">Корзина пуста</div>';
+                return;
+            }
+            
+            let html = '';
+            querySnapshot.forEach(doc => {
+                const job = doc.data();
+                html += `
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div style="flex: 1;">
+                                <h5 style="margin: 0 0 4px 0; color: #fff;">${job.title}</h5>
+                                <p style="margin: 0; color: var(--text-secondary); font-size: 13px;">${job.companyName}</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="btn" style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 8px 16px; font-size: 12px;" onclick="restoreJob('${doc.id}')">
+                                ♻️ Восстановить
+                            </button>
+                            <button class="btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 8px 16px; font-size: 12px;" onclick="permanentDeleteJob('${doc.id}')">
+                                🗑️ Удалить навсегда
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            list.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading trash:', error);
+        }
+    }
+
+    window.restoreJob = async (jobId) => {
+        try {
+            await updateDoc(doc(db, 'jobs', jobId), {
+                status: 'pending',
+                restoredAt: new Date().toISOString()
+            });
+            
+            showToast('♻️ Вакансия восстановлена', 'success');
+            renderTrash();
+        } catch (error) {
+            console.error('Error restoring job:', error);
+            showToast('❌ Ошибка восстановления', 'error');
+        }
+    };
+
+    window.permanentDeleteJob = async (jobId) => {
+        if (!confirm('ВНИМАНИЕ! Вакансия будет удалена навсегда. Продолжить?')) return;
+        
+        try {
+            await deleteDoc(doc(db, 'jobs', jobId));
+            showToast('🗑️ Вакансия удалена навсегда', 'success');
+            renderTrash();
+        } catch (error) {
+            console.error('Error deleting job permanently:', error);
+            showToast('❌ Ошибка удаления', 'error');
+        }
+    };
+
+    // APPROVE VERIFICATION FROM DOCS MODAL
+    window.approveVerification = async () => {
+        if (!currentVerifyUserId) return;
+        
+        try {
+            await updateDoc(doc(db, 'users', currentVerifyUserId), {
+                verified: 'yes',
+                verifiedAt: new Date().toISOString(),
+                verifiedBy: currentUser.uid
+            });
+            
+            showToast('✅ Верификация одобрена!', 'success');
+            closeModals();
+            renderAdminUsers();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error approving verification:', error);
+            showToast('❌ Ошибка одобрения', 'error');
+        }
+    };
+
+    // BAN USER FROM DOCS MODAL
+    window.banUserFromDocs = async () => {
+        if (!currentVerifyUserId) return;
+        if (!confirm('Забанить этого пользователя?')) return;
+        
+        try {
+            await updateDoc(doc(db, 'users', currentVerifyUserId), {
+                banned: true,
+                bannedAt: new Date().toISOString(),
+                bannedBy: currentUser.uid,
+                banReason: 'Забанен через просмотр документов'
+            });
+            
+            showToast('🚫 Пользователь забанен', 'success');
+            closeModals();
+            renderAdminUsers();
+            updateAdminStats();
+        } catch (error) {
+            console.error('Error banning user:', error);
+            showToast('❌ Ошибка бана', 'error');
+        }
+    };
+
+    // CALCULATE USER RATING
+    async function calculateUserRating(userId) {
+        try {
+            const reviewsRef = collection(db, 'reviews');
+            const q = query(reviewsRef, where('userId', '==', userId));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                return { rating: 0, count: 0 };
+            }
+            
+            let totalRating = 0;
+            let count = 0;
+            
+            querySnapshot.forEach(doc => {
+                const review = doc.data();
+                totalRating += review.rating;
+                count++;
+            });
+            
+            const avgRating = (totalRating / count).toFixed(1);
+            
+            // Update user's rating in profile
+            await updateDoc(doc(db, 'users', userId), {
+                rating: parseFloat(avgRating),
+                reviewCount: count
+            });
+            
+            return { rating: avgRating, count: count };
+        } catch (error) {
+            console.error('Error calculating rating:', error);
+            return { rating: 0, count: 0 };
+        }
+    }
+
+    // VIEW USER PROFILE
+    window.viewUserProfile = async (userId) => {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', userId));
+            if (!userDoc.exists()) {
+                showToast('❌ Пользователь не найден', 'error');
+                return;
+            }
+            
+            const user = userDoc.data();
+            
+            // Calculate rating
+            const ratingData = await calculateUserRating(userId);
+            
+            const modal = document.createElement('div');
+            modal.className = 'modal visible';
+            modal.innerHTML = `
+                <div class="modal-box" style="max-width: 600px;">
+                    <button onclick="this.closest('.modal').remove()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+                    
+                    <div style="text-align: center; margin-bottom: 24px;">
+                        <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff&size=120`}" 
+                             style="width: 120px; height: 120px; border-radius: 50%; margin-bottom: 16px; border: 4px solid var(--primary); object-fit: cover;">
+                        <h2 style="margin: 0 0 8px 0;">${user.name || 'Без имени'}</h2>
+                        <div style="color: var(--text-secondary); margin-bottom: 12px;">${user.email}</div>
+                        
+                        ${ratingData.count > 0 ? `
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 12px;">
+                                <div style="color: #fbbf24; font-size: 24px;">${'⭐'.repeat(Math.round(ratingData.rating))}</div>
+                                <div style="font-size: 20px; font-weight: 700;">${ratingData.rating}</div>
+                                <div style="color: var(--text-secondary); font-size: 14px;">(${ratingData.count} ${ratingData.count === 1 ? 'отзыв' : 'отзывов'})</div>
+                            </div>
+                        ` : '<div style="color: var(--text-secondary); font-size: 14px; margin-bottom: 12px;">Нет отзывов</div>'}
+                        
+                        <div style="display: inline-block; padding: 6px 16px; background: ${user.verified === 'yes' ? 'rgba(16,185,129,0.2)' : 'rgba(251,191,36,0.2)'}; color: ${user.verified === 'yes' ? '#10b981' : '#fbbf24'}; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                            ${user.verified === 'yes' ? '✅ Верифицирован' : user.verified === 'pending' ? '⏳ На проверке' : '❌ Не верифицирован'}
+                        </div>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0;">📋 Информация</h4>
+                        <p style="margin: 8px 0;"><strong>Тип:</strong> ${user.type === 'teen' ? '👤 Подросток' : '💼 Работодатель'}</p>
+                        ${user.age ? `<p style="margin: 8px 0;"><strong>Возраст:</strong> ${user.age} лет</p>` : ''}
+                        ${user.phone ? `<p style="margin: 8px 0;"><strong>Телефон:</strong> ${user.phone}</p>` : ''}
+                        ${user.city ? `<p style="margin: 8px 0;"><strong>Город:</strong> ${user.city}</p>` : ''}
+                        ${user.companyName ? `<p style="margin: 8px 0;"><strong>Компания:</strong> ${user.companyName}</p>` : ''}
+                        ${user.skills ? `<p style="margin: 8px 0;"><strong>Навыки:</strong> ${user.skills}</p>` : ''}
+                    </div>
+                    
+                    ${user.phone ? `
+                        <a href="https://wa.me/${user.phone.replace(/\D/g, '')}" target="_blank" class="btn btn-primary" style="width: 100%; text-decoration: none; display: block; text-align: center; margin-bottom: 12px;">
+                            💬 Написать в WhatsApp
+                        </a>
+                    ` : ''}
+                    
+                    <button class="btn btn-cancel" style="width: 100%;" onclick="this.closest('.modal').remove()">Закрыть</button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        } catch (error) {
+            console.error('Error viewing user profile:', error);
+            showToast('❌ Ошибка загрузки профиля', 'error');
+        }
+    };
+
 </script>
 </body>
 </html>

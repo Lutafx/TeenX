@@ -886,8 +886,31 @@ def handle_query(call):
         save_user_language(user_id, lang)
         bot.answer_callback_query(call.id, "✅")
         bot.send_message(call.message.chat.id, t(user_id, 'lang_changed'), parse_mode="Markdown")
-        # Перезапускаем меню на новом языке
-        send_welcome(call.message)
+        
+        # Отправляем обновлённое меню на новом языке
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'jobs_btn'), callback_data="show_jobs"),
+            types.InlineKeyboardButton(t(user_id, 'notifications_btn'), callback_data="toggle_notifications")
+        )
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'about_btn'), callback_data="about_platform"),
+            types.InlineKeyboardButton(t(user_id, 'support_btn'), callback_data="support")
+        )
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'language_btn'), callback_data="change_language"),
+            types.InlineKeyboardButton(t(user_id, 'link_btn'), callback_data="link_account")
+        )
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'site_btn'), url="https://teenx.pages.dev")
+        )
+        
+        bot.send_message(
+            call.message.chat.id,
+            t(user_id, 'welcome', name=call.from_user.first_name),
+            reply_markup=markup,
+            parse_mode="Markdown"
+        )
     
     # 2.6 Привязка аккаунта
     elif call.data == "link_account":

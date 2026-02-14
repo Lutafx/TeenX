@@ -449,44 +449,111 @@ def send_job_moderation_notification(job_data):
 
 
 def send_verification_notification(user_data):
-    """Отправить уведомление админу о новой верификации"""
+    """Отправить уведомление админу о новой верификации с документом"""
     if not ADMIN_ID or ADMIN_ID == 0:
         print("⚠️ ADMIN_ID не настроен")
         return
     
     try:
+        import re
         user_type = "👔 Работодатель" if user_data.get('type') == 'boss' else "👤 Подросток"
         
-        message = (
+        caption = (
             f"🆕 *НОВАЯ ВЕРИФИКАЦИЯ*\n\n"
             f"👤 *Тип:* {user_type}\n"
             f"📧 *Email:* {user_data.get('email', 'Не указан')}\n"
-            f"👨 *Имя:* {user_data.get('name', 'Не указано')}\n\n"
+            f"👨 *Имя:* {user_data.get('name', 'Не указано')}\n"
         )
         
-        # Для работодателей показываем БИН и компанию
+        # Для подростков — возраст и дату рождения
+        if user_data.get('type') == 'teen':
+            if user_data.get('age'):
+                caption += f"🎂 *Возраст:* {user_data['age']} лет\n"
+            if user_data.get('birthdate'):
+                caption += f"📅 *Дата рождения:* {user_data['birthdate']}\n"
+        
+        # Для работодателей — БИН и компанию
         if user_data.get('type') == 'boss':
-            message += (
-                f"🏛️ *БИН:* {user_data.get('bin', 'Не указан')}\n"
+            caption += (
+                f"\n🏛️ *БИН:* {user_data.get('bin', 'Не указан')}\n"
                 f"🏢 *Компания:* {user_data.get('companyName', 'Не указана')}\n"
                 f"👤 *Контактное лицо:* {user_data.get('contactPerson', 'Не указано')}\n"
-                f"📞 *Телефон:* {user_data.get('phone', 'Не указан')}\n\n"
+                f"📞 *Телефон:* {user_data.get('phone', 'Не указан')}\n"
             )
         
-        message += f"📄 *Документ:* [Открыть]({user_data.get('docUrl', '#')})"
+        if user_data.get('phone'):
+            caption += f"� *Телефон:* {user_data['phone']}\n"
         
+        caption += f"\n🔑 *UID:* `{user_data['uid']}`"
+        
+        # Кнопки
         markup = types.InlineKeyboardMarkup(row_width=2)
         markup.add(
             types.InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_user_{user_data['uid']}"),
             types.InlineKeyboardButton("❌ Отклонить", callback_data=f"reject_user_{user_data['uid']}")
         )
         
-        bot.send_message(
-            ADMIN_ID,
-            message,
-            parse_mode='Markdown',
-            reply_markup=markup
-        )
+        # Кнопка открыть документ в браузере
+        doc_url = user_data.get('docUrl', '')
+        if doc_url and doc_url != 'Не загружен':
+            markup.add(
+                types.InlineKeyboardButton("📄 Открыть документ в браузере", url=doc_url)
+            )
+        
+        # Кнопка WhatsApp если есть телефон
+        phone = user_data.get('phone', '')
+        if phone:
+            phone_clean = re.sub(r'\D', '', phone)
+            markup.add(
+                types.InlineKeyboardButton("💬 WhatsApp", url=f"https://wa.me/{phone_clean}")
+            )
+        
+        # Отправляем фото документа прямо в чат (если есть URL)
+        if doc_url and doc_url != 'Не загружен':
+            doc_name = user_data.get('documentName', 'Документ')
+            caption += f"\n📄 *Документ:* {doc_name}"
+            
+            try:
+                # Пробуем отправить как фото (для изображений)
+                bot.send_photo(
+                    ADMIN_ID,
+                    doc_url,
+                    caption=caption,
+                    reply_markup=markup,
+                    parse_mode="Markdown"
+                )
+                print(f"✅ Верификация с фото отправлена админу")
+            except Exception as photo_err:
+                print(f"⚠️ Не удалось отправить фото ({photo_err}), пробую как документ...")
+                try:
+                    # Если не фото — отправляем как документ
+                    bot.send_document(
+                        ADMIN_ID,
+                        doc_url,
+                        caption=caption,
+                        reply_markup=markup,
+                        parse_mode="Markdown"
+                    )
+                    print(f"✅ Верификация с документом отправлена админу")
+                except Exception as doc_err:
+                    print(f"⚠️ Не удалось отправить документ ({doc_err}), отправляю текстом...")
+                    # Фоллбек — текстовое сообщение со ссылкой
+                    caption += f"\n\n🔗 [Открыть документ]({doc_url})"
+                    bot.send_message(
+                        ADMIN_ID,
+                        caption,
+                        parse_mode='Markdown',
+                        reply_markup=markup
+                    )
+        else:
+            caption += f"\n\n⚠️ *Документ не загружен*"
+            bot.send_message(
+                ADMIN_ID,
+                caption,
+                parse_mode='Markdown',
+                reply_markup=markup
+            )
+        
         print(f"✅ Уведомление о верификации отправлено админу")
     except Exception as e:
         print(f"❌ Ошибка отправки уведомления о верификации: {e}")
@@ -578,6 +645,60 @@ def show_stats(message):
     )
     
     bot.send_message(message.chat.id, stats_text, parse_mode="Markdown")
+
+
+@bot.message_handler(commands=['viewdoc'])
+def viewdoc_command(message):
+    """Просмотр документа пользователя по UID (только админ)"""
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    parts = message.text.split()
+    if len(parts) < 2:
+        bot.send_message(message.chat.id, "❓ Использование: `/viewdoc <UID>`\n\nПример: `/viewdoc abc123xyz`", parse_mode="Markdown")
+        return
+    
+    uid = parts[1].strip()
+    
+    try:
+        user_ref = db.collection('users').document(uid)
+        user_snap = user_ref.get()
+        
+        if not user_snap.exists:
+            bot.send_message(message.chat.id, f"❌ Пользователь `{uid}` не найден", parse_mode="Markdown")
+            return
+        
+        user_data = user_snap.to_dict()
+        doc_url = user_data.get('docUrl', '')
+        
+        if not doc_url or doc_url == 'Не загружен':
+            bot.send_message(message.chat.id, f"⚠️ У пользователя `{uid}` нет загруженного документа", parse_mode="Markdown")
+            return
+        
+        caption = (
+            f"📄 *Документ пользователя*\n\n"
+            f"👤 *Имя:* {user_data.get('name', 'Не указано')}\n"
+            f"📧 *Email:* {user_data.get('email', 'Не указан')}\n"
+            f"📋 *Тип:* {'Подросток' if user_data.get('type') == 'teen' else 'Работодатель'}\n"
+            f"✅ *Верификация:* {user_data.get('verified', 'no')}\n"
+            f"📎 *Файл:* {user_data.get('documentName', 'Документ')}\n"
+            f"🔑 *UID:* `{uid}`"
+        )
+        
+        markup = types.InlineKeyboardMarkup()
+        markup.add(types.InlineKeyboardButton("📄 Открыть в браузере", url=doc_url))
+        
+        try:
+            bot.send_photo(message.chat.id, doc_url, caption=caption, reply_markup=markup, parse_mode="Markdown")
+        except:
+            try:
+                bot.send_document(message.chat.id, doc_url, caption=caption, reply_markup=markup, parse_mode="Markdown")
+            except:
+                caption += f"\n\n🔗 [Открыть документ]({doc_url})"
+                bot.send_message(message.chat.id, caption, reply_markup=markup, parse_mode="Markdown")
+    
+    except Exception as e:
+        bot.send_message(message.chat.id, f"❌ Ошибка: {e}")
 
 
 @bot.message_handler(commands=['broadcast'])
@@ -991,7 +1112,7 @@ def is_user_verified(telegram_id):
 
 
 def send_verification_request(chat_id, user):
-    """Отправить запрос на верификацию админу"""
+    """Отправить запрос на верификацию админу с документом"""
     import re
     
     markup = types.InlineKeyboardMarkup(row_width=2)
@@ -999,6 +1120,14 @@ def send_verification_request(chat_id, user):
         types.InlineKeyboardButton("✅ Одобрить", callback_data=f"approve_user_{user['uid']}"),
         types.InlineKeyboardButton("❌ Отклонить", callback_data=f"reject_user_{user['uid']}")
     )
+    
+    doc_url = user.get('docUrl', '')
+    
+    # Кнопка открыть документ в браузере
+    if doc_url and doc_url != 'Не загружен':
+        markup.add(
+            types.InlineKeyboardButton("📄 Открыть документ в браузере", url=doc_url)
+        )
     
     # Добавляем кнопку WhatsApp если есть телефон
     if user.get('phone'):
@@ -1018,25 +1147,44 @@ def send_verification_request(chat_id, user):
         caption += f"*Телефон:* {user['phone']}\n"
     
     if user.get('age'):
-        caption += f"*Возраст:* {user['age']}\n"
+        caption += f"*Возраст:* {user['age']} лет\n"
+    
+    if user.get('birthdate'):
+        caption += f"*Дата рождения:* {user['birthdate']}\n"
+    
+    if user.get('type') == 'boss':
+        caption += f"*БИН:* {user.get('bin', 'Не указан')}\n"
+        caption += f"*Компания:* {user.get('companyName', 'Не указана')}\n"
+        caption += f"*Контактное лицо:* {user.get('contactPerson', 'Не указано')}\n"
     
     caption += f"*UID:* `{user['uid']}`\n"
     
-    # Информация о документе
-    if user.get('docUrl') and user['docUrl'] != 'Не загружен':
+    # Информация о документе — отправляем фото прямо в чат
+    if doc_url and doc_url != 'Не загружен':
         caption += f"\n📄 *Документ:* {user.get('documentName', 'Загружен')}"
         
         try:
             bot.send_photo(
                 chat_id,
-                user['docUrl'],
+                doc_url,
                 caption=caption,
                 reply_markup=markup,
                 parse_mode="Markdown"
             )
         except Exception as e:
-            print(f"Error sending photo: {e}")
-            bot.send_message(chat_id, caption, reply_markup=markup, parse_mode="Markdown")
+            print(f"⚠️ Не удалось отправить фото: {e}")
+            try:
+                bot.send_document(
+                    chat_id,
+                    doc_url,
+                    caption=caption,
+                    reply_markup=markup,
+                    parse_mode="Markdown"
+                )
+            except Exception as e2:
+                print(f"⚠️ Не удалось отправить документ: {e2}")
+                caption += f"\n\n🔗 [Открыть документ]({doc_url})"
+                bot.send_message(chat_id, caption, reply_markup=markup, parse_mode="Markdown")
     else:
         caption += f"\n⚠️ *Документ не загружен*"
         bot.send_message(chat_id, caption, reply_markup=markup, parse_mode="Markdown")

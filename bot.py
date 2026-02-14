@@ -50,9 +50,140 @@ except Exception as e:
 
 bot = telebot.TeleBot(TOKEN)
 
-# Хранилище подписчиков (в памяти, можно перенести в Firebase)
+# Хранилище подписчиков (загружаются из Firebase)
 subscribers = set()
 last_job_count = 0
+
+# --- МУЛЬТИЯЗЫЧНОСТЬ ---
+BOT_TRANSLATIONS = {
+    'ru': {
+        'welcome': '👋 *Привет, {name}!*\n\n🦄 *TeenX Hub* — платформа легальной работы для подростков!\n\n✨ *Что я умею:*\n• 🔔 Уведомления о новых вакансиях\n• 📋 Показываю проверенные предложения\n• 🔍 Поиск по возрасту и городу\n• 💼 Помогаю найти работу быстро\n• 🆘 Поддержка 24/7\n\n🔥 *Уведомления включены!*',
+        'jobs_btn': '🔍 Вакансии',
+        'notifications_btn': '🔔 Уведомления',
+        'about_btn': 'ℹ️ О платформе',
+        'support_btn': '🆘 Поддержка',
+        'site_btn': '🌐 Открыть сайт',
+        'language_btn': '🌍 Язык',
+        'link_btn': '🔗 Привязать аккаунт',
+        'no_jobs': '📭 *Пока нет активных вакансий*\n\nНо не переживай! Как только появится что-то подходящее, я сразу тебе сообщу 🔔',
+        'jobs_found': '🔥 *Найдено {count} вакансий:*',
+        'notif_on': '🔔 *Уведомления включены!*\n\nТеперь ты будешь первым узнавать о новых вакансиях 🚀',
+        'notif_off': '🔕 *Уведомления отключены*\n\nЧтобы включить снова, нажми кнопку 🔔',
+        'filter_title': '🔍 *Фильтр вакансий*\n\nВыбери параметр поиска:',
+        'filter_age': '👶 По возрасту',
+        'filter_city': '📍 По городу',
+        'filter_all': '📋 Все вакансии',
+        'filter_back': '◀️ Назад',
+        'age_14': '14+ лет',
+        'age_16': '16+ лет',
+        'age_18': '18+ лет',
+        'no_results': '😔 Ничего не найдено по этому фильтру',
+        'new_jobs': '🔥 *НОВЫЕ ВАКАНСИИ!*\n\nПоявилось {count} новых предложений!\nУспей откликнуться первым 🚀',
+        'link_prompt': '🔗 *Привязка аккаунта*\n\nОтправь мне свой email, который использовал при регистрации на сайте:',
+        'link_success': '✅ *Аккаунт привязан!*\n\nТеперь ты будешь получать персональные уведомления.',
+        'link_fail': '❌ Пользователь с таким email не найден.\nПроверь правильность email или зарегистрируйся на сайте.',
+        'lang_select': '🌍 *Выбери язык / Тілді таңдаңыз / Select language:*',
+        'lang_changed': '✅ Язык изменен на русский',
+        'broadcast_prompt': '📢 Отправь мне текст для рассылки всем подписчикам:',
+        'broadcast_done': '✅ Рассылка завершена!\nОтправлено: {sent}, Ошибок: {errors}',
+        'salary': 'Зарплата',
+        'age': 'Возраст',
+        'city': 'Город',
+        'details': 'Подробнее на сайте',
+    },
+    'kz': {
+        'welcome': '👋 *Сәлем, {name}!*\n\n🦄 *TeenX Hub* — жасөспірімдерге арналған жұмыс платформасы!\n\n✨ *Мен не істей аламын:*\n• 🔔 Жаңа вакансиялар туралы хабарламалар\n• 📋 Тексерілген ұсыныстарды көрсету\n• 🔍 Жас пен қала бойынша іздеу\n• 💼 Жұмыс табуға көмек\n• 🆘 24/7 қолдау\n\n🔥 *Хабарламалар қосылды!*',
+        'jobs_btn': '🔍 Вакансиялар',
+        'notifications_btn': '🔔 Хабарламалар',
+        'about_btn': 'ℹ️ Платформа туралы',
+        'support_btn': '🆘 Қолдау',
+        'site_btn': '🌐 Сайтты ашу',
+        'language_btn': '🌍 Тіл',
+        'link_btn': '🔗 Аккаунтты байланыстыру',
+        'no_jobs': '📭 *Әзірге белсенді вакансиялар жоқ*\n\nУайымдама! Лайықты нәрсе пайда болған кезде, мен саған бірден хабарлаймын 🔔',
+        'jobs_found': '🔥 *{count} вакансия табылды:*',
+        'notif_on': '🔔 *Хабарламалар қосылды!*\n\nЕнді сен жаңа вакансиялар туралы бірінші білесің 🚀',
+        'notif_off': '🔕 *Хабарламалар өшірілді*\n\nҚайта қосу үшін 🔔 батырмасын бас',
+        'filter_title': '🔍 *Вакансия сүзгісі*\n\nІздеу параметрін таңда:',
+        'filter_age': '👶 Жас бойынша',
+        'filter_city': '📍 Қала бойынша',
+        'filter_all': '📋 Барлық вакансиялар',
+        'filter_back': '◀️ Артқа',
+        'age_14': '14+ жас',
+        'age_16': '16+ жас',
+        'age_18': '18+ жас',
+        'no_results': '😔 Бұл сүзгі бойынша ештеңе табылмады',
+        'new_jobs': '🔥 *ЖАҢА ВАКАНСИЯЛАР!*\n\n{count} жаңа ұсыныс пайда болды!\nБірінші болып жауап бер 🚀',
+        'link_prompt': '🔗 *Аккаунтты байланыстыру*\n\nСайтта тіркелген email-іңді жібер:',
+        'link_success': '✅ *Аккаунт байланыстырылды!*\n\nЕнді сен жеке хабарламалар аласың.',
+        'link_fail': '❌ Бұл email-мен пайдаланушы табылмады.\nEmail-ді тексер немесе сайтта тіркел.',
+        'lang_select': '🌍 *Выбери язык / Тілді таңдаңыз / Select language:*',
+        'lang_changed': '✅ Тіл қазақшаға өзгертілді',
+        'broadcast_prompt': '📢 Барлық жазылушыларға жіберу үшін мәтін жібер:',
+        'broadcast_done': '✅ Тарату аяқталды!\nЖіберілді: {sent}, Қателер: {errors}',
+        'salary': 'Жалақы',
+        'age': 'Жас',
+        'city': 'Қала',
+        'details': 'Сайтта толығырақ',
+    },
+    'en': {
+        'welcome': '👋 *Hi, {name}!*\n\n🦄 *TeenX Hub* — legal job platform for teens!\n\n✨ *What I can do:*\n• 🔔 New job notifications\n• 📋 Show verified offers\n• 🔍 Search by age and city\n• 💼 Help find work fast\n• 🆘 24/7 Support\n\n🔥 *Notifications enabled!*',
+        'jobs_btn': '🔍 Jobs',
+        'notifications_btn': '🔔 Notifications',
+        'about_btn': 'ℹ️ About',
+        'support_btn': '🆘 Support',
+        'site_btn': '🌐 Open Site',
+        'language_btn': '🌍 Language',
+        'link_btn': '🔗 Link Account',
+        'no_jobs': '📭 *No active jobs yet*\n\nDon\'t worry! I\'ll notify you as soon as something comes up 🔔',
+        'jobs_found': '🔥 *Found {count} jobs:*',
+        'notif_on': '🔔 *Notifications enabled!*\n\nYou\'ll be the first to know about new jobs 🚀',
+        'notif_off': '🔕 *Notifications disabled*\n\nPress 🔔 to enable again',
+        'filter_title': '🔍 *Job Filter*\n\nChoose search parameter:',
+        'filter_age': '👶 By Age',
+        'filter_city': '📍 By City',
+        'filter_all': '📋 All Jobs',
+        'filter_back': '◀️ Back',
+        'age_14': '14+ years',
+        'age_16': '16+ years',
+        'age_18': '18+ years',
+        'no_results': '😔 Nothing found with this filter',
+        'new_jobs': '🔥 *NEW JOBS!*\n\n{count} new offers appeared!\nBe the first to apply 🚀',
+        'link_prompt': '🔗 *Link Account*\n\nSend me the email you used to register on the site:',
+        'link_success': '✅ *Account linked!*\n\nNow you\'ll receive personal notifications.',
+        'link_fail': '❌ User with this email not found.\nCheck email or register on site.',
+        'lang_select': '🌍 *Выбери язык / Тілді таңдаңыз / Select language:*',
+        'lang_changed': '✅ Language changed to English',
+        'broadcast_prompt': '📢 Send me text to broadcast to all subscribers:',
+        'broadcast_done': '✅ Broadcast done!\nSent: {sent}, Errors: {errors}',
+        'salary': 'Salary',
+        'age': 'Age',
+        'city': 'City',
+        'details': 'Details on site',
+    }
+}
+
+# Хранилище языков пользователей
+user_languages = {}
+# Состояния пользователей (для диалогов)
+user_states = {}
+
+def t(user_id, key, **kwargs):
+    """Получить перевод для пользователя"""
+    lang = user_languages.get(user_id, 'ru')
+    text = BOT_TRANSLATIONS.get(lang, BOT_TRANSLATIONS['ru']).get(key, key)
+    if kwargs:
+        text = text.format(**kwargs)
+    return text
+
+def detect_user_language(message):
+    """Определить язык пользователя из Telegram"""
+    lang_code = message.from_user.language_code or 'ru'
+    if lang_code.startswith('kk'):
+        return 'kz'
+    elif lang_code.startswith('en'):
+        return 'en'
+    return 'ru'
 
 
 # --- ФУНКЦИИ РАБОТЫ С FIREBASE ---
@@ -124,6 +255,98 @@ def save_telegram_id(uid, telegram_id):
     except Exception as e:
         print(f"Ошибка сохранения Telegram ID: {e}")
         return False
+
+
+def load_subscribers_from_firebase():
+    """Загрузить подписчиков из Firebase при старте"""
+    global subscribers
+    if not db:
+        return
+    
+    try:
+        subs_ref = db.collection('bot_subscribers').stream()
+        for doc in subs_ref:
+            data = doc.to_dict()
+            subscribers.add(int(doc.id))
+            # Загружаем язык пользователя
+            if data.get('language'):
+                user_languages[int(doc.id)] = data['language']
+        print(f"📥 Загружено {len(subscribers)} подписчиков из Firebase")
+    except Exception as e:
+        print(f"❌ Ошибка загрузки подписчиков: {e}")
+
+
+def save_subscriber(user_id, language='ru'):
+    """Сохранить подписчика в Firebase"""
+    if not db:
+        return
+    
+    try:
+        db.collection('bot_subscribers').document(str(user_id)).set({
+            'telegram_id': user_id,
+            'language': language,
+            'subscribed_at': firestore.SERVER_TIMESTAMP,
+            'active': True
+        }, merge=True)
+    except Exception as e:
+        print(f"❌ Ошибка сохранения подписчика: {e}")
+
+
+def remove_subscriber(user_id):
+    """Удалить подписчика из Firebase"""
+    if not db:
+        return
+    
+    try:
+        db.collection('bot_subscribers').document(str(user_id)).update({
+            'active': False
+        })
+    except Exception as e:
+        print(f"❌ Ошибка удаления подписчика: {e}")
+
+
+def save_user_language(user_id, language):
+    """Сохранить язык пользователя в Firebase"""
+    if not db:
+        return
+    
+    try:
+        db.collection('bot_subscribers').document(str(user_id)).set({
+            'language': language
+        }, merge=True)
+    except Exception as e:
+        print(f"❌ Ошибка сохранения языка: {e}")
+
+
+def find_user_by_email(email):
+    """Найти пользователя по email для привязки аккаунта"""
+    if not db:
+        return None
+    
+    try:
+        users_ref = db.collection('users')
+        query = users_ref.where('email', '==', email).stream()
+        
+        for doc in query:
+            user_data = doc.to_dict()
+            user_data['uid'] = doc.id
+            return user_data
+        return None
+    except Exception as e:
+        print(f"❌ Ошибка поиска пользователя: {e}")
+        return None
+
+
+def get_jobs_by_age(min_age):
+    """Получить вакансии по минимальному возрасту"""
+    jobs = get_active_jobs()
+    return [j for j in jobs if int(j.get('minAge', 14)) <= min_age]
+
+
+def get_jobs_by_city(city):
+    """Получить вакансии по городу"""
+    jobs = get_active_jobs()
+    return [j for j in jobs if city.lower() in j.get('city', '').lower()]
 
 
 def get_pending_jobs():
@@ -276,33 +499,31 @@ def send_welcome(message):
     user_id = message.from_user.id
     subscribers.add(user_id)  # Автоматически подписываем
     
+    # Определяем язык и сохраняем
+    if user_id not in user_languages:
+        user_languages[user_id] = detect_user_language(message)
+    save_subscriber(user_id, user_languages.get(user_id, 'ru'))
+    
     markup = types.InlineKeyboardMarkup(row_width=2)
     markup.add(
-        types.InlineKeyboardButton("🔍 Вакансии", callback_data="show_jobs"),
-        types.InlineKeyboardButton("🔔 Уведомления", callback_data="toggle_notifications")
+        types.InlineKeyboardButton(t(user_id, 'jobs_btn'), callback_data="show_jobs"),
+        types.InlineKeyboardButton(t(user_id, 'notifications_btn'), callback_data="toggle_notifications")
     )
     markup.add(
-        types.InlineKeyboardButton("ℹ️ О платформе", callback_data="about_platform"),
-        types.InlineKeyboardButton("🆘 Поддержка", callback_data="support")
+        types.InlineKeyboardButton(t(user_id, 'about_btn'), callback_data="about_platform"),
+        types.InlineKeyboardButton(t(user_id, 'support_btn'), callback_data="support")
     )
     markup.add(
-        types.InlineKeyboardButton("🌐 Открыть сайт", url="https://teenx.pages.dev")
+        types.InlineKeyboardButton(t(user_id, 'language_btn'), callback_data="change_language"),
+        types.InlineKeyboardButton(t(user_id, 'link_btn'), callback_data="link_account")
     )
-    
-    welcome_text = (
-        f"👋 *Привет, {message.from_user.first_name}!*\n\n"
-        "🦄 *TeenX Hub* — платформа легальной работы для подростков!\n\n"
-        "✨ *Что я умею:*\n"
-        "• 🔔 Уведомления о новых вакансиях\n"
-        "• 📋 Показываю проверенные предложения\n"
-        "• 💼 Помогаю найти работу быстро\n"
-        "• 🆘 Поддержка 24/7\n\n"
-        "🔥 *Уведомления включены!* Ты первым узнаешь о новых вакансиях."
+    markup.add(
+        types.InlineKeyboardButton(t(user_id, 'site_btn'), url="https://teenx.pages.dev")
     )
     
     bot.send_message(
         message.chat.id,
-        welcome_text,
+        t(user_id, 'welcome', name=message.from_user.first_name),
         reply_markup=markup,
         parse_mode="Markdown"
     )
@@ -338,16 +559,69 @@ def show_stats(message):
     
     jobs = get_active_jobs()
     pending_verifications = get_pending_verifications()
+    pending_jobs = get_pending_jobs()
+    
+    # Подсчет языков
+    lang_counts = {}
+    for lang in user_languages.values():
+        lang_counts[lang] = lang_counts.get(lang, 0) + 1
+    lang_info = ', '.join([f"{k.upper()}: {v}" for k, v in lang_counts.items()]) or 'Нет данных'
     
     stats_text = (
         f"📊 *Статистика TeenX Bot*\n\n"
         f"👥 Подписчиков: *{len(subscribers)}*\n"
         f"💼 Активных вакансий: *{len(jobs)}*\n"
+        f"📋 На модерации: *{len(pending_jobs)}*\n"
         f"⏳ На верификации: *{len(pending_verifications)}*\n"
+        f"🌍 Языки: {lang_info}\n"
         f"🤖 Статус: *Онлайн*"
     )
     
     bot.send_message(message.chat.id, stats_text, parse_mode="Markdown")
+
+
+@bot.message_handler(commands=['broadcast'])
+def broadcast_command(message):
+    """Рассылка от админа"""
+    if message.from_user.id != ADMIN_ID:
+        return
+    
+    user_states[message.from_user.id] = 'broadcast'
+    bot.send_message(
+        message.chat.id,
+        t(message.from_user.id, 'broadcast_prompt'),
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(commands=['link'])
+def link_command(message):
+    """Привязка аккаунта"""
+    user_id = message.from_user.id
+    user_states[user_id] = 'link_account'
+    bot.send_message(
+        message.chat.id,
+        t(user_id, 'link_prompt'),
+        parse_mode="Markdown"
+    )
+
+
+@bot.message_handler(commands=['lang'])
+def lang_command(message):
+    """Смена языка"""
+    user_id = message.from_user.id
+    markup = types.InlineKeyboardMarkup(row_width=3)
+    markup.add(
+        types.InlineKeyboardButton("🇷🇺 Русский", callback_data="set_lang_ru"),
+        types.InlineKeyboardButton("🇰🇿 Қазақша", callback_data="set_lang_kz"),
+        types.InlineKeyboardButton("🇬🇧 English", callback_data="set_lang_en")
+    )
+    bot.send_message(
+        message.chat.id,
+        t(user_id, 'lang_select'),
+        reply_markup=markup,
+        parse_mode="Markdown"
+    )
 
 
 # --- ОБРАБОТКА КНОПОК ---
@@ -355,29 +629,107 @@ def show_stats(message):
 def handle_query(call):
     """Обработка всех callback кнопок"""
     
-    # 1. Показать вакансии
+    # 1. Показать вакансии (с фильтром)
     if call.data == "show_jobs":
-        bot.answer_callback_query(call.id, "Загружаю вакансии...")
-        jobs = get_active_jobs()
+        bot.answer_callback_query(call.id)
+        user_id = call.from_user.id
         
-        if not jobs:
-            bot.send_message(
-                call.message.chat.id,
-                "📭 *Пока нет активных вакансий*\n\n"
-                "Но не переживай! Как только появится что-то подходящее, "
-                "я сразу тебе сообщу 🔔",
-                parse_mode="Markdown"
-            )
-            return
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'filter_all'), callback_data="filter_all"),
+            types.InlineKeyboardButton(t(user_id, 'filter_age'), callback_data="filter_age")
+        )
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'filter_city'), callback_data="filter_city"),
+            types.InlineKeyboardButton(t(user_id, 'filter_back'), callback_data="back_to_menu")
+        )
         
         bot.send_message(
             call.message.chat.id,
-            f"🔥 *Найдено {len(jobs)} вакансий:*",
+            t(user_id, 'filter_title'),
+            reply_markup=markup,
             parse_mode="Markdown"
         )
+    
+    # 1.1 Фильтр: все вакансии
+    elif call.data == "filter_all":
+        bot.answer_callback_query(call.id, "Загружаю...")
+        user_id = call.from_user.id
+        jobs = get_active_jobs()
         
-        for job in jobs:
-            send_job_card(call.message.chat.id, job)
+        if not jobs:
+            bot.send_message(call.message.chat.id, t(user_id, 'no_jobs'), parse_mode="Markdown")
+            return
+        
+        bot.send_message(call.message.chat.id, t(user_id, 'jobs_found', count=len(jobs)), parse_mode="Markdown")
+        for job in jobs[:10]:
+            send_job_card(call.message.chat.id, job, user_id)
+    
+    # 1.2 Фильтр: по возрасту
+    elif call.data == "filter_age":
+        bot.answer_callback_query(call.id)
+        user_id = call.from_user.id
+        
+        markup = types.InlineKeyboardMarkup(row_width=3)
+        markup.add(
+            types.InlineKeyboardButton(t(user_id, 'age_14'), callback_data="age_14"),
+            types.InlineKeyboardButton(t(user_id, 'age_16'), callback_data="age_16"),
+            types.InlineKeyboardButton(t(user_id, 'age_18'), callback_data="age_18")
+        )
+        markup.add(types.InlineKeyboardButton(t(user_id, 'filter_back'), callback_data="show_jobs"))
+        
+        bot.send_message(call.message.chat.id, "👶 *Выбери возраст:*", reply_markup=markup, parse_mode="Markdown")
+    
+    # 1.3 Фильтр: по конкретному возрасту
+    elif call.data.startswith("age_"):
+        bot.answer_callback_query(call.id, "Загружаю...")
+        user_id = call.from_user.id
+        age = int(call.data.split("_")[1])
+        jobs = get_jobs_by_age(age)
+        
+        if not jobs:
+            bot.send_message(call.message.chat.id, t(user_id, 'no_results'), parse_mode="Markdown")
+            return
+        
+        bot.send_message(call.message.chat.id, t(user_id, 'jobs_found', count=len(jobs)), parse_mode="Markdown")
+        for job in jobs[:10]:
+            send_job_card(call.message.chat.id, job, user_id)
+    
+    # 1.4 Фильтр: по городу
+    elif call.data == "filter_city":
+        bot.answer_callback_query(call.id)
+        user_id = call.from_user.id
+        
+        # Получаем уникальные города из вакансий
+        jobs = get_active_jobs()
+        cities = list(set(j.get('city', 'Уральск') for j in jobs))
+        
+        markup = types.InlineKeyboardMarkup(row_width=2)
+        for city in cities[:8]:
+            markup.add(types.InlineKeyboardButton(f"📍 {city}", callback_data=f"city_{city}"))
+        markup.add(types.InlineKeyboardButton(t(user_id, 'filter_back'), callback_data="show_jobs"))
+        
+        bot.send_message(call.message.chat.id, "📍 *Выбери город:*", reply_markup=markup, parse_mode="Markdown")
+    
+    # 1.5 Фильтр: по конкретному городу
+    elif call.data.startswith("city_"):
+        bot.answer_callback_query(call.id, "Загружаю...")
+        user_id = call.from_user.id
+        city = call.data.replace("city_", "")
+        jobs = get_jobs_by_city(city)
+        
+        if not jobs:
+            bot.send_message(call.message.chat.id, t(user_id, 'no_results'), parse_mode="Markdown")
+            return
+        
+        bot.send_message(call.message.chat.id, t(user_id, 'jobs_found', count=len(jobs)), parse_mode="Markdown")
+        for job in jobs[:10]:
+            send_job_card(call.message.chat.id, job, user_id)
+    
+    # 1.6 Назад в меню
+    elif call.data == "back_to_menu":
+        bot.answer_callback_query(call.id)
+        send_welcome(call.message)
     
     # 2. Переключить уведомления
     elif call.data == "toggle_notifications":
@@ -385,23 +737,43 @@ def handle_query(call):
         
         if user_id in subscribers:
             subscribers.remove(user_id)
-            bot.answer_callback_query(call.id, "🔕 Уведомления отключены")
-            bot.send_message(
-                call.message.chat.id,
-                "🔕 *Уведомления отключены*\n\n"
-                "Ты больше не будешь получать оповещения о новых вакансиях.\n"
-                "Чтобы включить снова, нажми кнопку 🔔",
-                parse_mode="Markdown"
-            )
+            remove_subscriber(user_id)
+            bot.answer_callback_query(call.id, "🔕")
+            bot.send_message(call.message.chat.id, t(user_id, 'notif_off'), parse_mode="Markdown")
         else:
             subscribers.add(user_id)
-            bot.answer_callback_query(call.id, "🔔 Уведомления включены!")
-            bot.send_message(
-                call.message.chat.id,
-                "🔔 *Уведомления включены!*\n\n"
-                "Теперь ты будешь первым узнавать о новых вакансиях 🚀",
-                parse_mode="Markdown"
-            )
+            save_subscriber(user_id, user_languages.get(user_id, 'ru'))
+            bot.answer_callback_query(call.id, "🔔")
+            bot.send_message(call.message.chat.id, t(user_id, 'notif_on'), parse_mode="Markdown")
+    
+    # 2.5 Смена языка
+    elif call.data == "change_language":
+        bot.answer_callback_query(call.id)
+        user_id = call.from_user.id
+        markup = types.InlineKeyboardMarkup(row_width=3)
+        markup.add(
+            types.InlineKeyboardButton("🇷🇺 Русский", callback_data="set_lang_ru"),
+            types.InlineKeyboardButton("🇰🇿 Қазақша", callback_data="set_lang_kz"),
+            types.InlineKeyboardButton("🇬🇧 English", callback_data="set_lang_en")
+        )
+        bot.send_message(call.message.chat.id, t(user_id, 'lang_select'), reply_markup=markup, parse_mode="Markdown")
+    
+    elif call.data.startswith("set_lang_"):
+        user_id = call.from_user.id
+        lang = call.data.replace("set_lang_", "")
+        user_languages[user_id] = lang
+        save_user_language(user_id, lang)
+        bot.answer_callback_query(call.id, "✅")
+        bot.send_message(call.message.chat.id, t(user_id, 'lang_changed'), parse_mode="Markdown")
+        # Перезапускаем меню на новом языке
+        send_welcome(call.message)
+    
+    # 2.6 Привязка аккаунта
+    elif call.data == "link_account":
+        bot.answer_callback_query(call.id)
+        user_id = call.from_user.id
+        user_states[user_id] = 'link_account'
+        bot.send_message(call.message.chat.id, t(user_id, 'link_prompt'), parse_mode="Markdown")
     
     # 3. О платформе
     elif call.data == "about_platform":
@@ -579,22 +951,23 @@ def handle_query(call):
 
 
 # --- ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ---
-def send_job_card(chat_id, job):
+def send_job_card(chat_id, job, user_id=None):
     """Отправить анонс вакансии с ссылкой на сайт"""
+    uid = user_id or chat_id
     salary = f"до {job.get('salaryTo', 0):,}₸" if job.get('salaryTo') else job.get('price', 'По договорённости')
     
     markup = types.InlineKeyboardMarkup()
     markup.add(
-        types.InlineKeyboardButton("🌐 Подробнее на сайте", url="https://teenx.pages.dev")
+        types.InlineKeyboardButton(f"🌐 {t(uid, 'details')}", url="https://teenx.pages.dev")
     )
     
     job_text = (
         f"💼 *{job.get('title', 'Вакансия')}*\n\n"
-        f"💰 Зарплата: {salary}\n"
-        f"👶 Возраст: от {job.get('minAge', 14)} лет\n"
-        f"📍 Город: {job.get('city', 'Уральск')}\n\n"
+        f"💰 {t(uid, 'salary')}: {salary}\n"
+        f"👶 {t(uid, 'age')}: от {job.get('minAge', 14)} лет\n"
+        f"📍 {t(uid, 'city')}: {job.get('city', 'Уральск')}\n\n"
         f"📝 {job.get('responsibilities', job.get('desc', ''))[:150]}...\n\n"
-        f"🔗 *Полная информация на сайте*"
+        f"🔗 *{t(uid, 'details')}*"
     )
     
     bot.send_message(chat_id, job_text, reply_markup=markup, parse_mode="Markdown")
@@ -701,6 +1074,51 @@ def send_job_moderation_request(chat_id, job):
     bot.send_message(chat_id, job_text, reply_markup=markup, parse_mode="Markdown")
 
 
+# --- ОБРАБОТКА ТЕКСТОВЫХ СООБЩЕНИЙ ---
+@bot.message_handler(func=lambda message: message.from_user.id in user_states)
+def handle_user_state(message):
+    """Обработка текстовых сообщений в зависимости от состояния"""
+    user_id = message.from_user.id
+    state = user_states.pop(user_id, None)
+    
+    # Рассылка от админа
+    if state == 'broadcast' and user_id == ADMIN_ID:
+        broadcast_text = message.text
+        sent = 0
+        errors = 0
+        
+        for sub_id in list(subscribers):
+            try:
+                bot.send_message(sub_id, f"📢 *Рассылка от TeenX:*\n\n{broadcast_text}", parse_mode="Markdown")
+                sent += 1
+                time.sleep(0.1)
+            except Exception as e:
+                errors += 1
+                subscribers.discard(sub_id)
+        
+        bot.send_message(
+            message.chat.id,
+            t(user_id, 'broadcast_done', sent=sent, errors=errors),
+            parse_mode="Markdown"
+        )
+    
+    # Привязка аккаунта
+    elif state == 'link_account':
+        email = message.text.strip().lower()
+        
+        if '@' not in email or '.' not in email:
+            bot.send_message(message.chat.id, "❌ Неверный формат email. Попробуй ещё раз: /link")
+            return
+        
+        user_data = find_user_by_email(email)
+        
+        if user_data:
+            save_telegram_id(user_data['uid'], str(user_id))
+            bot.send_message(message.chat.id, t(user_id, 'link_success'), parse_mode="Markdown")
+        else:
+            bot.send_message(message.chat.id, t(user_id, 'link_fail'), parse_mode="Markdown")
+
+
 # --- АВТОМАТИЧЕСКИЕ УВЕДОМЛЕНИЯ ---
 # Хранилище для отслеживания уже обработанных записей
 processed_jobs = set()
@@ -802,10 +1220,13 @@ def check_new_jobs():
 # --- ЗАПУСК БОТА ---
 if __name__ == "__main__":
     print("=" * 50)
-    print("🦄 TeenX Hub Bot запущен!")
+    print("🦄 TeenX Hub Bot v2.0 запущен!")
     print(f"📊 Firebase: {'✅ Подключен' if db else '❌ Отключен'}")
     print(f"👤 Админ ID: {ADMIN_ID}")
     print("=" * 50)
+    
+    # Загружаем подписчиков из Firebase
+    load_subscribers_from_firebase()
     
     # Запускаем фоновые потоки для мониторинга
     notification_thread = threading.Thread(target=check_new_jobs, daemon=True)
@@ -817,7 +1238,17 @@ if __name__ == "__main__":
     print("🔔 Система уведомлений запущена")
     print("📋 Мониторинг вакансий запущен")
     print("👤 Мониторинг верификаций запущен")
+    print(f"🌍 Мультиязычность: RU/KZ/EN")
+    print(f"📢 Рассылка: /broadcast")
+    print(f"🔗 Привязка: /link")
+    print(f"🌍 Язык: /lang")
     
-    # Запускаем бота
+    # Запускаем бота с авто-переподключением
     print("⏳ Ожидаю сообщения...\n")
-    bot.infinity_polling()
+    while True:
+        try:
+            bot.infinity_polling(timeout=60, long_polling_timeout=30)
+        except Exception as e:
+            print(f"❌ Ошибка polling: {e}")
+            print("🔄 Переподключение через 5 секунд...")
+            time.sleep(5)

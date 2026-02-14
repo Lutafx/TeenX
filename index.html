@@ -1972,16 +1972,17 @@
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        /* Show language switcher only on mobile */
+        @media (max-width: 768px) {
+            .lang-btn {
+                display: block !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-<!-- Language Switcher -->
-<div style="position: fixed; top: 20px; right: 20px; z-index: 10000; background: rgba(10, 10, 10, 0.9); backdrop-filter: blur(10px); border: 1px solid var(--border); border-radius: 12px; padding: 8px; display: flex; gap: 4px;">
-    <button class="lang-btn" data-lang="ru" onclick="switchLanguage('ru')" style="padding: 8px 12px; border: none; border-radius: 8px; background: rgba(124, 58, 237, 0.2); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600;">RU</button>
-    <button class="lang-btn" data-lang="kz" onclick="switchLanguage('kz')" style="padding: 8px 12px; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600;">KZ</button>
-    <button class="lang-btn" data-lang="en" onclick="switchLanguage('en')" style="padding: 8px 12px; border: none; border-radius: 8px; background: rgba(255, 255, 255, 0.1); color: #fff; cursor: pointer; font-size: 12px; font-weight: 600;">EN</button>
-</div>
 
 <!-- Toast Container -->
 <div class="toast-container" id="toastContainer"></div>
@@ -2020,6 +2021,9 @@
             <div class="job-counter" id="jobCounter" style="display:none;">
                 🔥 <span id="jobCount">0</span> вакансий
             </div>
+            <button class="lang-btn" onclick="switchLang()" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 12px; border-radius: 8px; font-size: 12px; cursor: pointer; display: none;">
+                <span id="currentLang">RU</span>
+            </button>
         </div>
         <div id="authHeaderBtn">
             <button class="btn btn-primary" style="padding: 10px 20px; font-size: 14px;" onclick="openAuthModal()">Войти</button>
@@ -6880,6 +6884,26 @@
         } catch (error) {
             console.error('Error viewing user profile:', error);
             showToast('❌ Ошибка загрузки профиля', 'error');
+        }
+    };
+
+    // Simple language switcher for mobile
+    let currentLangIndex = 0;
+    const languages = ['RU', 'KZ', 'EN'];
+    const langCodes = ['ru', 'kk', 'en'];
+    
+    window.switchLang = () => {
+        currentLangIndex = (currentLangIndex + 1) % languages.length;
+        const newLang = languages[currentLangIndex];
+        const newLangCode = langCodes[currentLangIndex];
+        
+        document.getElementById('currentLang').textContent = newLang;
+        
+        // For mobile - use Google Translate URL
+        if (window.innerWidth <= 768) {
+            const currentUrl = window.location.href;
+            const googleTranslateUrl = `https://translate.google.com/translate?sl=auto&tl=${newLangCode}&u=${encodeURIComponent(currentUrl)}`;
+            window.open(googleTranslateUrl, '_blank');
         }
     };
 

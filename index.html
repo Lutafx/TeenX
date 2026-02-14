@@ -2530,6 +2530,34 @@
                     <div id="historyList"></div>
                 </div>
 
+                <!-- PWA Install Section -->
+                <div id="pwaInstallSection" style="margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
+                    <h3 style="color: var(--primary-light); margin-bottom:15px;">📱 Мобильное приложение</h3>
+                    <div style="background:linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(37,99,235,0.1) 100%); border:1px solid rgba(124,58,237,0.2); padding:20px; border-radius:12px; margin-bottom:16px;">
+                        <div style="display:flex; align-items:center; margin-bottom:12px;">
+                            <div style="font-size:32px; margin-right:12px;">📱</div>
+                            <div>
+                                <h4 style="margin:0; color:var(--primary-light); font-size:16px;">Установи TeenX App</h4>
+                                <p style="margin:0; color:var(--text-secondary); font-size:13px;">Быстрый доступ с главного экрана телефона</p>
+                            </div>
+                        </div>
+                        <div style="font-size:13px; color:var(--text-secondary); margin-bottom:16px;">
+                            ✅ Работает офлайн<br>
+                            ✅ Push-уведомления о вакансиях<br>
+                            ✅ Быстрая загрузка<br>
+                            ✅ Автоматические обновления
+                        </div>
+                        <button id="manualInstallBtn" class="btn btn-accent" style="width:100%;" onclick="installPWA()">
+                            📱 Установить приложение
+                        </button>
+                    </div>
+                    <div id="pwaInstallSuccess" style="display:none; background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.2); padding:16px; border-radius:8px; text-align:center;">
+                        <div style="font-size:32px; margin-bottom:8px;">🎉</div>
+                        <h4 style="margin:0; color:#10b981; margin-bottom:8px;">Приложение установлено!</h4>
+                        <p style="margin:0; color:var(--text-secondary); font-size:13px;">Найди иконку TeenX на главном экране</p>
+                    </div>
+                </div>
+
                 <div id="bossPanel" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
                     <h3 style="color: var(--primary-light); margin-bottom:15px;">💼 Панель работодателя</h3>
                     
@@ -5935,6 +5963,80 @@
     window.addEventListener('appinstalled', () => {
         console.log('✅ PWA installed successfully!');
         showToast('🎉 Приложение установлено!', 'success');
+        
+        // Hide install button and show success message
+        const installSection = document.getElementById('pwaInstallSection');
+        const installBtn = document.getElementById('manualInstallBtn');
+        const successDiv = document.getElementById('pwaInstallSuccess');
+        
+        if (installBtn) installBtn.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'block';
+    });
+
+    // Manual PWA Install Function
+    window.installPWA = async () => {
+        // Check if PWA is supported
+        if (!('serviceWorker' in navigator)) {
+            showToast('❌ PWA не поддерживается в вашем браузере', 'error');
+            return;
+        }
+
+        // Check if already installed
+        if (localStorage.getItem('pwaInstalled') === 'true') {
+            showToast('📱 Приложение уже установлено!', 'info');
+            return;
+        }
+
+        // Try to use deferred prompt first
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response: ${outcome}`);
+            
+            if (outcome === 'accepted') {
+                localStorage.setItem('pwaInstalled', 'true');
+                showToast('🎉 Приложение установлено!', 'success');
+                
+                // Hide install button and show success message
+                const installBtn = document.getElementById('manualInstallBtn');
+                const successDiv = document.getElementById('pwaInstallSuccess');
+                
+                if (installBtn) installBtn.style.display = 'none';
+                if (successDiv) successDiv.style.display = 'block';
+            }
+            
+            deferredPrompt = null;
+            return;
+        }
+
+        // Manual install instructions for different browsers
+        const userAgent = navigator.userAgent.toLowerCase();
+        let instructions = '';
+
+        if (userAgent.includes('chrome') && !userAgent.includes('edg')) {
+            instructions = 'Chrome: Нажмите меню (⋮) → "Установить приложение" → "Установить"';
+        } else if (userAgent.includes('firefox')) {
+            instructions = 'Firefox: Нажмите меню (≡) → "Установить сайт как приложение"';
+        } else if (userAgent.includes('safari')) {
+            instructions = 'Safari: Нажмите "Поделиться" → "На экран \'Домой\' → "Добавить"';
+        } else if (userAgent.includes('edg')) {
+            instructions = 'Edge: Нажмите меню (⋯) → "Приложения" → "Установить это приложение как приложение"';
+        } else {
+            instructions = 'Найдите в меню браузера опцию "Установить приложение" или "Добавить на главный экран"';
+        }
+
+        showToast('📱 ' + instructions, 'info', 8000);
+    };
+
+    // Check PWA install status on page load
+    window.addEventListener('load', () => {
+        if (localStorage.getItem('pwaInstalled') === 'true') {
+            const installBtn = document.getElementById('manualInstallBtn');
+            const successDiv = document.getElementById('pwaInstallSuccess');
+            
+            if (installBtn) installBtn.style.display = 'none';
+            if (successDiv) successDiv.style.display = 'block';
+        }
     });
 </script>
 </body>

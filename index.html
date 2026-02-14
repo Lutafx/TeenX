@@ -3192,7 +3192,17 @@
             console.error('Modal Auth not found');
         }
     };
-    window.closeModals = () => document.querySelectorAll('.modal').forEach(m => m.classList.remove('visible'));
+    window.closeModals = () => {
+        document.querySelectorAll('.modal').forEach(m => {
+            // If modal has an ID, it's a static modal - just hide it
+            if (m.id) {
+                m.classList.remove('visible');
+            } else {
+                // If modal has no ID, it's a dynamic modal - remove it
+                m.remove();
+            }
+        });
+    };
     window.openModal = (id) => {
         const modal = document.getElementById(id);
         if (modal) {
@@ -5392,22 +5402,22 @@
                     ` : ''}
                     
                     <div style="display:flex; gap:12px; flex-wrap:wrap;">
-                        <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Закрыть</button>
+                        <button class="btn btn-primary" onclick="closeModals()">Закрыть</button>
                         ${user.verificationDoc ? 
-                            `<button class="btn" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;" onclick="this.closest('.modal').remove(); viewVerificationDocs('${userId}')">📄 Документы верификации</button>` : ''
+                            `<button class="btn" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;" onclick="closeModals(); viewVerificationDocs('${userId}')">📄 Документы верификации</button>` : ''
                         }
                         ${user.banned ? 
-                            `<button class="btn admin-btn-unban" onclick="this.closest('.modal').remove(); unbanUser('${userId}')">✅ Разбанить</button>` :
-                            `<button class="btn admin-btn-ban" onclick="this.closest('.modal').remove(); banUser('${userId}')">🚫 Забанить</button>`
+                            `<button class="btn admin-btn-unban" onclick="closeModals(); unbanUser('${userId}')">✅ Разбанить</button>` :
+                            `<button class="btn admin-btn-ban" onclick="closeModals(); banUser('${userId}')">🚫 Забанить</button>`
                         }
                         ${user.verified !== 'yes' && !user.banned ? 
-                            `<button class="btn admin-btn-verify" onclick="this.closest('.modal').remove(); verifyUser('${userId}')">✅ Верифицировать</button>
-                             <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="this.closest('.modal').remove(); rejectVerification('${userId}')">❌ Отклонить</button>` : ''
+                            `<button class="btn admin-btn-verify" onclick="closeModals(); verifyUser('${userId}')">✅ Верифицировать</button>
+                             <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="closeModals(); rejectVerification('${userId}')">❌ Отклонить</button>` : ''
                         }
                         ${user.verified === 'yes' ? 
-                            `<button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="this.closest('.modal').remove(); removeVerification('${userId}')">❌ Снять верификацию</button>` : ''
+                            `<button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="closeModals(); removeVerification('${userId}')">❌ Снять верификацию</button>` : ''
                         }
-                        <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="this.closest('.modal').remove(); deleteUser('${userId}')">🗑️ Удалить пользователя</button>
+                        <button class="btn" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;" onclick="closeModals(); deleteUser('${userId}')">🗑️ Удалить пользователя</button>
                     </div>
                 </div>
             `;
@@ -6051,7 +6061,7 @@
                     </div>
                     
                     <div style="display:flex; gap:12px;">
-                        <button class="btn btn-primary" onclick="this.closest('.modal').remove()">Закрыть</button>
+                        <button class="btn btn-primary" onclick="closeModals()">Закрыть</button>
                     </div>
                 </div>
             `;
@@ -6418,275 +6428,7 @@
         }
     });
 
-    // Translation System
-    const translations = {
-        ru: {
-            // Header
-            'logo': 'TeenX — Платформа трудоустройства',
-            'auth_btn': 'Войти',
-            
-            // Landing
-            'hero_title': 'Первая платформа в Казахстане для трудоустройства подростков 14-18 лет',
-            'hero_subtitle': 'Безопасно, легально, просто',
-            'get_started': 'Начать',
-            
-            // Features
-            'feature1_title': '⚖️ Юридическая чистота',
-            'feature1_desc': 'Все вакансии соответствуют законодательству РК',
-            'feature2_title': '💼 Карьерный лифт',
-            'feature2_desc': 'Первый шаг в успешную карьеру',
-            'feature3_title': '🔒 Безопасность данных',
-            'feature3_desc': 'Защита персональной информации',
-            
-            // Auth
-            'select_role': 'Выберите роль',
-            'teen': 'Подросток (14-18 лет)',
-            'boss': 'Работодатель',
-            'email_placeholder': 'Email',
-            'password_placeholder': 'Пароль',
-            'sign_in': 'Войти',
-            'register': 'Зарегистрироваться',
-            
-            // Navigation
-            'jobs': 'Вакансии',
-            'profile': 'Профиль',
-            'messages': 'Сообщения',
-            'settings': 'Настройки',
-            'admin': 'Админ',
-            'support': 'Поддержка',
-            'documents': 'Документы',
-            'my_jobs': 'Мои вакансии',
-            'logout': 'Выйти',
-            
-            // Job Actions
-            'create_job': 'Создать вакансию',
-            'apply': 'Откликнуться',
-            'view_details': 'Подробнее',
-            'edit': 'Редактировать',
-            'delete': 'Удалить',
-            'restore': 'Восстановить',
-            'delete_forever': 'Удалить навсегда',
-            
-            // Status
-            'verified': 'Верифицирован',
-            'pending': 'На проверке',
-            'rejected': 'Отклонен',
-            'active': 'Активна',
-            'banned': 'Забанен',
-            'blacklist': 'Черный список',
-            'trash': 'Корзина',
-            'approve': 'Одобрить',
-            'reject': 'Отклонить',
-            'ban': 'Забанить',
-            'unban': 'Разбанить',
-            
-            // Common
-            'salary': 'Зарплата',
-            'age': 'Возраст',
-            'city': 'Город',
-            'phone': 'Телефон',
-            'email': 'Email',
-            'save': 'Сохранить',
-            'cancel': 'Отмена',
-            'close': 'Закрыть',
-            'search': 'Поиск',
-            'filter': 'Фильтр',
-            'sort': 'Сортировка',
-            'reviews': 'Отзывы',
-            'rating': 'Рейтинг',
-            'no_reviews': 'Нет отзывов',
-            'write_review': 'Оставить отзыв',
-            'contact': 'WhatsApp',
-            'admin_panel': 'Панель администратора',
-            'jobs_management': 'Вакансии',
-            'statistics': 'Статистика',
-            'loading': 'Загрузка...',
-            'error': 'Ошибка',
-            'success': 'Успешно'
-        },
-        kz: {
-            // Header
-            'logo': 'TeenX — Жұмысқа орналастыру платформасы',
-            'auth_btn': 'Кіру',
-            
-            // Landing
-            'hero_title': 'Қазақстандағы 14-18 жастағы жасөспірімдерді жұмысқа орналастыруға арналған алғашқы платформа',
-            'hero_subtitle': 'Қауіпсіз, заңды, қарапайым',
-            'get_started': 'Бастау',
-            'age': 'Жас',
-            'city': 'Қала',
-            'apply': 'Жауап беру',
-            'contact': 'WhatsApp',
-            
-            // Admin
-            'admin_panel': 'Әкімші панелі',
-            'users': 'Пайдаланушылар',
-            'jobs_management': 'Бос орындар',
-            'statistics': 'Статистика',
-            
-            // Common
-            'loading': 'Жүктелуде...',
-            'error': 'Қате',
-            'success': 'Сәтті',
-            'cancel': 'Болдырмау',
-            'save': 'Сақтау',
-            'delete': 'Жою',
-            'edit': 'Өңдеу'
-        },
-        en: {
-            // Header
-            'logo': 'TeenX — Employment Platform',
-            'auth_btn': 'Sign In',
-            
-            // Landing
-            'hero_title': 'First platform in Kazakhstan for teen employment 14-18 years',
-            'hero_subtitle': 'Safe, legal, simple',
-            'get_started': 'Get Started',
-            
-            // Features
-            'feature1_title': '⚖️ Legal Compliance',
-            'feature1_desc': 'All jobs comply with RK legislation',
-            'feature2_title': '💼 Career Ladder',
-            'feature2_desc': 'First step to successful career',
-            'feature3_title': '🔒 Data Security',
-            'feature3_desc': 'Personal information protection',
-            
-            // Auth
-            'select_role': 'Select Role',
-            'teen': 'Teen (14-18 years)',
-            'boss': 'Employer',
-            'email_placeholder': 'Email',
-            'password_placeholder': 'Password',
-            'sign_in': 'Sign In',
-            'register': 'Register',
-            
-            // Navigation
-            'jobs': 'Jobs',
-            'profile': 'Profile',
-            'messages': 'Messages',
-            'settings': 'Settings',
-            
-            // Job
-            'salary': 'Salary',
-            'age': 'Age',
-            'city': 'City',
-            'apply': 'Apply',
-            'contact': 'WhatsApp',
-            
-            // Admin
-            'admin_panel': 'Admin Panel',
-            'users': 'Users',
-            'jobs_management': 'Jobs',
-            'statistics': 'Statistics',
-            
-            // Common
-            'loading': 'Loading...',
-            'error': 'Error',
-            'success': 'Success',
-            'cancel': 'Cancel',
-            'save': 'Save',
-            'delete': 'Delete',
-            'edit': 'Edit'
-        }
-    };
-
-    let currentLanguage = localStorage.getItem('language') || 'ru';
-
-    // Switch Language
-    window.switchLanguage = (lang) => {
-        currentLanguage = lang;
-        localStorage.setItem('language', lang);
-        
-        // Update button styles
-        document.querySelectorAll('.lang-btn').forEach(btn => {
-            if (btn.dataset.lang === lang) {
-                btn.style.background = 'rgba(124, 58, 237, 0.2)';
-            } else {
-                btn.style.background = 'rgba(255, 255, 255, 0.1)';
-            }
-        });
-        
-        // Translate page
-        translatePage();
-    };
-
-    // Translate Page
-    function translatePage() {
-        const trans = translations[currentLanguage];
-        
-        // Update elements with data-translate attribute
-        document.querySelectorAll('[data-translate]').forEach(element => {
-            const key = element.getAttribute('data-translate');
-            if (trans[key]) {
-                element.textContent = trans[key];
-            }
-        });
-        
-        // Update common elements
-        updateCommonElements(trans);
-        
-        // Update placeholders
-        updatePlaceholders(trans);
-        
-        // Update title
-        document.title = trans['logo'] || 'TeenX';
-    }
-
-    // Update Common Elements
-    function updateCommonElements(trans) {
-        // Logo
-        const logo = document.querySelector('.logo');
-        if (logo) {
-            logo.innerHTML = `Teen<span>X</span> — ${currentLanguage === 'ru' ? 'Платформа трудоустройства' : currentLanguage === 'kz' ? 'Жұмысқа орналастыру платформасы' : 'Employment Platform'}`;
-        }
-        
-        // Auth button
-        const authBtn = document.getElementById('authHeaderBtn');
-        if (authBtn) {
-            authBtn.textContent = trans['auth_btn'] || 'Sign In';
-        }
-        
-        // Navigation items
-        const navItems = {
-            'side-jobs': trans['jobs'] || 'Jobs',
-            'side-profile': trans['profile'] || 'Profile',
-            'side-messages': trans['messages'] || 'Messages',
-            'side-settings': trans['settings'] || 'Settings'
-        };
-        
-        Object.keys(navItems).forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                const textElement = element.querySelector('span');
-                if (textElement) {
-                    textElement.textContent = navItems[id];
-                }
-            }
-        });
-    }
-
-    // Update Placeholders
-    function updatePlaceholders(trans) {
-        const placeholders = {
-            'email': trans['email_placeholder'] || 'Email',
-            'pass': trans['password_placeholder'] || 'Password',
-            'jTitle': trans['job_title'] || 'Job Title',
-            'jCompanyName': trans['company_name'] || 'Company Name'
-        };
-        
-        Object.keys(placeholders).forEach(id => {
-            const element = document.getElementById(id);
-            if (element) {
-                element.placeholder = placeholders[id];
-            }
-        });
-    }
-
-    // Initialize language on page load
-    window.addEventListener('load', () => {
-        switchLanguage(currentLanguage);
-    });
-
+    
     // Review System
     let currentJobIdForReview = null;
     let selectedRating = 0;
@@ -7093,7 +6835,7 @@
             modal.className = 'modal visible';
             modal.innerHTML = `
                 <div class="modal-box" style="max-width: 600px;">
-                    <button onclick="this.closest('.modal').remove()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
+                    <button onclick="closeModals()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.1); border: none; color: white; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center;">✕</button>
                     
                     <div style="text-align: center; margin-bottom: 24px;">
                         <img src="${user.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name || 'User')}&background=7c3aed&color=fff&size=120`}" 
@@ -7130,7 +6872,7 @@
                         </a>
                     ` : ''}
                     
-                    <button class="btn btn-cancel" style="width: 100%;" onclick="this.closest('.modal').remove()">Закрыть</button>
+                    <button class="btn btn-cancel" style="width: 100%;" onclick="closeModals()">Закрыть</button>
                 </div>
             `;
             
@@ -7140,6 +6882,21 @@
             showToast('❌ Ошибка загрузки профиля', 'error');
         }
     };
+
+    // Initialize auth button click handler
+    document.addEventListener('DOMContentLoaded', () => {
+        const authBtn = document.querySelector('#authHeaderBtn button');
+        if (authBtn) {
+            authBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                console.log('Auth button clicked');
+                openAuthModal();
+            });
+            console.log('Auth button handler attached');
+        } else {
+            console.error('Auth button not found');
+        }
+    });
 
 </script>
 </body>

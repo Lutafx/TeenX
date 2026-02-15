@@ -2613,7 +2613,7 @@
                     <!-- For verified employers -->
                     <div id="verifiedBossActions">
                         <button class="btn btn-accent" style="width:100%; margin-bottom:12px;" onclick="openRegularJobModal()">➕ Создать вакансию</button>
-                        <button class="btn" style="width:100%; background:rgba(59,130,246,0.15); color:#3b82f6;" onclick="switchToMyJobs()">📋 Мои вакансии</button>
+                        <button class="btn" style="width:100%; background:rgba(59,130,246,0.15); color:#3b82f6;" onclick="renderMyJobsForEmployer()">📋 Мои вакансии</button>
                     </div>
                     
                     <div id="myJobsList" style="margin-top:20px;"></div>
@@ -3814,7 +3814,7 @@
                 document.getElementById('nav-myjobs').style.display = 'flex';
                 document.getElementById('unverifiedBossMessage').style.display = 'none';
                 document.getElementById('verifiedBossActions').style.display = 'block';
-                renderMyJobs();
+                renderMyJobsForEmployer();
             } else {
                 // UNVERIFIED employer - show verification prompt
                 document.getElementById('side-myjobs').style.display = 'none';
@@ -4120,38 +4120,7 @@
         }
     };
 
-    // BOSS FUNCTIONS
-    async function renderMyJobs() {
-        const snap = await getDocs(collection(db, "jobs"));
-        const list = document.getElementById('myJobsList');
-        list.innerHTML = '';
-        
-        let hasJobs = false;
-        snap.forEach(d => {
-            const j = d.data();
-            if (j.employerId !== currentUser.uid || j.status === 'deleted') return;
-            hasJobs = true;
-            
-            const statusBadge = j.status === 'pending' 
-                ? '<span class="badge badge-pending">На модерации</span>' 
-                : '<span class="badge badge-verified">Активна</span>';
-            
-            list.innerHTML += `
-                <div class="admin-card">
-                    <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
-                        <h4 style="font-size:16px; font-weight:600;">${j.title}</h4>
-                        ${statusBadge}
-                    </div>
-                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:8px;">${j.salaryFrom} - ${j.salaryTo} ₸ • ${j.minAge}+ лет</div>
-                    <div style="font-size:13px; color:var(--text-secondary);">${(j.responsibilities || j.companyDescription || '').substring(0, 80)}...</div>
-                </div>
-            `;
-        });
-        
-        if (!hasJobs) {
-            list.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary); font-size:14px;">У вас пока нет вакансий</div>';
-        }
-    }
+    // BOSS FUNCTIONS (renderMyJobs removed - now using renderMyJobsForEmployer)
     
     // ADMIN FUNCTIONS
     window.showAdminTab = (tab) => {
@@ -5171,18 +5140,35 @@
     };
 
     // RENDER MY JOBS FOR EMPLOYER WITH EDIT/DELETE
-    async function renderMyJobsForEmployer() {
+    window.renderMyJobsForEmployer = async function() {
+        console.log('📋 renderMyJobsForEmployer called');
+        console.log('📋 currentUser.uid:', currentUser?.uid);
+        
         const snap = await getDocs(collection(db, "jobs"));
         const list = document.getElementById('myJobsList');
+        
+        if (!list) {
+            console.error('❌ myJobsList element not found!');
+            return;
+        }
+        
         list.innerHTML = '<div style="text-align:center; padding:20px;"><div class="spinner"></div></div>';
+        
+        console.log('📋 Total jobs in DB:', snap.size);
         
         const myJobs = [];
         snap.forEach(d => {
             const j = d.data();
-            if (j.employerId === currentUser.uid && j.status !== 'deleted') {
+            console.log('🔍 Job:', d.id, '| title:', j.title, '| employerId:', j.employerId, '| contactEmail:', j.contactEmail, '| match:', j.employerId === currentUser.uid, '| status:', j.status);
+            // Match by employerId OR by contactEmail (for jobs created by admin on behalf of employer)
+            const isMyJob = j.employerId === currentUser.uid || 
+                           (currentUser.email && j.contactEmail && j.contactEmail.toLowerCase() === currentUser.email.toLowerCase());
+            if (isMyJob && j.status !== 'deleted') {
                 myJobs.push({ id: d.id, ...j });
             }
         });
+        
+        console.log('📋 My jobs found:', myJobs.length);
         
         list.innerHTML = '';
         
@@ -5284,6 +5270,10 @@
     window.updateMyJob = async () => {
         if (!window.editingJobId) return;
         
+        // Preserve employerId
+        const existingSnap = await getDoc(doc(db, 'jobs', window.editingJobId));
+        const existing = existingSnap.data();
+        
         const jobData = {
             title: document.getElementById('jTitle').value.trim(),
             companyName: document.getElementById('jCompanyName').value.trim(),
@@ -5298,6 +5288,7 @@
             contactName: document.getElementById('jContactName').value.trim(),
             phone: document.getElementById('jPhone').value.trim(),
             contactEmail: document.getElementById('jContactEmail').value.trim(),
+            employerId: existing.employerId,
             updatedAt: new Date().toISOString()
         };
         
@@ -5694,121 +5685,7 @@
         }
     };
 
-    // Switch to My Jobs for Employer
-    window.switchToMyJobs = async () => {
-        try {
-            console.log('🔍 Loading jobs for employer:', currentUser.uid);
-            const myJobsList = document.getElementById('myJobsList');
-            
-            if (!myJobsList) {
-                console.error('❌ myJobsList element not found!');
-                showToast('Ошибка: элемент списка вакансий не найден', 'error');
-                return;
-            }
-            
-            myJobsList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">⏳ Загрузка вакансий...</div>';
-            myJobsList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            
-            // Get ALL jobs and filter manually (to avoid Firestore index requirement)
-            const jobsRef = collection(db, 'jobs');
-            const allJobsSnapshot = await getDocs(jobsRef);
-            
-            console.log(`📊 Total jobs in database: ${allJobsSnapshot.size}`);
-            
-            // Filter jobs by employerId manually
-            const myJobs = [];
-            allJobsSnapshot.forEach(doc => {
-                const job = doc.data();
-                console.log('🔍 Checking job:', {
-                    id: doc.id,
-                    title: job.title,
-                    employerId: job.employerId,
-                    currentUserId: currentUser.uid,
-                    match: job.employerId === currentUser.uid
-                });
-                if (job.employerId === currentUser.uid) {
-                    myJobs.push({ id: doc.id, ...job });
-                    console.log('✅ Found my job:', job.title, 'Status:', job.status);
-                }
-            });
-            
-            console.log(`📊 Found ${myJobs.length} jobs for current employer`);
-            
-            if (myJobs.length === 0) {
-                myJobsList.innerHTML = `
-                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                        <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
-                        <h4 style="margin-bottom: 8px;">У вас пока нет вакансий</h4>
-                        <p style="font-size: 14px;">Создайте свою первую вакансию</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '<h4 style="margin-bottom: 16px; color: var(--primary-light);">📋 Мои вакансии</h4>';
-            
-            myJobs.forEach(jobData => {
-                const job = jobData;
-                const statusColors = {
-                    'pending': '#f59e0b',
-                    'active': '#10b981',
-                    'approved': '#10b981',
-                    'rejected': '#ef4444',
-                    'cancelled': '#6b7280',
-                    'deleted': '#6b7280'
-                };
-                
-                const statusTexts = {
-                    'pending': 'На проверке',
-                    'active': 'Активна',
-                    'approved': 'Одобрена',
-                    'rejected': 'Отклонена',
-                    'cancelled': 'Отменена',
-                    'deleted': 'Удалена'
-                };
-                
-                html += `
-                    <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
-                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
-                            <div>
-                                <h5 style="margin: 0; color: #fff; font-size: 16px;">${job.title}</h5>
-                                <p style="margin: 4px 0; color: var(--text-secondary); font-size: 14px;">${job.companyName}</p>
-                            </div>
-                            <span style="background: ${statusColors[job.status]}20; color: ${statusColors[job.status]}; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;">
-                                ${statusTexts[job.status]}
-                            </span>
-                        </div>
-                        
-                        <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px;">
-                            <span style="background: rgba(16,185,129,0.1); color: #10b981; padding: 4px 8px; border-radius: 6px; font-size: 12px;">
-                                💰 ${job.salaryFrom} - ${job.salaryTo} ₸
-                            </span>
-                            <span style="background: rgba(59,130,246,0.1); color: #3b82f6; padding: 4px 8px; border-radius: 6px; font-size: 12px;">
-                                👤 ${job.minAge}+ лет
-                            </span>
-                            <span style="background: rgba(139,92,246,0.1); color: #8b5cf6; padding: 4px 8px; border-radius: 6px; font-size: 12px;">
-                                📍 ${job.city}
-                            </span>
-                        </div>
-                        
-                        <div style="display: flex; gap: 8px;">
-                            <button class="btn" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 8px 16px; font-size: 12px;" onclick="editEmployerJob('${job.id}')">
-                                ✏️ Редактировать
-                            </button>
-                            <button class="btn" style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 8px 16px; font-size: 12px;" onclick="deleteEmployerJob('${job.id}')">
-                                🗑️ Удалить
-                            </button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            myJobsList.innerHTML = html;
-        } catch (error) {
-            console.error('Error loading my jobs:', error);
-            showToast('❌ Ошибка загрузки вакансий', 'error');
-        }
-    };
+    // switchToMyJobs removed - using renderMyJobsForEmployer instead
 
     // Edit Employer Job
     window.editEmployerJob = async (jobId) => {
@@ -5903,7 +5780,7 @@
             
             alert('✅ Вакансия обновлена и отправлена на повторную модерацию!');
             closeModals();
-            switchToMyJobs(); // Refresh the jobs list
+            renderMyJobsForEmployer(); // Refresh the jobs list
             
             // Reset modal
             const modalTitle = document.querySelector('#modalJob h2');
@@ -5929,7 +5806,7 @@
         try {
             await deleteDoc(doc(db, 'jobs', jobId));
             showToast('🗑️ Вакансия удалена', 'success');
-            switchToMyJobs(); // Refresh the jobs list
+            renderMyJobsForEmployer(); // Refresh the jobs list
         } catch (error) {
             console.error('Error deleting job:', error);
             showToast('❌ Ошибка удаления вакансии', 'error');

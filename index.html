@@ -2567,6 +2567,11 @@
                     <div id="historyList"></div>
                 </div>
 
+                <div id="userReviewsSection" style="display:none; margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
+                    <h3 style="color: var(--primary-light); margin-bottom:15px;">⭐ Отзывы о работе</h3>
+                    <div id="userReviewsList"></div>
+                </div>
+
                 <!-- PWA Install Section -->
                 <div id="pwaInstallSection" style="margin-top:40px; border-top:1px solid var(--border); padding-top:20px;">
                     <h3 style="color: var(--primary-light); margin-bottom:15px;">📱 Мобильное приложение</h3>
@@ -2872,27 +2877,18 @@
             </p>
         </div>
         
-        <!-- ОТЗЫВЫ -->
-        <div id="reviewsSection" style="border-top: 1px solid var(--border); padding-top: 24px; margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-                <h3 style="font-size: 20px; margin: 0;">⭐ Отзывы</h3>
-                <button class="btn" style="background: rgba(124, 58, 237, 0.15); color: #7c3aed; padding: 8px 16px; font-size: 13px;" onclick="openReviewModal()">
-                    ✍️ Оставить отзыв
-                </button>
-            </div>
-            
-            <div id="reviewsList" style="margin-top: 16px;">
-                <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                    <div style="font-size: 48px; margin-bottom: 12px; opacity: 0.3;">💬</div>
-                    <p>Пока нет отзывов</p>
-                </div>
-            </div>
-        </div>
-
         <!-- КНОПКИ -->
-        <div style="display: flex; gap: 12px;">
-            <button class="btn btn-primary" onclick="openApplicationForm()" style="flex: 1;">Откликнуться</button>
-            <button class="btn btn-ghost" onclick="contactEmployer()" style="flex: 1;">WhatsApp</button>
+        <div id="jobActionButtons" style="display: flex; gap: 12px;">
+            <button class="btn btn-primary" id="btnApply" onclick="openApplicationForm()" style="flex: 1;">Откликнуться</button>
+            <button class="btn btn-ghost" id="btnWhatsApp" onclick="contactEmployer()" style="flex: 1;">WhatsApp</button>
+        </div>
+        <div id="ownJobNotice" style="display:none; text-align:center; padding:16px; background:rgba(251,191,36,0.1); border:1px solid rgba(251,191,36,0.3); border-radius:12px; color:#fbbf24; font-size:14px;">
+            Это ваша вакансия
+        </div>
+        <div id="reviewButton" style="display:none; text-align:center; margin-top:12px;">
+            <button class="btn" style="background: rgba(124, 58, 237, 0.15); color: #7c3aed; width:100%;" onclick="openReviewModal()">
+                ✍️ Оставить отзыв о работе
+            </button>
         </div>
     </div>
 </div>
@@ -3590,6 +3586,14 @@
                 type: selectedRole,
                 verified: 'no'
             };
+            currentUser.uid = user.uid;
+            
+            // Block banned users
+            if (currentUser.banned) {
+                alert('🚫 Ваш аккаунт заблокирован. Доступ запрещён.');
+                await signOut(auth);
+                return;
+            }
             
             // Auto-update age based on birthdate
             await updateUserAge(currentUser);
@@ -3999,10 +4003,19 @@
         document.getElementById('detailRequirements').textContent = job.requirements || 'Требования не указаны';
         document.getElementById('detailMinAge').textContent = job.minAge || '14';
         
-        openModal('modalJobDetail');
+        // Hide apply/WhatsApp for own jobs
+        const isOwnJob = currentUser && currentJobData.employerId === currentUser.uid;
+        document.getElementById('jobActionButtons').style.display = isOwnJob ? 'none' : 'flex';
+        document.getElementById('ownJobNotice').style.display = isOwnJob ? 'block' : 'none';
         
-        // Load reviews after modal opens
-        await loadReviews(jobId);
+        // Check if user has applied to this job (to show review button)
+        if (currentUser && !isOwnJob) {
+            checkUserApplicationForReview();
+        } else {
+            document.getElementById('reviewButton').style.display = 'none';
+        }
+        
+        openModal('modalJobDetail');
     };
 
     // OPEN APPLICATION FORM
@@ -4614,6 +4627,107 @@
             console.error('Error loading history:', error);
         }
     }
+
+    // Check if user has applied to job (for review button)
+    async function checkUserApplicationForReview() {
+        if (!currentUser || !currentJobId) return;
+        
+        try {
+            // Check if user has applied to this job
+            const appsQuery = query(
+                collection(db, "applications"),
+                where("userId", "==", currentUser.uid),
+                where("jobId", "==", currentJobId)
+            );
+            const appsSnapshot = await getDocs(appsQuery);
+            
+            // Check if user already left a review
+            const reviewsQuery = query(
+                collection(db, "reviews"),
+                where("userId", "==", currentUser.uid),
+                where("jobId", "==", currentJobId)
+            );
+            const reviewsSnapshot = await getDocs(reviewsQuery);
+            
+            // Show review button if user applied but hasn't reviewed yet
+            const hasApplied = !appsSnapshot.empty;
+            const hasReviewed = !reviewsSnapshot.empty;
+            
+            document.getElementById('reviewButton').style.display = hasApplied && !hasReviewed ? 'block' : 'none';
+        } catch (error) {
+            console.error('Error checking application for review:', error);
+            document.getElementById('reviewButton').style.display = 'none';
+        }
+    }
+
+    // Load User Reviews
+    async function loadUserReviews() {
+        if (!currentUser) return;
+        
+        try {
+            const q = query(
+                collection(db, "reviews"),
+                where("userId", "==", currentUser.uid)
+            );
+            const snapshot = await getDocs(q);
+            
+            const reviewsList = document.getElementById('userReviewsList');
+            const reviewsSection = document.getElementById('userReviewsSection');
+            
+            if (snapshot.empty) {
+                reviewsSection.style.display = 'none';
+                return;
+            }
+            
+            reviewsSection.style.display = 'block';
+            
+            const reviews = [];
+            snapshot.forEach(doc => {
+                reviews.push({ id: doc.id, ...doc.data() });
+            });
+            
+            // Sort by date (newest first)
+            reviews.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            
+            // Calculate average rating
+            const avgRating = (reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length).toFixed(1);
+            
+            let html = `
+                <div style="background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3); padding: 16px; border-radius: 12px; margin-bottom: 20px; text-align: center;">
+                    <div style="font-size: 32px; margin-bottom: 8px;">${'⭐'.repeat(Math.round(avgRating))}</div>
+                    <div style="font-size: 24px; font-weight: 700; color: #fbbf24; margin-bottom: 4px;">${avgRating}</div>
+                    <div style="font-size: 13px; color: var(--text-secondary);">На основе ${reviews.length} ${reviews.length === 1 ? 'отзыва' : 'отзывов'}</div>
+                </div>
+            `;
+            
+            reviews.forEach(review => {
+                const date = new Date(review.createdAt);
+                const timeAgo = getTimeAgo(date);
+                
+                html += `
+                    <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 12px;">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 12px;">
+                            <div>
+                                <div style="font-weight: 600; margin-bottom: 4px;">${review.jobTitle || 'Вакансия'}</div>
+                                <div style="font-size: 12px; color: var(--text-secondary);">${timeAgo}</div>
+                            </div>
+                            <div style="color: #fbbf24; font-size: 18px;">
+                                ${'⭐'.repeat(review.rating)}
+                            </div>
+                        </div>
+                        <p style="color: var(--text-secondary); line-height: 1.6; margin: 0;">${review.text}</p>
+                        ${review.userName && review.userName !== currentUser.name ? 
+                            `<div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px; font-style: italic;">От: ${review.userName}</div>` : ''
+                        }
+                    </div>
+                `;
+            });
+            
+            reviewsList.innerHTML = html;
+        } catch (error) {
+            console.error('Error loading user reviews:', error);
+        }
+    }
     
     // Render Application History
     function renderApplicationHistory() {
@@ -5013,6 +5127,8 @@
             renderMyJobsForEmployer();
         } else if (tab === 'profile') {
             updateProfileProgress();
+            await loadApplicationHistory();
+            await loadUserReviews();
         } else if (tab === 'admin') {
             await updateAdminStats();
             switchAdminPanel('users');
@@ -5330,6 +5446,9 @@
                         `<button class="admin-btn-small admin-btn-verify" onclick="event.stopPropagation(); verifyUser('${user.id}')">✅ Верифицировать</button>
                          <button class="admin-btn-small" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;" onclick="event.stopPropagation(); rejectVerification('${user.id}')">❌ Отклонить</button>` : ''
                     }
+                    ${user.verified === 'yes' ? 
+                        `<button class="admin-btn-small" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;" onclick="event.stopPropagation(); removeVerification('${user.id}')">❌ Снять верификацию</button>` : ''
+                    }
                 </div>
             `;
             
@@ -5441,18 +5560,39 @@
         }
     };
 
-    // Ban User
+    // Ban User — block access + delete jobs
     window.banUser = async (userId) => {
-        if (!confirm('Вы уверены, что хотите забанить этого пользователя?')) return;
+        if (!confirm('Вы уверены, что хотите забанить этого пользователя?\n\nВсе его вакансии будут удалены, а аккаунт заблокирован.')) return;
         
         try {
+            // Delete all user's jobs
+            const jobsRef = collection(db, 'jobs');
+            const userJobsQuery = query(jobsRef, where('employerId', '==', userId));
+            const userJobsSnapshot = await getDocs(userJobsQuery);
+            const deleteJobsPromises = userJobsSnapshot.docs.map(jobDoc => 
+                deleteDoc(doc(db, 'jobs', jobDoc.id))
+            );
+            await Promise.all(deleteJobsPromises);
+            
+            // Delete all user's applications
+            const appsRef = collection(db, 'applications');
+            const userAppsQuery = query(appsRef, where('userId', '==', userId));
+            const userAppsSnapshot = await getDocs(userAppsQuery);
+            const deleteAppsPromises = userAppsSnapshot.docs.map(appDoc => 
+                deleteDoc(doc(db, 'applications', appDoc.id))
+            );
+            await Promise.all(deleteAppsPromises);
+            
+            // Mark user as banned (keeps record for blocking login)
             await updateDoc(doc(db, 'users', userId), { 
                 banned: true,
                 bannedAt: new Date().toISOString(),
-                bannedBy: currentUser.uid
+                bannedBy: currentUser.uid,
+                verified: 'no',
+                docUrl: ''
             });
             
-            showToast('🚫 Пользователь забанен', 'success');
+            showToast('🚫 Пользователь забанен, все вакансии удалены', 'success');
             renderAdminUsers();
             updateAdminStats();
         } catch (error) {

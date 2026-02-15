@@ -2160,7 +2160,7 @@
             </div>
             
             <div class="filters-bar">
-                <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Поиск по названию..." oninput="filterJobs()">
+                <input type="text" class="filter-input" id="searchInput" placeholder="🔍 Поиск по названию..." oninput="filterJobs()" autocomplete="off">
                 <button class="filter-btn active" onclick="filterByAge('all')">Все</button>
                 <button class="filter-btn" onclick="filterByAge('14')">14+</button>
                 <button class="filter-btn" onclick="filterByAge('16')">16+</button>
@@ -2502,9 +2502,9 @@
             <div class="modal-box" style="max-width: 500px;">
                 <h2 style="margin-bottom: 24px;">🚫 Добавить в черный список</h2>
                 
-                <input id="blacklistEmail" type="email" placeholder="Email пользователя" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;">
+                <input id="blacklistEmail" type="email" placeholder="Email пользователя" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;" autocomplete="email">
                 
-                <textarea id="blacklistReason" placeholder="Причина блокировки (необязательно)" rows="3" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 20px; resize: vertical;"></textarea>
+                <textarea id="blacklistReason" placeholder="Причина блокировки (необязательно)" rows="3" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 20px; resize: vertical;" autocomplete="off"></textarea>
                 
                 <div style="display: flex; gap: 12px;">
                     <button class="btn btn-primary" style="flex: 1; background: rgba(239, 68, 68, 0.2); color: #ef4444;" onclick="addToBlacklist()">🚫 Добавить в ЧС</button>
@@ -2721,8 +2721,8 @@
         </button>
         <div style="text-align:center; color:var(--text-secondary); margin-bottom:20px; font-size:12px;">ИЛИ ЧЕРЕЗ EMAIL</div>
         
-        <input id="email" placeholder="Email">
-        <input id="pass" type="password" placeholder="Пароль">
+        <input id="email" placeholder="Email" autocomplete="email">
+        <input id="pass" type="password" placeholder="Пароль" autocomplete="current-password">
         
         <div class="checkbox-wrapper">
             <input type="checkbox" id="acceptTerms">
@@ -2743,15 +2743,15 @@
         </p>
         
         <h3 style="font-size: 18px; margin-bottom: 16px; color: #60a5fa;">Основная информация</h3>
-        <input id="jTitle" placeholder="Название вакансии (например: Промоутер)" required>
-        <input id="jCompanyName" placeholder="Название компании" required>
-        <textarea id="jCompanyDescription" placeholder="О компании (чем занимаетесь...)" rows="3" required></textarea>
-        <input id="jCity" placeholder="Город" value="Уральск" required>
+        <input id="jTitle" placeholder="Название вакансии (например: Промоутер)" autocomplete="organization-title" required>
+        <input id="jCompanyName" placeholder="Название компании" autocomplete="organization" required>
+        <textarea id="jCompanyDescription" placeholder="О компании (чем занимаетесь...)" rows="3" autocomplete="organization" required></textarea>
+        <input id="jCity" placeholder="Город" value="Уральск" autocomplete="address-level2" required>
         
         <h3 style="font-size: 18px; margin-bottom: 16px; margin-top: 24px; color: #10b981;">Условия оплаты</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-            <input id="jSalaryFrom" type="number" placeholder="Зарплата от (₸)" required>
-            <input id="jSalaryTo" type="number" placeholder="Зарплата до (₸)" required>
+            <input id="jSalaryFrom" type="number" placeholder="Зарплата от (₸)" autocomplete="off" required>
+            <input id="jSalaryTo" type="number" placeholder="Зарплата до (₸)" autocomplete="off" required>
         </div>
         <select id="jPaymentType" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px;">
             <option value="на руки">на руки</option>
@@ -2799,9 +2799,9 @@
         <textarea id="jBenefits" placeholder="Что мы предлагаем..." rows="3"></textarea>
         
         <h3 style="font-size: 18px; margin-bottom: 16px; margin-top: 24px; color: #ec4899;">Контакты</h3>
-        <input id="jContactName" placeholder="Контактное лицо" required>
-        <input id="jPhone" placeholder="WhatsApp (например: 77001234567)" required>
-        <input id="jContactEmail" type="email" placeholder="Email (необязательно)">
+        <input id="jContactName" placeholder="Контактное лицо" autocomplete="name" required>
+        <input id="jPhone" placeholder="WhatsApp (например: 77001234567)" autocomplete="tel" required>
+        <input id="jContactEmail" type="email" placeholder="Email (необязательно)" autocomplete="email">
         
         <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 16px; border-radius: 8px; margin: 24px 0;">
             <h4 style="color: #60a5fa; margin-bottom: 8px;">Модерация вакансий</h4>
@@ -2909,9 +2909,9 @@
             </div>
         </div>
         
-        <textarea id="reviewText" placeholder="Расскажите о вашем опыте работы..." rows="5" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px; resize: vertical;"></textarea>
+        <textarea id="reviewText" placeholder="Расскажите о вашем опыте работы..." rows="5" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 12px; resize: vertical;" autocomplete="off"></textarea>
         
-        <input id="reviewName" type="text" placeholder="Ваше имя (необязательно)" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 20px;">
+        <input id="reviewName" type="text" placeholder="Ваше имя (необязательно)" style="width: 100%; background: #161616; border: 1px solid var(--border); padding: 16px; border-radius: 12px; color: #fff; margin-bottom: 20px;" autocomplete="name">
         
         <div style="display: flex; gap: 12px;">
             <button class="btn btn-primary" style="flex: 1;" onclick="submitReview()">Отправить отзыв</button>
@@ -2936,17 +2936,17 @@
         </div>
         
         <div id="applicationForm">
-            <input id="appName" type="text" placeholder="Ваше имя *" required>
-            <input id="appAge" type="number" min="14" max="18" placeholder="Ваш возраст *" required>
+            <input id="appName" type="text" placeholder="Ваше имя *" autocomplete="name" required>
+            <input id="appAge" type="number" min="14" max="18" placeholder="Ваш возраст *" autocomplete="off" required>
             <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
                 Минимальный возраст для этой вакансии: <span id="appMinAge"></span> лет
             </p>
-            <input id="appPhone" type="tel" placeholder="Номер телефона * (например: +7 777 123 45 67)" required>
+            <input id="appPhone" type="tel" placeholder="Номер телефона * (например: +7 777 123 45 67)" autocomplete="tel" required>
             <p style="font-size: 12px; color: #94a3b8; margin-bottom: 12px;">
                 Работодатель свяжется с вами по этому номеру
             </p>
-            <input id="appEmail" type="email" placeholder="Email (необязательно)">
-            <textarea id="appMessage" rows="4" placeholder="Сопроводительное письмо (необязательно)"></textarea>
+            <input id="appEmail" type="email" placeholder="Email (необязательно)" autocomplete="email">
+            <textarea id="appMessage" rows="4" placeholder="Сопроводительное письмо (необязательно)" autocomplete="off"></textarea>
             
             <div style="display: flex; gap: 12px; margin-top: 24px;">
                 <button class="btn btn-primary" onclick="submitApplication()" style="flex: 1;">Отправить отклик</button>
@@ -5697,15 +5697,37 @@
     // Switch to My Jobs for Employer
     window.switchToMyJobs = async () => {
         try {
+            console.log('🔍 Loading jobs for employer:', currentUser.uid);
             const myJobsList = document.getElementById('myJobsList');
+            
+            if (!myJobsList) {
+                console.error('❌ myJobsList element not found!');
+                showToast('Ошибка: элемент списка вакансий не найден', 'error');
+                return;
+            }
+            
             myJobsList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">⏳ Загрузка вакансий...</div>';
             myJobsList.scrollIntoView({ behavior: 'smooth', block: 'start' });
             
+            // Get ALL jobs and filter manually (to avoid Firestore index requirement)
             const jobsRef = collection(db, 'jobs');
-            const q = query(jobsRef, where('employerId', '==', currentUser.uid));
-            const querySnapshot = await getDocs(q);
+            const allJobsSnapshot = await getDocs(jobsRef);
             
-            if (querySnapshot.empty) {
+            console.log(`📊 Total jobs in database: ${allJobsSnapshot.size}`);
+            
+            // Filter jobs by employerId manually
+            const myJobs = [];
+            allJobsSnapshot.forEach(doc => {
+                const job = doc.data();
+                if (job.employerId === currentUser.uid) {
+                    myJobs.push({ id: doc.id, ...job });
+                    console.log('✅ Found my job:', job.title, 'Status:', job.status);
+                }
+            });
+            
+            console.log(`📊 Found ${myJobs.length} jobs for current employer`);
+            
+            if (myJobs.length === 0) {
                 myJobsList.innerHTML = `
                     <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
                         <div style="font-size: 48px; margin-bottom: 16px;">📋</div>
@@ -5718,8 +5740,8 @@
             
             let html = '<h4 style="margin-bottom: 16px; color: var(--primary-light);">📋 Мои вакансии</h4>';
             
-            querySnapshot.forEach(doc => {
-                const job = doc.data();
+            myJobs.forEach(jobData => {
+                const job = jobData;
                 const statusColors = {
                     'pending': '#f59e0b',
                     'active': '#10b981',
@@ -5763,10 +5785,10 @@
                         </div>
                         
                         <div style="display: flex; gap: 8px;">
-                            <button class="btn" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 8px 16px; font-size: 12px;" onclick="editEmployerJob('${doc.id}')">
+                            <button class="btn" style="background: rgba(59,130,246,0.15); color: #3b82f6; padding: 8px 16px; font-size: 12px;" onclick="editEmployerJob('${job.id}')">
                                 ✏️ Редактировать
                             </button>
-                            <button class="btn" style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 8px 16px; font-size: 12px;" onclick="deleteEmployerJob('${doc.id}')">
+                            <button class="btn" style="background: rgba(239,68,68,0.15); color: #ef4444; padding: 8px 16px; font-size: 12px;" onclick="deleteEmployerJob('${job.id}')">
                                 🗑️ Удалить
                             </button>
                         </div>

@@ -4966,28 +4966,23 @@
                 statusEl.innerHTML = '<div style="color:#fbbf24;">⏳ Загрузка документа...</div>';
                 
                 try {
-                    // Upload to Cloudinary instead of Firebase Storage
-                    const formData = new FormData();
-                    formData.append('file', uploadedFile);
-                    formData.append('upload_preset', 'verification_docs');
-                    
-                    const response = await fetch(
-                        `https://api.cloudinary.com/v1_1/dt1oalyv/image/upload`,
-                        {
-                            method: 'POST',
-                            body: formData
-                        }
-                    );
-                    
-                    const data = await response.json();
-                    if (data.secure_url) {
-                        docUrl = data.secure_url;
-                        console.log('✅ Документ загружен в Cloudinary:', docUrl);
-                    } else {
-                        throw new Error('Cloudinary upload failed');
+                    // Convert file to Base64 and store directly in Firestore
+                    const fileSize = uploadedFile.size;
+                    if (fileSize > 500000) { // 500KB limit for safety
+                        throw new Error('Файл слишком большой. Максимальный размер: 500KB');
                     }
+                    
+                    const base64String = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(uploadedFile);
+                    });
+                    
+                    docUrl = base64String;
+                    console.log('✅ Файл преобразован в Base64, размер:', fileSize, 'bytes');
                 } catch (uploadErr) {
-                    console.error('❌ Ошибка загрузки в Cloudinary:', uploadErr);
+                    console.error('❌ Ошибка обработки файла:', uploadErr);
                     statusEl.innerHTML = '<div style="color:#ef4444;">❌ Ошибка загрузки документа. Попробуйте ещё раз.</div>';
                     return;
                 }
@@ -5959,13 +5954,19 @@
                     ${user.companyName ? `<p><strong>Компания:</strong> ${user.companyName}</p>` : ''}
                 </div>
                 
-                ${user.verificationDoc ? `
+                ${user.docUrl && user.docUrl !== 'Не загружен' ? `
                     <div style="background:rgba(255,255,255,0.03); padding:20px; border-radius:12px;">
                         <h4 style="margin:0 0 12px 0;">📄 Документ верификации ${user.type === 'boss' ? '(подтверждающий БИН)' : ''}</h4>
                         <div style="text-align:center;">
-                            ${user.verificationDoc.endsWith('.pdf') ? 
-                                `<a href="${user.verificationDoc}" target="_blank" class="btn btn-primary" style="display:inline-block; margin:10px;">📄 Открыть PDF</a>` :
-                                `<img src="${user.verificationDoc}" style="max-width:100%; border-radius:8px; margin-top:12px;" alt="Документ верификации">`
+                            ${user.docUrl.startsWith('data:') ? 
+                                // Base64 image
+                                `<img src="${user.docUrl}" style="max-width:100%; border-radius:8px; margin-top:12px;" alt="Документ верификации">
+                                 <br>
+                                 <a href="${user.docUrl}" download="${user.documentName || 'document'}" class="btn btn-primary" style="display:inline-block; margin:10px;">💾 Скачать</a>` :
+                                // Regular URL
+                                user.docUrl.endsWith('.pdf') ? 
+                                `<a href="${user.docUrl}" target="_blank" class="btn btn-primary" style="display:inline-block; margin:10px;">📄 Открыть PDF</a>` :
+                                `<img src="${user.docUrl}" style="max-width:100%; border-radius:8px; margin-top:12px;" alt="Документ верификации">`
                             }
                         </div>
                         ${user.type === 'boss' ? `

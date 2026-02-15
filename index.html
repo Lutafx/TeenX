@@ -4483,25 +4483,28 @@
         renderApp();
     };
     
-    // Avatar Upload
+    // Avatar Upload (Base64)
     window.uploadAvatar = async () => {
         const file = document.getElementById('avatarInput').files[0];
         if (!file) return;
         
-        if (file.size > 5 * 1024 * 1024) {
-            showToast('Файл слишком большой. Максимум 5MB', 'error');
+        if (file.size > 500000) {
+            showToast('Файл слишком большой. Максимум 500KB', 'error');
             return;
         }
         
         showToast('Загрузка фото...', 'info');
         
         try {
-            const storageRef = ref(storage, `avatars/${currentUser.uid}/${Date.now()}_${file.name}`);
-            await uploadBytes(storageRef, file);
-            const url = await getDownloadURL(storageRef);
+            const base64 = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
             
             await updateDoc(doc(db, "users", currentUser.uid), {
-                avatar: url
+                avatar: base64
             });
             
             showToast('Фото профиля обновлено', 'success');
@@ -5694,11 +5697,13 @@
     // Switch to My Jobs for Employer
     window.switchToMyJobs = async () => {
         try {
+            const myJobsList = document.getElementById('myJobsList');
+            myJobsList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--text-secondary);">⏳ Загрузка вакансий...</div>';
+            myJobsList.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            
             const jobsRef = collection(db, 'jobs');
             const q = query(jobsRef, where('employerId', '==', currentUser.uid));
             const querySnapshot = await getDocs(q);
-            
-            const myJobsList = document.getElementById('myJobsList');
             
             if (querySnapshot.empty) {
                 myJobsList.innerHTML = `
@@ -5717,16 +5722,20 @@
                 const job = doc.data();
                 const statusColors = {
                     'pending': '#f59e0b',
+                    'active': '#10b981',
                     'approved': '#10b981',
                     'rejected': '#ef4444',
-                    'cancelled': '#6b7280'
+                    'cancelled': '#6b7280',
+                    'deleted': '#6b7280'
                 };
                 
                 const statusTexts = {
                     'pending': 'На проверке',
+                    'active': 'Активна',
                     'approved': 'Одобрена',
                     'rejected': 'Отклонена',
-                    'cancelled': 'Отменена'
+                    'cancelled': 'Отменена',
+                    'deleted': 'Удалена'
                 };
                 
                 html += `

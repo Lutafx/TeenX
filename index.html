@@ -4966,15 +4966,28 @@
                 statusEl.innerHTML = '<div style="color:#fbbf24;">⏳ Загрузка документа...</div>';
                 
                 try {
-                    const fileExt = uploadedFile.name.split('.').pop();
-                    const fileName = `verification_docs/${currentUser.uid}_${Date.now()}.${fileExt}`;
-                    const storageRef = ref(storage, fileName);
+                    // Upload to Cloudinary instead of Firebase Storage
+                    const formData = new FormData();
+                    formData.append('file', uploadedFile);
+                    formData.append('upload_preset', 'verification_docs');
                     
-                    await uploadBytes(storageRef, uploadedFile);
-                    docUrl = await getDownloadURL(storageRef);
-                    console.log('✅ Документ загружен в Firebase Storage:', docUrl);
+                    const response = await fetch(
+                        `https://api.cloudinary.com/v1_1/dt1oalyv/image/upload`,
+                        {
+                            method: 'POST',
+                            body: formData
+                        }
+                    );
+                    
+                    const data = await response.json();
+                    if (data.secure_url) {
+                        docUrl = data.secure_url;
+                        console.log('✅ Документ загружен в Cloudinary:', docUrl);
+                    } else {
+                        throw new Error('Cloudinary upload failed');
+                    }
                 } catch (uploadErr) {
-                    console.error('❌ Ошибка загрузки в Firebase Storage:', uploadErr);
+                    console.error('❌ Ошибка загрузки в Cloudinary:', uploadErr);
                     statusEl.innerHTML = '<div style="color:#ef4444;">❌ Ошибка загрузки документа. Попробуйте ещё раз.</div>';
                     return;
                 }

@@ -4142,8 +4142,8 @@
                         <h4 style="font-size:16px; font-weight:600;">${j.title}</h4>
                         ${statusBadge}
                     </div>
-                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:8px;">${j.price} • ${j.age}</div>
-                    <div style="font-size:13px; color:var(--text-secondary);">${j.desc.substring(0, 80)}...</div>
+                    <div style="font-size:13px; color:var(--text-secondary); margin-bottom:8px;">${j.salaryFrom} - ${j.salaryTo} ₸ • ${j.minAge}+ лет</div>
+                    <div style="font-size:13px; color:var(--text-secondary);">${(j.responsibilities || j.companyDescription || '').substring(0, 80)}...</div>
                 </div>
             `;
         });
@@ -5719,6 +5719,13 @@
             const myJobs = [];
             allJobsSnapshot.forEach(doc => {
                 const job = doc.data();
+                console.log('🔍 Checking job:', {
+                    id: doc.id,
+                    title: job.title,
+                    employerId: job.employerId,
+                    currentUserId: currentUser.uid,
+                    match: job.employerId === currentUser.uid
+                });
                 if (job.employerId === currentUser.uid) {
                     myJobs.push({ id: doc.id, ...job });
                     console.log('✅ Found my job:', job.title, 'Status:', job.status);
@@ -5857,6 +5864,10 @@
     // Update Employer Job
     window.updateEmployerJob = async () => {
         try {
+            // Get existing job to preserve employerId
+            const existingJobSnap = await getDoc(doc(db, 'jobs', currentEditingJobId));
+            const existingJob = existingJobSnap.data();
+            
             const jobData = {
                 title: document.getElementById('jTitle').value.trim(),
                 companyName: document.getElementById('jCompanyName').value.trim(),
@@ -5878,6 +5889,7 @@
                 contactName: document.getElementById('jContactName').value.trim(),
                 phone: document.getElementById('jPhone').value.trim(),
                 contactEmail: document.getElementById('jContactEmail').value.trim(),
+                employerId: existingJob.employerId, // PRESERVE employerId
                 status: 'pending', // Reset to pending after edit
                 updatedAt: new Date().toISOString()
             };
@@ -6322,6 +6334,10 @@
         if (!currentEditingJobId) return;
         
         try {
+            // Get existing job to preserve employerId
+            const existingJobSnap = await getDoc(doc(db, 'jobs', currentEditingJobId));
+            const existingJob = existingJobSnap.data();
+            
             const jobData = {
                 title: document.getElementById('jTitle').value.trim(),
                 companyName: document.getElementById('jCompanyName').value.trim(),
@@ -6343,6 +6359,7 @@
                 contactName: document.getElementById('jContactName').value.trim(),
                 phone: document.getElementById('jPhone').value.trim(),
                 contactEmail: document.getElementById('jContactEmail').value.trim(),
+                employerId: existingJob.employerId, // PRESERVE employerId
                 updatedAt: new Date().toISOString()
             };
             

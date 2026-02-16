@@ -1,54 +1,65 @@
-import telebot
-import firebase_admin
-from firebase_admin import credentials, firestore, storage
-from telebot import types
-import time
-import threading
-from datetime import datetime
 import os
-import sys
+import json
+import asyncio
+from flask import Flask, Response
+import threading
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
+import firebase_admin
+from firebase_admin import credentials, firestore
+import time
+from datetime import datetime
 import logging
 from dotenv import load_dotenv
 
-# Отключаем все логи (кроме критических ошибок)
-logging.basicConfig(level=logging.CRITICAL)
-logging.getLogger('firebase_admin').setLevel(logging.CRITICAL)
-logging.getLogger('google').setLevel(logging.CRITICAL)
-logging.getLogger('urllib3').setLevel(logging.CRITICAL)
-logging.getLogger('requests').setLevel(logging.CRITICAL)
+# Flask для Render
+flask_app = Flask(__name__)
 
-# Исправление кодировки для Windows
-if sys.platform == 'win32':
-    sys.stdout.reconfigure(encoding='utf-8')
+@flask_app.route('/')
+def home():
+    return Response("TeenX Bot is running! ", mimetype='text/plain')
+
+@flask_app.route('/health')
+def health():
+    return Response("OK", mimetype='text/plain')
+
+# Настройка логов
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    level=logging.INFO
+)
+logger = logging.getLogger(__name__)
 
 # Загрузка переменных окружения
 load_dotenv()
 
 # --- КОНФИГУРАЦИЯ ---
-TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', 'your_bot_token_here')
+TOKEN = os.getenv('TELEGRAM_TOKEN')
 ADMIN_ID = int(os.getenv('TELEGRAM_ADMIN_ID', '0'))
+
+if not TOKEN:
+    raise ValueError("❌ TELEGRAM_TOKEN не найден! Создай файл .env или установи переменную окружения")
 
 # Инициализация Firebase
 try:
-    # Загружаем credentials из файла (НЕ загружай этот файл в GitHub!)
-    cred = credentials.Certificate('serviceAccountKey.json')
+    # Для Render используем переменные окружения
+    firebase_creds = os.getenv('FIREBASE_CREDENTIALS')
+    if firebase_creds:
+        cred_dict = json.loads(firebase_creds)
+        cred = credentials.Certificate(cred_dict)
+    else:
+        # Для локальной разработки используем файл
+        cred = credentials.Certificate('serviceAccountKey.json')
+    
     firebase_admin.initialize_app(cred, {
         'storageBucket': 'teenx-hub.firebasestorage.app'
     })
     db = firestore.client()
-    
-    # Отключаем логи Firebase
-    import logging
-    logging.getLogger('firebase_admin').setLevel(logging.CRITICAL)
-    logging.getLogger('google').setLevel(logging.CRITICAL)
-    
     print("✅ Firebase подключен успешно")
 except Exception as e:
     print(f"❌ Ошибка Firebase: {e}")
-    db = None
     print("Бот будет работать в ограниченном режиме")
-
-bot = telebot.TeleBot(TOKEN)
+    db = None
 
 # Хранилище подписчиков (загружаются из Firebase)
 subscribers = set()
@@ -1414,12 +1425,18 @@ if __name__ == "__main__":
     print(f"🔗 Привязка: /link")
     print(f"🌍 Язык: /lang")
     
-    # Запускаем бота с авто-переподключением
-    print("⏳ Ожидаю сообщения...\n")
-    while True:
-        try:
-            bot.infinity_polling(timeout=60, long_polling_timeout=30)
-        except Exception as e:
-            print(f"❌ Ошибка polling: {e}")
-            print("🔄 Переподключение через 5 секунд...")
-            time.sleep(5)
+    # Запускаем бота в отдельном потоке
+    def run_bot():
+        while True:
+            try:
+                bot.infinity_polling(timeout=60, long_polling_timeout=30)
+            except Exception as e:
+                print(f"❌ Ошибка: {e}")
+                time.sleep(5)
+    
+    bot_thread = threading.Thread(target=run_bot, daemon=True)
+    bot_thread.start()
+    
+    # Flask для Render
+    port = int(os.environ.get('PORT', 10000))
+    flask_app.run(host='0.0.0.0', port=port)

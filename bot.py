@@ -1,16 +1,16 @@
-import os
-import json
-import asyncio
-from flask import Flask, Response
-import threading
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, ContextTypes, filters
+import telebot
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, storage
+from telebot import types
 import time
+import threading
 from datetime import datetime
+import os
+import sys
 import logging
 from dotenv import load_dotenv
+from flask import Flask, Response
+import json
 
 # Flask для Render
 flask_app = Flask(__name__)
@@ -23,12 +23,16 @@ def home():
 def health():
     return Response("OK", mimetype='text/plain')
 
-# Настройка логов
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-logger = logging.getLogger(__name__)
+# Отключаем все логи (кроме критических ошибок)
+logging.basicConfig(level=logging.CRITICAL)
+logging.getLogger('firebase_admin').setLevel(logging.CRITICAL)
+logging.getLogger('google').setLevel(logging.CRITICAL)
+logging.getLogger('urllib3').setLevel(logging.CRITICAL)
+logging.getLogger('requests').setLevel(logging.CRITICAL)
+
+# Исправление кодировки для Windows
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
 
 # Загрузка переменных окружения
 load_dotenv()
@@ -60,6 +64,8 @@ except Exception as e:
     print(f"❌ Ошибка Firebase: {e}")
     print("Бот будет работать в ограниченном режиме")
     db = None
+
+bot = telebot.TeleBot(TOKEN)
 
 # Хранилище подписчиков (загружаются из Firebase)
 subscribers = set()

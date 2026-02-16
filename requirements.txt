@@ -3,5 +3,3 @@ firebase-admin==6.2.0
 python-dotenv==1.0.0
 flask==3.0.0
 
-# Force clean build
---no-cache-dir
